@@ -13,9 +13,15 @@ class FirstFragmentViewModel : ViewModel() {
     // TODO: Implement the ViewModel
 
     fun initStuffs() {
-
         viewModelScope.launch(Dispatchers.IO) {
             ConfigurationRepository.updateConfigList()
+            // ConfigurationRepository.activateConfig("config--road-name--description.json")
+        }
+    }
+
+    fun activateConfig(configName: String, filePath: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            ConfigurationRepository.activateConfig(configName, filePath)
             // ConfigurationRepository.activateConfig("config--road-name--description.json")
         }
     }

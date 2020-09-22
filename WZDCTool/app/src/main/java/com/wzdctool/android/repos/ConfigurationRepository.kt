@@ -18,7 +18,6 @@ object ConfigurationRepository {
     val activeConfigSubject = MutableLiveData<ConfigurationObj>()
 
     private val storageContainer = "publishedconfigfiles"
-    private val storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=neaeraiotstorage;AccountKey=gSFq2szM88ag0BV/J7QqzoXdak1aIGsUgyWagsR/96mlVnQhdOTnns6D7z8nOgRUdQy3FdbMxEmufrCqmE6mdw==;EndpointSuffix=core.windows.net"
 
 
 //    val configList: Observable<List<String>>
@@ -38,11 +37,11 @@ object ConfigurationRepository {
 
     // fun refreshWorkZoneList(): Observable<LiveResource<List<String>>> = Observable.just
 
-    fun activateConfig(configName: String): Boolean {
+    fun activateConfig(configName: String, filePath: String): Boolean {
         // TODO: Catch exception and return false
         // if (configName !in configListSubject.value!!) return false
 
-        val filePath = downloadConfigFile(configName) ?: return false
+        val filePath = downloadConfigFile(configName, filePath) ?: return false
         val fileContents: String = File(filePath).readText(Charsets.UTF_8)
         val config: ConfigurationObj = Gson().fromJson(
             fileContents,
@@ -132,8 +131,8 @@ object ConfigurationRepository {
         // println("Getting Configuration File List")
     }
 
-    private fun downloadConfigFile(configName: String): String? {
-        try {
+    private fun downloadConfigFile(configName: String, fileDir: String): String? {
+        // try {
             // Retrieve storage account from connection-string.
             val storageAccount: CloudStorageAccount =
                 CloudStorageAccount.parse(storageConnectionString)
@@ -151,10 +150,10 @@ object ConfigurationRepository {
             val source = File(filePath)
             blob.download(FileOutputStream(source))
             return filePath
-        } catch (e: Exception) {
-            // Output the stack trace.
-            e.printStackTrace()
-            return null
-        }
+//         } catch (e: Exception) {
+//            // Output the stack trace.
+//            e.printStackTrace()
+//            return null
+//        }
     }
 }

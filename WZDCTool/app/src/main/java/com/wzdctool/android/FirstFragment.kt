@@ -74,7 +74,8 @@ class FirstFragment : Fragment() {
                 return@setOnClickListener
             }
             val configName: String = spinner.selectedItem.toString()
-            ConfigurationRepository.activateConfig(configName)
+            viewModel.activateConfig(configName, activity?.filesDir.toString())
+            //ConfigurationRepository.activateConfig(configName)
         }
     }
 
