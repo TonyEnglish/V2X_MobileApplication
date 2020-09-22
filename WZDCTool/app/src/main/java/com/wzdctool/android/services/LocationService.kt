@@ -22,6 +22,10 @@ import androidx.lifecycle.MutableLiveData
 import com.wzdctool.android.Constants
 import com.wzdctool.android.MainActivity
 import com.wzdctool.android.dataclasses.CSVObj
+import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.csvDataSubject
+import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
+import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import java.util.*
 
 
@@ -45,13 +49,18 @@ class LocationService : Service() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
             for (location in locationResult.locations){
-                // currentLocation.value = location
+
+                locationSubject.value = location
                 Log.v("LocationService", "Lat: ${location.latitude}, " +
                         "Lon: ${location.longitude}, " + "elevation: ${location.altitude}, " +
                         "accuracy: ${location.accuracy}")
-                val csvObj = CSVObj(Date(location.time), 0, location.accuracy,
-                    location.latitude, location.longitude, location.altitude, location.speed,
-                    location.bearing, "", "", false)
+
+                if (dataLoggingSubject.value != true) {
+                    val csvObj = CSVObj(Date(location.time), 0, location.accuracy,
+                        location.latitude, location.longitude, location.altitude, location.speed,
+                        location.bearing, "", "", false)
+                    csvDataSubject.value = csvObj
+                }
                 //val time: Date, val num_sats: Int, val hdop: Double, val latitude: Double,
                 // val longitude: Double, val altitude: Double, val speed: Double,
                 // val heading: Double, val marker: String, val marker_value: String

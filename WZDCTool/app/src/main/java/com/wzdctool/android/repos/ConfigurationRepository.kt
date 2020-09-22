@@ -8,6 +8,7 @@ import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
+import com.wzdctool.android.SecureKeys
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import java.io.File
 import java.io.FileOutputStream
@@ -96,7 +97,7 @@ object ConfigurationRepository {
         // Retrieve storage account from connection-string.
         println("Getting Connection String")
         val storageAccount: CloudStorageAccount =
-            CloudStorageAccount.parse(storageConnectionString)
+            CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
 
         println("Creating Cloud Client")
         // Create the blob client.
@@ -135,7 +136,7 @@ object ConfigurationRepository {
         // try {
             // Retrieve storage account from connection-string.
             val storageAccount: CloudStorageAccount =
-                CloudStorageAccount.parse(storageConnectionString)
+                CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
 
             // Create the blob client.
             val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
