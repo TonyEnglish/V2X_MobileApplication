@@ -6,12 +6,21 @@ import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.DataCollectionObj
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.SecondFragmentUIObj
+import rx.Observable
+import rx.subjects.BehaviorSubject
+import rx.subjects.PublishSubject
+import rx.subjects.Subject
+
 
 object DataClassesRepository {
-    val csvDataSubject = MutableLiveData<CSVObj>()
     val dataCollectionSubject = MutableLiveData<DataCollectionObj>()
     val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
-    val markerSubject = MutableLiveData<MarkerObj>()
-    val locationSubject = MutableLiveData<Location>()
-    val dataLoggingSubject = MutableLiveData<Boolean>(false)
+    // val markerSubject = ObservableField<MarkerObj>()
+    val locationSubject = BehaviorSubject.create<Location>()
+    val dataLoggingSubject = BehaviorSubject.create<Boolean>(false)
+
+    val notificationSubject = BehaviorSubject.create<String>()
+    // val dataLoggingSubject = PublishSubject.createDefault<Boolean>() // MutableLiveData<Boolean>(false)
+
+    val gotRPSubject = MutableLiveData<Boolean> (false)
 }

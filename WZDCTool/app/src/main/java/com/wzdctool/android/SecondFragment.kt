@@ -7,16 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.DataCollectionObj
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.SecondFragmentUIObj
+import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
+import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
+import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlin.math.min
 
 /**
@@ -57,8 +64,8 @@ class SecondFragment : Fragment() {
         view.findViewById<Button>(R.id.startBtn).setOnClickListener {
             println("Data Logging Started")
             val marker = MarkerObj("Data Log", "True")
-            DataClassesRepository.markerSubject.value = marker
-            viewModel.dataLog.value = true
+            markerSubject.onNext(marker)
+            // dataLoggingSubject.value = true
 
             view.findViewById<Button>(R.id.startBtn).isEnabled = false
             view.findViewById<Button>(R.id.ref).isEnabled = true
@@ -68,8 +75,8 @@ class SecondFragment : Fragment() {
         view.findViewById<Button>(R.id.endBtn).setOnClickListener {
             println("Data Logging Ended")
             val marker = MarkerObj("Data Log", "False")
-            DataClassesRepository.markerSubject.value = marker
-            viewModel.dataLog.value = false
+            markerSubject.onNext(marker)
+            // dataLoggingSubject.value = false
 
             view.findViewById<Button>(R.id.endBtn).isEnabled = false
             view.findViewById<Button>(R.id.wp).isEnabled = false
@@ -84,12 +91,31 @@ class SecondFragment : Fragment() {
         view.findViewById<Button>(R.id.ref).setOnClickListener {
             println("Reference Point Marked")
             val marker = MarkerObj("RP", "")
-            DataClassesRepository.markerSubject.value = marker
+            markerSubject.onNext(marker)
             view.findViewById<Button>(R.id.ref).isEnabled = false
             view.findViewById<Button>(R.id.endBtn).isEnabled = true
             view.findViewById<Button>(R.id.wp).isEnabled = true
             for (i in 1..viewModel.localUIObj.num_lanes)
                 view.findViewById<ToggleButton>(buttons[i]).isEnabled = true
+        }
+
+        view.findViewById<Button>(R.id.lane1btn).setOnClickListener {
+            viewModel.laneClicked(1)
+        }
+
+        view.findViewById<Button>(R.id.wp).setOnClickListener {
+            if (viewModel.wpStat) {
+                println("Workers Not Present")
+                viewModel.wpStat = false
+                val marker = MarkerObj("WP", "False")
+                markerSubject.onNext(marker)
+            }
+            else {
+                println("Workers Present")
+                viewModel.wpStat = true
+                val marker = MarkerObj("WP", "True")
+                markerSubject.onNext(marker)
+            }
         }
 
     }
@@ -112,6 +138,21 @@ class SecondFragment : Fragment() {
         ititializeLaneBtns(viewModel.localUIObj.num_lanes)
 
 
+
+
+        // viewModelScope.launch(Dispatchers.IO) {
+
+        dataFileSubject.subscribe {
+            viewModel.uploadDataFile(it)
+        }
+        // notificationText.postValue("Uploaded Path Data")
+        // ConfigurationRepository.activateConfig("config--road-name--description.json")
+        // }
+
+//        var csvObserver = Observer<CSVObj> {
+//            viewModel.writeToDataFile(it)
+//        }
+//        csvDataSubject.observe(viewLifecycleOwner, csvObserver)
 
         // TODO: Use the ViewModel
         // viewModel.numLanes

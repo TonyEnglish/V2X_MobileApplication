@@ -17,6 +17,7 @@ object ConfigurationRepository {
     val configListSubject = MutableLiveData<List<String>>()
     val localConfigListSubject = MutableLiveData<List<String>>()
     val activeConfigSubject = MutableLiveData<ConfigurationObj>()
+    val activeWZIDSubject = MutableLiveData<String>()
 
     private val storageContainer = "publishedconfigfiles"
 
@@ -30,11 +31,15 @@ object ConfigurationRepository {
 //    val activeConfig: Observable<ConfigurationObj>
 //        get() = activeConfigSubject
 
-    fun getCurrentConfigList() = configListSubject.value
+//    fun getCurrentConfigList() = configListSubject.value
+//
+//    fun getCurrentLocalConfigList() = localConfigListSubject.value
+//
+//    fun getCurrentActiveConfig() = activeConfigSubject.value
 
-    fun getCurrentLocalConfigList() = localConfigListSubject.value
-
-    fun getCurrentActiveConfig() = activeConfigSubject.value
+    fun getDataFileName(wzId: String): String {
+        return "path-data--$wzId.csv"
+    }
 
     // fun refreshWorkZoneList(): Observable<LiveResource<List<String>>> = Observable.just
 
@@ -49,6 +54,7 @@ object ConfigurationRepository {
             ConfigurationObj::class.java
         )
         activeConfigSubject.postValue(config)
+        activeWZIDSubject.postValue(configName.removePrefix("config--").removeSuffix(".json"))
         return true
     }
 
