@@ -84,6 +84,10 @@ object DataFileRepository {
 //        }
     }
 
+//    private fun removeObservers() {
+//        markerSubject.
+//    }
+
     private fun createCSVObj(location: Location): CSVObj {
         val marker: String = if (markerQueue.size >= 1) markerQueue.remove() else ""
         val markerValue: String = if (markerValueQueue.size >= 1) markerValueQueue.remove() else ""

@@ -13,6 +13,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.DataCollectionObj
@@ -29,7 +35,7 @@ import kotlin.math.min
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment() {
+class SecondFragment : Fragment(), OnMapReadyCallback {
 
 //    companion object {
 //        fun newInstance() = test_fragment()
@@ -38,6 +44,7 @@ class SecondFragment : Fragment() {
     private lateinit var viewModel: SecondFragmentViewModel
     private lateinit var uiObjObserver: Observer<SecondFragmentUIObj>
     private lateinit var localUIObj: SecondFragmentUIObj
+    private lateinit var mMap: GoogleMap
 
     val buttons = listOf(0, R.id.lane1btn, R.id.lane2btn, R.id.lane3btn, R.id.lane4btn, R.id.lane5btn, R.id.lane6btn, R.id.lane7btn, R.id.lane8btn)
 
@@ -118,6 +125,21 @@ class SecondFragment : Fragment() {
             }
         }
 
+        // SecondFragment.getMapAsync(this)
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+    }
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Add a marker in Sydney and move the camera
+        val sydney = LatLng(-34.0, 151.0)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
 

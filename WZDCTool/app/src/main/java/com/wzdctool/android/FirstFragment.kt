@@ -45,28 +45,7 @@ class FirstFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
-//        view.findViewById<Spinner>(R.id.spinner2).setOnItemClickListener {
-//            view.findViewById<Button>(R.id.button_first).isEnabled = false
-//        }
         val configSpinner = view.findViewById(R.id.spinner2) as Spinner
-//        configSpinner.onItemSelectedListener =
-//            object : OnItemSelectedListener {
-//                override fun onItemSelected(
-//                    parentView: AdapterView<*>?,
-//                    selectedItemView: View?,
-//                    position: Int,
-//                    id: Long
-//                ) {
-//                    val activeConfigName = activeWZIDSubject.value?.let { getConfigName(it) }
-//                    if (configSpinner.selectedItem != activeConfigName) {
-//                        view.findViewById<Button>(R.id.button_first).isEnabled = false
-//                    }
-//                }
-//
-//                override fun onNothingSelected(parentView: AdapterView<*>?) {
-//                    view.findViewById<Button>(R.id.button_first).isEnabled = false
-//                }
-//            }
 
         view.findViewById<Button>(R.id.import_config).setOnClickListener {
             view.findViewById<Button>(R.id.button_first).isEnabled = false
@@ -75,8 +54,6 @@ class FirstFragment : Fragment() {
             }
             val configName: String = configSpinner.selectedItem.toString()
             viewModel.activateConfig(configName, activity?.filesDir.toString())
-            // view.findViewById<TextView>(R.id.activeConfigTextView).text = "Active Config: $configName"
-            //ConfigurationRepository.activateConfig(configName)
         }
 
         view.findViewById<Switch>(R.id.switch1).setOnClickListener {

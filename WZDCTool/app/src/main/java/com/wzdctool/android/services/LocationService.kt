@@ -29,6 +29,7 @@ import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataFileRepository
 import java.util.*
 
 class LocationService : Service() {
@@ -43,9 +44,9 @@ class LocationService : Service() {
         return null
     }
 
-    override fun onCreate() {
-        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show()
-    }
+//    override fun onCreate() {
+//        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show()
+//    }
 
     var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
@@ -163,6 +164,7 @@ class LocationService : Service() {
             if (action != null) {
                 if (action == Constants.ACTION_START_LOCATION_SERVICE) {
                     startLocationService()
+                    DataFileRepository.initializeObservers()
                 }
                 else if (action == Constants.ACTION_STOP_LOCATION_SERVICE) {
                     stopLocationService()
