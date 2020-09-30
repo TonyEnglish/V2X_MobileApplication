@@ -13,14 +13,15 @@ import rx.subjects.Subject
 
 
 object DataClassesRepository {
-    val dataCollectionSubject = MutableLiveData<DataCollectionObj>()
-    val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
+    val dataCollectionSubject: PublishSubject<DataCollectionObj> = PublishSubject.create<DataCollectionObj>()
+    lateinit var dataCollectionObj: DataCollectionObj
+    // val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
     // val markerSubject = ObservableField<MarkerObj>()
-    val locationSubject = BehaviorSubject.create<Location>()
-    val dataLoggingSubject = BehaviorSubject.create<Boolean>(false)
+    val locationSubject: PublishSubject<Location> = PublishSubject.create<Location>()
+    // val dataLoggingSubject = BehaviorSubject.create<Boolean>(false)
 
-    val notificationSubject = BehaviorSubject.create<String>()
+    val notificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     // val dataLoggingSubject = PublishSubject.createDefault<Boolean>() // MutableLiveData<Boolean>(false)
 
-    val gotRPSubject = MutableLiveData<Boolean> (false)
+    // val gotRPSubject = BehaviorSubject.create<Boolean>(false)
 }

@@ -1,65 +1,47 @@
 package com.wzdctool.android
 
-import android.os.Environment
-import android.widget.TextView
-import android.widget.Toast
-import androidx.lifecycle.LiveData
+import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
-import com.microsoft.azure.storage.CloudStorageAccount
-import com.microsoft.azure.storage.blob.CloudBlobClient
-import com.microsoft.azure.storage.blob.CloudBlobContainer
-import com.microsoft.azure.storage.blob.CloudBlockBlob
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
-import com.wzdctool.android.repos.DataClassesRepository
-import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
-import com.wzdctool.android.repos.DataClassesRepository.gotRPSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
-import com.wzdctool.android.services.LocationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.math.*
 
 class SecondFragmentViewModel : ViewModel() {
-    // TODO: Implement the ViewModel\
-
     // Required parameters
     lateinit var localDataObj: DataCollectionObj
     lateinit var localUIObj: SecondFragmentUIObj
-    //DataCollectionObj (val num_lanes: Int, val start_coord: Coordinate,
-    //                         val end_coord: Coordinate, val speed_limits: SPEEDLIMITS,
-    //                         val automatic_detection: Boolean)
 
+    private var prevDistance = 0.0
+    var automaticDetection = false
 
-    //
     var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
     var currWpStat = false
-//    var dataLog = MutableLiveData<Boolean>(false)
-//    var gotRP = MutableLiveData<Boolean>(false)
+    var zoom = -1
+    var dataLog = MutableLiveData<Boolean>(false)
+    var gotRP = MutableLiveData<Boolean>(false)
+    var navigationLiveData = MutableLiveData<Int>()
     var notificationText = MutableLiveData<String>()
-    // var
 
-//    val currentUIObj: MutableLiveData<SecondFragmentUIObj> by lazy {
-//        MutableLiveData<SecondFragmentUIObj>()
-//    }
-
-
-    fun firstTimeSetup() {
-        // laneStat.setValue(currLaneStat)
-    }
 
     fun initializeUI(data_obj: DataCollectionObj) {
         localUIObj = mapDataToUIObj(data_obj)
+        automaticDetection = localUIObj.automatic_detection
     }
 
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
@@ -67,8 +49,8 @@ class SecondFragmentViewModel : ViewModel() {
             num_lanes = data_obj.num_lanes,
             laneStat = laneStat,
             wpStat = wpStat,
-            dataLog = dataLoggingSubject.value!!,
-            gotRP = gotRPSubject.value!!,
+            dataLog = dataLog.value!!,
+            gotRP = gotRP.value!!,
             currLocation = Coordinate(0.0, 0.0, 0.0), // currentLocation,
             start_coord = data_obj.start_coord,
             end_coord = data_obj.end_coord,
@@ -76,30 +58,186 @@ class SecondFragmentViewModel : ViewModel() {
             automatic_detection = data_obj.automatic_detection
         )
         return ui_obj
-        //(val num_lanes: Int, val laneStat: List<Boolean>,
-        //                                val wpStat: Boolean, val dataLog: Boolean, val gotRP: Boolean,
-        //                                val currLocation: Coordinate, val start_coord: Coordinate,
-        //                                val end_coord: Coordinate, val speed_limits: SPEEDLIMITS,
-        //                                val automatic_detection: Boolean)
+    }
+
+    fun startDataCollection() {
+        println("Data Logging Started")
+        val marker = MarkerObj("Data Log", "True")
+        markerSubject.onNext(marker)
+        dataLog.value = true
+    }
+
+    fun stopDataCollection() {
+        println("Data Logging Ended")
+        val marker = MarkerObj("Data Log", "False")
+        markerSubject.onNext(marker)
+        dataLog.value = false
+        gotRP.value = false
+        navigationLiveData.value = R.id.action_SecondFragment_to_FirstFragment
+    }
+
+    fun markRefPt() {
+        println("Reference Point Marked")
+        val marker = MarkerObj("RP", "")
+        markerSubject.onNext(marker)
+        gotRP.value = true
+    }
+
+    private fun mapLocationToCoord(location: Location): Coordinate {
+        return Coordinate(location.latitude, location.longitude, location.altitude)
+    }
+
+    fun checkLocation(location: Location) {
+        val currCoord = mapLocationToCoord(location)
+        if (dataLog.value!!) {
+            if (!gotRP.value!!) {
+                val distance = distDeg(localUIObj.start_coord, currCoord)
+                if (prevDistance < distance) {
+                    markRefPt()
+                }
+                prevDistance = distance
+            }
+            else {
+                val distance = distDeg(localUIObj.end_coord, currCoord)
+                if (distance <= 50) {
+                    stopDataCollection()
+                }
+            }
+        }
+        else if (!dataLog.value!!) {
+            val distance = distDeg(localUIObj.start_coord, currCoord)
+            if (distance <= 50) {
+                prevDistance = distance
+                startDataCollection()
+            }
+        }
+    }
+
+    fun initMap(mMap: GoogleMap, mMapView: MapView) {
+        val startMarkerPosition = LatLng(
+            localUIObj.start_coord.Lat,
+            localUIObj.start_coord.Lon
+        )
+        val endMarkerPosition = LatLng(
+            localUIObj.end_coord.Lat,
+            localUIObj.end_coord.Lon
+        )
+        val startMarker = MarkerOptions()
+            .position(startMarkerPosition)
+            .title("Start of Work Zone")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        val endMarker = MarkerOptions()
+            .position(endMarkerPosition)
+            .title("End of Work Zone")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        mMap.addMarker(startMarker)
+        mMap.addMarker(endMarker)
+
+        val centerLat = (startMarkerPosition.latitude + endMarkerPosition.latitude)/2
+        val centerLon = (startMarkerPosition.longitude + endMarkerPosition.longitude)/2
+        // val center = str(centerLat) + ',' + str(centerLon)
+
+        val north = max(startMarkerPosition.latitude, endMarkerPosition.latitude)
+        val south = min(startMarkerPosition.latitude, endMarkerPosition.latitude)
+        val east = max(startMarkerPosition.longitude, endMarkerPosition.longitude)
+        val west = min(startMarkerPosition.longitude, endMarkerPosition.longitude)
+
+        val pixelWidth = mMapView.width
+        val pixelHeight = mMapView.height
+
+        zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
+    }
+
+    fun updateMapLocation(location: Location, mMap: GoogleMap) {
+        val currLocation = LatLng(location.latitude, location.longitude)
+        val center = CameraUpdateFactory.newLatLngZoom(currLocation, zoom.toFloat())
+        mMap.animateCamera(center, 10, null);
+    }
+
+    fun calcZoomLevel(north: Double, south: Double, east: Double, west: Double, pixelWidth: Int, pixelHeight: Int): Int {
+        val GLOBE_WIDTH = 256
+        val ZOOM_MAX = 21
+        var angle = east - west
+        if (angle < 0) {
+            angle += 360
+        }
+        val zoomHoriz = (ln(
+            pixelWidth * 360
+                    / angle
+                    / GLOBE_WIDTH
+        )
+                / ln(2.0)
+                ).roundToInt() - 1
+
+        angle = north - south
+        val centerLat = (north + south) / 2
+        if (angle < 0)
+            angle += 360
+        val zoomVert = (
+                ln(
+                    pixelHeight * 360
+                            / angle
+                            / GLOBE_WIDTH
+                            * cos(centerLat * Math.PI / 180)
+                )
+                        / ln(2.0)
+                ).roundToInt() - 1
+
+        return Math.max(Math.min(Math.min(zoomHoriz, zoomVert), ZOOM_MAX), 0)
+    }
+
+    private fun dist(p1: Coordinate, p2: Coordinate): Double {
+        val R = 6371000
+        val avgLat = (p1.Lat + p2.Lat) / 2
+        return R * sqrt((p1.Lat - p2.Lat).pow(2) + cos(avgLat).pow(2) * (p1.Lon - p2.Lon).pow(2))
+    }
+
+    private fun distDeg(p1: Coordinate, p2: Coordinate): Double {
+        val R = 6371000
+        val p = PI/180
+        val avgLat = (p1.Lat*p + p2.Lat*p) / 2
+        return R * sqrt(
+            (p1.Lat * p - p2.Lat * p).pow(2) + cos(avgLat).pow(2) * (p1.Lon * p - p2.Lon * p).pow(
+                2
+            )
+        )
+    }
+
+    // TODO: Determine if need lon=lon*cos(lat)
+    private fun dist_to_line(v: Coordinate, w: Coordinate, p: Coordinate): Double {
+        val l = dist(v, w).pow(2.0)
+        val t = max(0.0, min(1.0, dot(dif(p, v), dif(w, v))))
+        val pp = Coordinate(v.Lat + t * (w.Lat - v.Lat), v.Lon + t * (w.Lon - v.Lon), null)
+        return dist(p, pp)
+    }
+
+    private fun dot(v: Coordinate, w: Coordinate): Double {
+        return v.Lat * w.Lat + v.Lon * w.Lon
+    }
+
+    private fun dif(v: Coordinate, w: Coordinate): Coordinate {
+        return if (v.Elev != null && w.Elev != null )
+            Coordinate(v.Lon - w.Lon, v.Lon - w.Lon, v.Elev - w.Elev)
+        else
+            Coordinate(v.Lon - w.Lon, v.Lon - w.Lon, null)
     }
 
     fun laneClicked(lane: Int) {
-        if (!laneStat[lane]) {
+        if (laneStat[lane]) {
             println("Lane $lane Opened")
-            laneStat[lane] = true
+            laneStat[lane] = false
             val marker = MarkerObj("LO", lane.toString())
             markerSubject.onNext(marker)
         }
         else {
             println("Lane $lane Closed")
-            laneStat[1] = false
+            laneStat[lane] = true
             val marker = MarkerObj("LC", lane.toString())
             markerSubject.onNext(marker)
         }
     }
 
     fun uploadDataFile(fileName: String) {
-
         viewModelScope.launch(Dispatchers.IO) {
             DataFileRepository.dataFileName =
                 "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"

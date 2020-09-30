@@ -42,6 +42,7 @@ class FirstFragment : Fragment() {
         println("onViewCreated")
 
         view.findViewById<Button>(R.id.button_first).setOnClickListener {
+            viewModel.updateDataCollectionObj()
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
@@ -58,7 +59,8 @@ class FirstFragment : Fragment() {
 
         view.findViewById<Switch>(R.id.switch1).setOnClickListener {
             viewModel.automaticDetection = !view.findViewById<Switch>(R.id.switch1).isChecked
-            viewModel.updateDataCollectionObj()
+//            if (activeConfigSubject.value != null)
+//                viewModel.updateDataCollectionObj()
         }
     }
 

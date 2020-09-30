@@ -14,8 +14,6 @@ import com.wzdctool.android.SecureKeys
 import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.LOCATION
 import com.wzdctool.android.dataclasses.MarkerObj
-import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
-import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,7 +63,7 @@ object DataFileRepository {
                 markerValueQueue.add(it.value)
                 createDataFile()
                 loggingData = true
-                val csvObj = createCSVObj(prevLocation)
+                // val csvObj = createCSVObj(prevLocation)
             }
         }
 
@@ -76,17 +74,7 @@ object DataFileRepository {
             }
             prevLocation = it
         }
-
-//        dataLoggingSubject.subscribe {
-//            if (it) {
-//                createDataFile()
-//            }
-//        }
     }
-
-//    private fun removeObservers() {
-//        markerSubject.
-//    }
 
     private fun createCSVObj(location: Location): CSVObj {
         val marker: String = if (markerQueue.size >= 1) markerQueue.remove() else ""
@@ -118,10 +106,7 @@ object DataFileRepository {
         )
         osw = OutputStreamWriter(fOut)
         osw.appendLine(
-            csvHeaders.toString().replace("[", "").replace("]", "").replace(
-                " ",
-                ""
-            )
+            csvHeaders.toString().replace("[", "").replace("]", "")
         )
     }
 

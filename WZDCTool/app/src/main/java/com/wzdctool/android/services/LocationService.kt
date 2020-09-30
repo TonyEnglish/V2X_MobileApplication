@@ -27,10 +27,12 @@ import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.Marker
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.DataClassesRepository
-import com.wzdctool.android.repos.DataClassesRepository.dataLoggingSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataFileRepository
+import java.lang.Math.*
 import java.util.*
+import kotlin.math.ln
+import kotlin.math.roundToInt
 
 class LocationService : Service() {
 
@@ -66,28 +68,6 @@ class LocationService : Service() {
         }
     }
 
-    //    var builder = NotificationCompat.Builder(this, CHANNEL_ID)
-//        .setSmallIcon(R.drawable.notification_icon)
-//        .setContentTitle(textTitle)
-//        .setContentText(textContent)
-//        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//
-//    private fun createNotificationChannel() {
-//        // Create the NotificationChannel, but only on API 26+ because
-//        // the NotificationChannel class is new and not in the support library
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val name = getString(R.string.channel_name)
-//            val descriptionText = getString(R.string.channel_description)
-//            val importance = NotificationManager.IMPORTANCE_DEFAULT
-//            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-//                description = descriptionText
-//            }
-//            // Register the channel with the system
-//            val notificationManager: NotificationManager =
-//                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//    }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun startLocationService() {
 

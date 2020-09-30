@@ -54,9 +54,6 @@ class MainActivity : AppCompatActivity() {
         Constants.DATA_FILE_DIRECTORY = filesDir.toString()
         Constants.DOWNLOAD_LOCTION = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()
 
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-
         startLocationService()
     }
 
@@ -71,13 +68,6 @@ class MainActivity : AppCompatActivity() {
                 // You can use the API that requires the permission.
                 // performAction(...)
             }
-            //            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
-            //            // In an educational UI, explain to the user why your app requires this
-            //            // permission for a specific feature to behave as expected. In this UI,
-            //            // include a "cancel" or "no thanks" button that allows the user to
-            //            // continue using your app without granting the permission.
-            //            showInContextUI(...)
-            //        }
             else -> {
                 // You can directly ask for the permission.
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
