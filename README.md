@@ -12,6 +12,11 @@ This repository contains the following components:
 
 - POC Work Zone Data Collection (WZDC) tool
   - Mobile Application (Android)
+  
+### Related Projects
+
+- [V2X Manual Data Collection](https://github.com/TonyEnglish/V2X-manual-data-collection)
+- [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
 
