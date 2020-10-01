@@ -42,16 +42,18 @@ There are currently no test cases for this proof of concept tool.
 
 ### Execution
 
-#### Step 1
-![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)
+Import Configuration File  |  Data Collection          |  Upload path Data
+:-------------------------:|:-------------------------:|:-------------------------:
+![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Path_Data_Uploaded.jpg)
+
+
+#### Step 1: Import Configuration File
 The first step in mapping a work zone is importing the configuration file already created for the work zone. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator. Once a configuration file is selected, the next button brings the user to the data collection component
 
-#### Step 2
-![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)
+#### Step 2: Data Collection
 The next step is to physically map the work zone. This involves driving through the work zone while marking features in the mobile application. These features include lane closures/openings and the presence of workers. In automatic detection mode, the application will begin and end data collection based on the locations set in the configuration file. In manual detection mode, the user must start and end data collection, and the application will save these locations to allow the application to run automatically the next time this work zone is mapped.
 
-#### Step 3
-![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Path_Data_Uploaded.jpg)
+#### Step 3: Upload Path Data
 The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
 
 ## Additional Notes
