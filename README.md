@@ -33,43 +33,26 @@ Requires:
 *Required - Provide users with detailed instrucitons for how to use your software. The specifics of this section will vary between projects, but should adhere to the following minimum outline:*
 
 ### Building
-*Required - Specifics for how to build/compile this code should be outlined here. If your code does not require any type of build/compilation, specify that here.*
 
-Example: 
+No building/compiling is required for this tool.
 
-Step 1: Build Docker image:
-```
-docker build myproject
-```
-
-Step 2: Run Docker image:
-```
-docker run myproject
-```
 ### Testing
-*Required - Specifics for how to run any test cases your project may have. If your test cases are automatically run as part of the build process, or you don't include any testing, specify that here.*
 
-Example:
-
-Run unit tests:
-```
-/test/runUnitTests.sh
-```
+There are currently no test cases for this proof of concept tool.
 
 ### Execution
-*Required - Explain how to use the final product of your code. If your code is meant to be run as is (ex: scripts), specify how to run those scripts. If your code is meant to be deployed (ex: AWS Lambda), specify how to do that.*
 
-Example:
+#### Step 1
+![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)
+The first step in mapping a work zone is importing the configuration file already created for the work zone. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator. Once a configuration file is selected, the next button brings the user to the data collection component
 
-Run the script:
-```
-python /scripts/myScript.py
-```
+#### Step 2
+![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)
+The next step is to physically map the work zone. This involves driving through the work zone while marking features in the mobile application. These features include lane closures/openings and the presence of workers. In automatic detection mode, the application will begin and end data collection based on the locations set in the configuration file. In manual detection mode, the user must start and end data collection, and the application will save these locations to allow the application to run automatically the next time this work zone is mapped.
 
-Deploy to Lambda:
-```
-aws lambda create-function --function-name my-function ... 
-```
+#### Step 3
+![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Path_Data_Uploaded.jpg)
+The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
 
 ## Additional Notes
 
