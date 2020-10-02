@@ -55,7 +55,8 @@ class SecondFragmentViewModel : ViewModel() {
             start_coord = data_obj.start_coord,
             end_coord = data_obj.end_coord,
             speed_limits = data_obj.speed_limits,
-            automatic_detection = data_obj.automatic_detection
+            automatic_detection = data_obj.automatic_detection,
+            data_lane = data_obj.data_lane
         )
         return ui_obj
     }

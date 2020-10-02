@@ -36,7 +36,8 @@ class FirstFragmentViewModel : ViewModel() {
             start_coord = activeConfigSubject.value!!.Location.BeginningLocation,
             end_coord = activeConfigSubject.value!!.Location.EndingLocation,
             speed_limits = activeConfigSubject.value!!.SpeedLimits,
-            automatic_detection = automaticDetection)
+            automatic_detection = automaticDetection,
+            data_lane = activeConfigSubject.value!!.LaneInfo.VehiclePathDataLane)
         dataCollectionObj = data_obj
     }
 }

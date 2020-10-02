@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -56,6 +58,26 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         R.id.lane6btn,
         R.id.lane7btn,
         R.id.lane8btn
+    )
+    val statusList = listOf(
+        0,
+        R.id.lane1status,
+        R.id.lane2status,
+        R.id.lane3status,
+        R.id.lane4status
+    )
+    val textViewList = listOf(
+        0,
+        R.id.lane1textView,
+        R.id.lane2textView,
+        R.id.lane3textView,
+        R.id.lane4textView
+    )
+    val laneLines = listOf(
+        0,
+        R.id.laneLine1_2,
+        R.id.laneLine2_3,
+        R.id.laneLine3_4,
     )
 
     override fun onCreateView(
@@ -122,7 +144,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<Button>(R.id.wp).isEnabled = true
 //        }
         for (i in 1..viewModel.localUIObj.num_lanes)
-            requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
+            if (i != viewModel.localUIObj.data_lane)
+                requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -193,7 +216,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
-        ititializeLaneBtns(viewModel.localUIObj.num_lanes)
+        ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
 
         dataFileSubject.subscribe {
             viewModel.uploadDataFile(it)
@@ -234,55 +257,85 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     }
 
-    private fun ititializeLaneBtns(numLanes: Int) {
+    private fun ititializeLaneBtns(numLanes: Int, dataLane: Int) {
         requireView().findViewById<Button>(R.id.lane1btn).setOnClickListener {
             viewModel.laneClicked(1)
         }
+
+        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
+        carImageViewparams.endToEnd = buttons[dataLane]
+        carImageViewparams.startToStart = buttons[dataLane]
+
+        val textViewParams = requireView().findViewById<TextView>(statusList[dataLane])
+        textViewParams.visibility = View.GONE
+
+        requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
+
         val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
         if (numLanes <= 1 ) {
             // TODO: Throw exception
             return
         }
         else if (numLanes > 1) {
-            btn1params.endToStart = R.id.lane2btn
-            btn1params.startToStart = 0
-
+            for (i in (min(numLanes, 4)+1)..4) {
+                val button = requireView().findViewById<ToggleButton>(buttons[i])
+                button.visibility = View.INVISIBLE
+                val status = requireView().findViewById<TextView>(statusList[i])
+                status.visibility = View.INVISIBLE
+                val textView = requireView().findViewById<TextView>(textViewList[i])
+                textView.visibility = View.INVISIBLE
+                val laneLine = requireView().findViewById<ImageView>(laneLines[i-1])
+                laneLine.visibility = View.INVISIBLE
+            }
             for (i in 2..min(numLanes, 4)) {
                 val button = requireView().findViewById<ToggleButton>(buttons[i])
-                val params = button.layoutParams as ConstraintLayout.LayoutParams
-                params.startToEnd = buttons[i - 1]
-                if (i == numLanes || i == 4) params.endToEnd = 0
-                else params.endToEnd = buttons[i + 1]
-                button.visibility = View.VISIBLE
                 button.setOnClickListener {
                     viewModel.laneClicked(i)
                 }
             }
-
-            // Second row of lane buttons
-            if (numLanes == 5) {
-                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
-                btn1params.endToEnd = 0
-                btn1params.startToStart = 0
-                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
-            }
-            else if (numLanes > 5) {
-                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
-                btn5params.endToStart = R.id.lane6btn
-                btn5params.startToStart = 0
-                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
-                for (i in 6..numLanes) {
-                    val button = requireView().findViewById<ToggleButton>(buttons[i])
-                    val params = button.layoutParams as ConstraintLayout.LayoutParams
-                    params.startToEnd = buttons[i - 1]
-                    if (i == numLanes) params.endToEnd = 0
-                    else params.endToEnd = buttons[i + 1]
-                    button.visibility = View.VISIBLE
-                    button.setOnClickListener {
-                        viewModel.laneClicked(i)
-                    }
-                }
-            }
         }
+//            btn1params.endToStart = R.id.lane2btn
+//            btn1params.startToStart = 0
+//
+//            for (i in 2..min(numLanes, 4)) {
+//                val button = requireView().findViewById<ToggleButton>(buttons[i])
+//                val params = button.layoutParams as ConstraintLayout.LayoutParams
+//                params.startToEnd = buttons[i - 1]
+//                if (i == numLanes || i == 4) params.endToEnd = 0
+//                else params.endToEnd = buttons[i + 1]
+//                button.visibility = View.VISIBLE
+//                button.setOnClickListener {
+//                    viewModel.laneClicked(i)
+//                }
+//            }
+//
+//            // Second row of lane buttons
+//            if (numLanes == 5) {
+//                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
+//                btn1params.endToEnd = 0
+//                btn1params.startToStart = 0
+//                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
+//            }
+//            else if (numLanes > 5) {
+//                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
+//                btn5params.endToStart = R.id.lane6btn
+//                btn5params.startToStart = 0
+//                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
+//                for (i in 6..numLanes) {
+//                    val button = requireView().findViewById<ToggleButton>(buttons[i])
+//                    val params = button.layoutParams as ConstraintLayout.LayoutParams
+//                    params.startToEnd = buttons[i - 1]
+//                    if (i == numLanes) params.endToEnd = 0
+//                    else params.endToEnd = buttons[i + 1]
+//                    button.visibility = View.VISIBLE
+//                    button.setOnClickListener {
+//                        viewModel.laneClicked(i)
+//                    }
+//                }
+//            }
+
+//            app:layout_constraintEnd_toEndOf="@+id/lane1btn"
+//            app:layout_constraintStart_toStartOf="@+id/lane1btn"
+//        }
     }
 }
