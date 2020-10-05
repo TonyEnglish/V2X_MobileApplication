@@ -1,6 +1,7 @@
 package com.wzdctool.android
 
 import android.location.Location
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,7 +30,7 @@ class SecondFragmentViewModel : ViewModel() {
     private var prevDistance = 0.0
     var automaticDetection = false
 
-    var laneStat = MutableList<Boolean>(8+1) {false}
+    // var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
     var currWpStat = false
     var zoom = -1
@@ -37,6 +38,7 @@ class SecondFragmentViewModel : ViewModel() {
     var gotRP = MutableLiveData<Boolean>(false)
     var navigationLiveData = MutableLiveData<Int>()
     var notificationText = MutableLiveData<String>()
+    var laneStat = MutableLiveData<MutableList<Boolean>>(MutableList<Boolean>(8+1) {false})
 
 
     fun initializeUI(data_obj: DataCollectionObj) {
@@ -47,7 +49,7 @@ class SecondFragmentViewModel : ViewModel() {
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
         val ui_obj = SecondFragmentUIObj(
             num_lanes = data_obj.num_lanes,
-            laneStat = laneStat,
+            laneStat = laneStat.value!!,
             wpStat = wpStat,
             dataLog = dataLog.value!!,
             gotRP = gotRP.value!!,
@@ -224,15 +226,18 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun laneClicked(lane: Int) {
-        if (laneStat[lane]) {
+        val currLaneStat: MutableList<Boolean> = laneStat.value!!
+        if (currLaneStat[lane]) {
             println("Lane $lane Opened")
-            laneStat[lane] = false
+            currLaneStat[lane] = false
+            laneStat.value = currLaneStat
             val marker = MarkerObj("LO", lane.toString())
             markerSubject.onNext(marker)
         }
         else {
             println("Lane $lane Closed")
-            laneStat[lane] = true
+            currLaneStat[lane] = true
+            laneStat.value = currLaneStat
             val marker = MarkerObj("LC", lane.toString())
             markerSubject.onNext(marker)
         }

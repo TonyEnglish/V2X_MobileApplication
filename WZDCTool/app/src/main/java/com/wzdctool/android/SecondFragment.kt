@@ -148,6 +148,20 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
     }
 
+    fun laneClickedUI(laneStatLocal: List<Boolean>) {
+        for (lane in 1..viewModel.localUIObj.num_lanes) {
+            val statusMsg = requireView().findViewById<TextView>(statusList[lane])
+            if (!laneStatLocal[lane]) {
+                statusMsg.text = resources.getString(R.string.status_open)
+                statusMsg.setTextColor(resources.getColor(R.color.status_open))
+            }
+            else {
+                statusMsg.text = resources.getString(R.string.status_closed)
+                statusMsg.setTextColor(resources.getColor(R.color.status_closed))
+            }
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -236,6 +250,10 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 markRefPtUI()
             // else
             // TODO: Something??
+        })
+
+        viewModel.laneStat.observe(viewLifecycleOwner, {
+            laneClickedUI(it)
         })
 
         // if (!viewModel.automaticDetection) {

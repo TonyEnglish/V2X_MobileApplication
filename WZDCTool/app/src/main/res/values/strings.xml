@@ -10,6 +10,10 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="is_location_service_running_pref">isLocationServiceRunning</string>
+
+    <string name="status_open">OPEN</string>
+    <string name="status_closed">CLOSED</string>
+
     <string-array name="config_files">
     </string-array>
 </resources>
