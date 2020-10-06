@@ -82,18 +82,18 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             premissionRequestCode -> {
                 // If request is cancelled, the result arrays are empty.
-                if ((grantResults.isNotEmpty() &&
-                            grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission is granted. Continue the action or workflow
-                    // in your app.
-                } else {
-                    // TODO: Notify user that application will not function
-                    // Explain to the user that the feature is unavailable because
-                    // the features requires a permission that the user has denied.
-                    // At the same time, respect the user's decision. Don't link to
-                    // system settings in an effort to convince the user to change
-                    // their decision.
-                }
+//                if ((grantResults.isNotEmpty() &&
+//                            grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+//                    // Permission is granted. Continue the action or workflow
+//                    // in your app.
+//                } else {
+//                    // TODO: Notify user that application will not function
+//                    // Explain to the user that the feature is unavailable because
+//                    // the features requires a permission that the user has denied.
+//                    // At the same time, respect the user's decision. Don't link to
+//                    // system settings in an effort to convince the user to change
+//                    // their decision.
+//                }
                 return
             }
         }
