@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class FirstFragmentViewModel : ViewModel() {
 
-    var automaticDetection = false
+    var automaticDetection = true
 
     fun updateConfigList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -31,6 +31,7 @@ class FirstFragmentViewModel : ViewModel() {
     }
 
     fun updateDataCollectionObj() {
+        println("Automatic Detection: $automaticDetection")
         val data_obj = DataCollectionObj(
             num_lanes = activeConfigSubject.value!!.LaneInfo.NumberOfLanes,
             start_coord = activeConfigSubject.value!!.Location.BeginningLocation,

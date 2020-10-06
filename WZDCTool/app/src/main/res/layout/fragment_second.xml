@@ -17,31 +17,30 @@
 <!--        app:layout_constraintEnd_toEndOf="parent"-->
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/guideline8"/>-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/lane_guideline"/>-->
 
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="16dp" />
+<!--    <androidx.constraintlayout.widget.Guideline-->
+<!--        android:id="@+id/guideline2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        app:layout_constraintGuide_begin="16dp" />-->
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:text="Data Collection"
-        android:textSize="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
-
-
+<!--    <TextView-->
+<!--        android:id="@+id/textView2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="0dp"-->
+<!--        android:text="Data Collection"-->
+<!--        android:textSize="24dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.497"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/guideline2" />-->
 
     <FrameLayout
+        android:id="@+id/button_background"
         android:layout_width="match_parent"
         android:layout_height="265dp"
         android:background="#FFFFFF"
@@ -61,7 +60,7 @@
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/laneLine2_3"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="366dp" />
 
     <ImageView
@@ -72,7 +71,7 @@
         app:layout_constraintEnd_toStartOf="@+id/laneLine3_4"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/laneLine1_2"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="364dp" />
 
     <ImageView
@@ -83,7 +82,7 @@
         app:layout_constraintEnd_toStartOf="@+id/laneLine2_3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="364dp" />
 
     <ToggleButton
@@ -96,10 +95,10 @@
         android:textOn="Workers Present"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
+        app:layout_constraintTop_toTopOf="@+id/wp_guideline" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/wp_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -153,7 +152,7 @@
         android:text="Lane 1"
         app:layout_constraintEnd_toEndOf="@+id/lane1btn"
         app:layout_constraintStart_toStartOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="392dp" />
 
     <TextView
@@ -163,7 +162,7 @@
         android:text="Lane 2"
         app:layout_constraintEnd_toEndOf="@+id/lane2btn"
         app:layout_constraintStart_toStartOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="392dp" />
 
     <TextView
@@ -173,7 +172,7 @@
         android:text="Lane 3"
         app:layout_constraintEnd_toEndOf="@+id/lane3btn"
         app:layout_constraintStart_toStartOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="392dp" />
 
     <TextView
@@ -183,7 +182,7 @@
         android:text="Lane 4"
         app:layout_constraintEnd_toEndOf="@+id/lane4btn"
         app:layout_constraintStart_toStartOf="@+id/lane4btn"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="392dp" />
 
     <ToggleButton
@@ -198,7 +197,7 @@
         app:layout_constraintEnd_toStartOf="@+id/lane2btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
         tools:layout_editor_absoluteY="450dp" />
 
     <ToggleButton
@@ -213,7 +212,7 @@
         app:layout_constraintEnd_toStartOf="@+id/lane3btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
         tools:layout_editor_absoluteY="450dp" />
 
     <ToggleButton
@@ -228,7 +227,7 @@
         app:layout_constraintEnd_toStartOf="@+id/lane4btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
         tools:layout_editor_absoluteY="450dp" />
 
     <ToggleButton
@@ -243,7 +242,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
         tools:layout_editor_absoluteY="450dp" />
 
     <ToggleButton
@@ -295,7 +294,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline8"
+        android:id="@+id/lane_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -314,7 +313,7 @@
         android:layout_height="80dp"
         android:layout_marginTop="5dp"
         android:src="@drawable/caricon"
-        app:layout_constraintTop_toTopOf="@id/guideline8"
+        app:layout_constraintTop_toTopOf="@id/lane_guideline"
         tools:layout_editor_absoluteY="373dp" />
 
     <TextView
@@ -328,7 +327,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/lane1btn"
         app:layout_constraintStart_toStartOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
 
     <TextView
         android:id="@+id/lane2status"
@@ -341,7 +340,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/lane2btn"
         app:layout_constraintStart_toStartOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
 
     <TextView
         android:id="@+id/lane3status"
@@ -354,7 +353,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/lane3btn"
         app:layout_constraintStart_toStartOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
 
     <TextView
         android:id="@+id/lane4status"
@@ -367,7 +366,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/lane4btn"
         app:layout_constraintStart_toStartOf="@+id/lane4btn"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
+        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,7 +28,7 @@ class SecondFragmentViewModel : ViewModel() {
     lateinit var localUIObj: SecondFragmentUIObj
 
     private var prevDistance = 0.0
-    var automaticDetection = false
+    var automaticDetection = MutableLiveData<Boolean>()
 
     // var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
@@ -43,7 +43,7 @@ class SecondFragmentViewModel : ViewModel() {
 
     fun initializeUI(data_obj: DataCollectionObj) {
         localUIObj = mapDataToUIObj(data_obj)
-        automaticDetection = localUIObj.automatic_detection
+        automaticDetection.value = localUIObj.automatic_detection
     }
 
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
@@ -170,7 +170,7 @@ class SecondFragmentViewModel : ViewModel() {
                     / GLOBE_WIDTH
         )
                 / ln(2.0)
-                ).roundToInt() - 1
+                ).roundToInt() - 3
 
         angle = north - south
         val centerLat = (north + south) / 2
@@ -184,7 +184,7 @@ class SecondFragmentViewModel : ViewModel() {
                             * cos(centerLat * Math.PI / 180)
                 )
                         / ln(2.0)
-                ).roundToInt() - 1
+                ).roundToInt() - 3
 
         return Math.max(Math.min(Math.min(zoomHoriz, zoomVert), ZOOM_MAX), 0)
     }

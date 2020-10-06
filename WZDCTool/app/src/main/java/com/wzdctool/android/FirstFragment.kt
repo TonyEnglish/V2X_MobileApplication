@@ -56,9 +56,8 @@ class FirstFragment : Fragment() {
             val configName: String = configSpinner.selectedItem.toString()
             viewModel.activateConfig(configName, activity?.filesDir.toString())
         }
-
         view.findViewById<Switch>(R.id.switch1).setOnClickListener {
-            viewModel.automaticDetection = !view.findViewById<Switch>(R.id.switch1).isChecked
+            viewModel.automaticDetection = view.findViewById<Switch>(R.id.switch1).isChecked
 //            if (activeConfigSubject.value != null)
 //                viewModel.updateDataCollectionObj()
         }

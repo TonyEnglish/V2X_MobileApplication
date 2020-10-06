@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.ToggleButton
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -112,37 +110,37 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun startDataCollectionUI() {
-//        if (viewModel.automaticDetection) {
-//            // TODO: stuffs
-//        }
-//        else {
-        requireView().findViewById<Button>(R.id.startBtn).isEnabled = false
-        requireView().findViewById<Button>(R.id.ref).isEnabled = true
-//        }
+        if (viewModel.automaticDetection.value!!) {
+            // TODO: stuffs
+        }
+        else {
+            requireView().findViewById<Button>(R.id.startBtn).isEnabled = false
+            requireView().findViewById<Button>(R.id.ref).isEnabled = true
+        }
     }
 
     fun stopDataCollectionUI() {
-//        if (viewModel.automaticDetection) {
-//            // TODO: stuffs
-//        }
-//        else {
-        requireView().findViewById<Button>(R.id.endBtn).isEnabled = false
-        requireView().findViewById<Button>(R.id.wp).isEnabled = false
-        requireView().findViewById<Button>(R.id.startBtn).isEnabled = true
-//        }
+        if (viewModel.automaticDetection.value!!) {
+            // TODO: stuffs
+        }
+        else {
+            requireView().findViewById<Button>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<Button>(R.id.wp).isEnabled = false
+            requireView().findViewById<Button>(R.id.startBtn).isEnabled = true
+        }
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
     }
 
     fun markRefPtUI() {
-//        if (viewModel.automaticDetection) {
-//            // TODO: stuffs
-//        }
-//        else {
+        if (viewModel.automaticDetection.value!!) {
+            // TODO: stuffs
+        }
+        else {
             requireView().findViewById<Button>(R.id.ref).isEnabled = false
             requireView().findViewById<Button>(R.id.endBtn).isEnabled = true
             requireView().findViewById<Button>(R.id.wp).isEnabled = true
-//        }
+        }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
                 requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
@@ -162,13 +160,34 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    fun collectionModeUI() {
+        if (viewModel.automaticDetection.value!!) {
+            requireView().findViewById<Button>(R.id.startBtn).visibility = View.INVISIBLE
+            requireView().findViewById<Button>(R.id.endBtn).visibility = View.INVISIBLE
+            requireView().findViewById<Button>(R.id.ref).visibility = View.INVISIBLE
+
+            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_auto).toInt())
+            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_auto).toInt())
+            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_auto).toInt() + 10
+        }
+        else {
+            requireView().findViewById<Button>(R.id.startBtn).visibility = View.VISIBLE
+            requireView().findViewById<Button>(R.id.endBtn).visibility = View.VISIBLE
+            requireView().findViewById<Button>(R.id.ref).visibility = View.VISIBLE
+
+            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_manual).toInt())
+            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_manual).toInt())
+            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_manual).toInt() + 10
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
         mMap.isMyLocationEnabled = true
         viewModel.initMap(mMap, mMapView)
 
-        if (viewModel.automaticDetection) {
+        if (viewModel.automaticDetection.value!!) {
             locationSubject.subscribe{
                 viewModel.updateMapLocation(it, mMap)
                 viewModel.checkLocation(it)
@@ -254,6 +273,10 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
         viewModel.laneStat.observe(viewLifecycleOwner, {
             laneClickedUI(it)
+        })
+
+        viewModel.automaticDetection.observe(viewLifecycleOwner, {
+            collectionModeUI()
         })
 
         // if (!viewModel.automaticDetection) {
