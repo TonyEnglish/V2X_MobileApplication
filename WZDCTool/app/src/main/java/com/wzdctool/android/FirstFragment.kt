@@ -1,25 +1,21 @@
 package com.wzdctool.android
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.Switch
+import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.dataclasses.ConfigurationObj
-import com.wzdctool.android.dataclasses.Coordinate
-import com.wzdctool.android.dataclasses.DataCollectionObj
-import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
+import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.ConfigurationRepository.configListSubject
-import com.wzdctool.android.repos.DataClassesRepository.dataCollectionSubject
-import kotlinx.coroutines.Dispatchers
+import com.wzdctool.android.repos.DataFileRepository.getConfigName
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -33,8 +29,8 @@ class FirstFragment : Fragment() {
     private lateinit var viewModel: FirstFragmentViewModel
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         println("onCreateView")
         // Inflate the layout for this fragment
@@ -46,23 +42,24 @@ class FirstFragment : Fragment() {
         println("onViewCreated")
 
         view.findViewById<Button>(R.id.button_first).setOnClickListener {
+            viewModel.updateDataCollectionObj()
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
+        val configSpinner = view.findViewById(R.id.spinner2) as Spinner
+
         view.findViewById<Button>(R.id.import_config).setOnClickListener {
             view.findViewById<Button>(R.id.button_first).isEnabled = false
-            val spinner = view.findViewById(R.id.spinner2) as Spinner
-            if (spinner.selectedItem == null) {
+            if (configSpinner.selectedItem == null) {
                 return@setOnClickListener
             }
-            val configName: String = spinner.selectedItem.toString()
+            val configName: String = configSpinner.selectedItem.toString()
             viewModel.activateConfig(configName, activity?.filesDir.toString())
-            //ConfigurationRepository.activateConfig(configName)
         }
-
         view.findViewById<Switch>(R.id.switch1).setOnClickListener {
-            viewModel.automaticDetection = !view.findViewById<Switch>(R.id.switch1).isChecked
-            viewModel.updateDataCollectionObj()
+            viewModel.automaticDetection = view.findViewById<Switch>(R.id.switch1).isChecked
+//            if (activeConfigSubject.value != null)
+//                viewModel.updateDataCollectionObj()
         }
     }
 

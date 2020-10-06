@@ -106,7 +106,7 @@ data class LOCATION(
 data class Coordinate(
     val Lat: Double,
     val Lon: Double,
-    val Elev: Double
+    val Elev: Double?
 )
 
 enum class EVENTSTATUS

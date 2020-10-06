@@ -6,6 +6,7 @@ object Constants {
     const val ACTION_STOP_LOCATION_SERVICE: String = "stopLocationService"
 
     // TODO: Do not hardcode path
-    const val CONFIG_DIRECTORY: String = "/data/user/0/com.wzdctool.android/files/" //Android/data/com.wzdctool.android
-    const val DATA_FILE_DIRECTORY: String = "/data/user/0/com.wzdctool.android/files/"
+    var CONFIG_DIRECTORY: String = "" //Android/data/com.wzdctool.android
+    var DATA_FILE_DIRECTORY: String = ""
+    var DOWNLOAD_LOCTION: String = ""
 }

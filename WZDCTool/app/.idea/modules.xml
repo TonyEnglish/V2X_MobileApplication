@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/306195212/WZDC_Tool.iml" filepath="$PROJECT_DIR$/.idea/modules/306195212/WZDC_Tool.iml" group="WZDC_Tool" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app.iml" group="WZDC Tool/app" />
+    </modules>
+  </component>
+</project>

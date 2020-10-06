@@ -17,6 +17,7 @@ object ConfigurationRepository {
     val configListSubject = MutableLiveData<List<String>>()
     val localConfigListSubject = MutableLiveData<List<String>>()
     val activeConfigSubject = MutableLiveData<ConfigurationObj>()
+    val activeWZIDSubject = MutableLiveData<String>()
 
     private val storageContainer = "publishedconfigfiles"
 
@@ -30,11 +31,15 @@ object ConfigurationRepository {
 //    val activeConfig: Observable<ConfigurationObj>
 //        get() = activeConfigSubject
 
-    fun getCurrentConfigList() = configListSubject.value
+//    fun getCurrentConfigList() = configListSubject.value
+//
+//    fun getCurrentLocalConfigList() = localConfigListSubject.value
+//
+//    fun getCurrentActiveConfig() = activeConfigSubject.value
 
-    fun getCurrentLocalConfigList() = localConfigListSubject.value
-
-    fun getCurrentActiveConfig() = activeConfigSubject.value
+    fun getDataFileName(wzId: String): String {
+        return "path-data--$wzId.csv"
+    }
 
     // fun refreshWorkZoneList(): Observable<LiveResource<List<String>>> = Observable.just
 
@@ -49,6 +54,7 @@ object ConfigurationRepository {
             ConfigurationObj::class.java
         )
         activeConfigSubject.postValue(config)
+        activeWZIDSubject.postValue(configName.removePrefix("config--").removeSuffix(".json"))
         return true
     }
 
@@ -91,28 +97,19 @@ object ConfigurationRepository {
     }
 
     fun getConfigFileList(): List<String> {
-        println("Getting Configuration File List")
-        // try {
 
         // Retrieve storage account from connection-string.
-        println("Getting Connection String")
         val storageAccount: CloudStorageAccount =
             CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
 
-        println("Creating Cloud Client")
         // Create the blob client.
         val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
 
-        println("Setting Container")
         // Retrieve reference to a previously created container.
         val container: CloudBlobContainer = blobClient.getContainerReference(storageContainer)
         val configNameList: MutableList<String> = mutableListOf<String>()
 
         val configList = container.listBlobs()
-//                .sortedBy {
-//                    (it as CloudBlob).properties.lastModified.compareTo(Calendar.getInstance().time)
-//                }
-        println("Printing Configuration File List")
         println(configList.count())
         val tempList = configList.sortedWith(compareBy {
             (it as CloudBlob).properties.lastModified  //.compareTo(Calendar.getInstance().time)
@@ -122,39 +119,26 @@ object ConfigurationRepository {
             configNameList.add(it.uri.path.split("/")[it.uri.path.split("/").size - 1])
         }
         return configNameList
-
-        // } catch (e: Exception) {
-        // Output the stack trace.
-        // e.printStackTrace()
-        // return listOf<String>()
-        // }
-
-        // println("Getting Configuration File List")
     }
 
     private fun downloadConfigFile(configName: String, fileDir: String): String? {
-        // try {
-            // Retrieve storage account from connection-string.
-            val storageAccount: CloudStorageAccount =
-                CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
+        // Retrieve storage account from connection-string.
+        val storageAccount: CloudStorageAccount =
+            CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
 
-            // Create the blob client.
-            val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
+        // Create the blob client.
+        val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
 
-            // Retrieve reference to a previously created container.
-            val container: CloudBlobContainer = blobClient.getContainerReference(storageContainer)
-            // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
-            val blob: CloudBlockBlob = container.getBlockBlobReference(configName)
-            val filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
-            // Activity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-            println("File Path: $filePath")
-            val source = File(filePath)
-            blob.download(FileOutputStream(source))
-            return filePath
-//         } catch (e: Exception) {
-//            // Output the stack trace.
-//            e.printStackTrace()
-//            return null
-//        }
+        // Retrieve reference to a previously created container.
+        val container: CloudBlobContainer = blobClient.getContainerReference(storageContainer)
+        // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
+        val blob: CloudBlockBlob = container.getBlockBlobReference(configName)
+        val filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
+        // Activity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+        println("File Path: $filePath")
+        val source = File(filePath)
+
+        blob.download(FileOutputStream(source))
+        return filePath
     }
 }
