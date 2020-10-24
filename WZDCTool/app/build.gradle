@@ -57,6 +57,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     // implementation 'androidx.activity:activity-ktx:1.2.0-alpha08'
     implementation 'androidx.multidex:multidex:2.0.1'
+    // implementation 'com.github.mik3y:usb-serial-for-android:Tag'
+    implementation 'com.github.felHR85:UsbSerial:6.1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
