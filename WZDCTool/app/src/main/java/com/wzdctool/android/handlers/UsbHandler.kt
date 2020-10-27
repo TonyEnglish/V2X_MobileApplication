@@ -64,6 +64,7 @@ class UsbHandler : Handler() {
                     if (newLocation != null) {
                         if (newLocation.altitude == 0.0 || newLocation.bearing == 0f) {
                             isValid = false
+                            DataClassesRepository.notificationSubject.onNext("RMC Invalid")
                         }
                         update = true   // Only update when RMC line is parsed
                     }
@@ -76,6 +77,7 @@ class UsbHandler : Handler() {
                     if (newLocation != null) {
                         if (newLocation.altitude == 0.0) {
                             isValid = false
+                            DataClassesRepository.notificationSubject.onNext("GGA Invalid")
                         }
                     }
                 }
