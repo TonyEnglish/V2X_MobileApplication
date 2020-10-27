@@ -1,30 +1,96 @@
 package com.wzdctool.android
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
+import android.os.*
+import android.provider.CalendarContract
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
+import android.widget.EditText
+import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
+import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.handlers.UsbHandler
+import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
+import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
 import com.wzdctool.android.services.LocationService
+import com.wzdctool.android.services.UsbService
+import com.wzdctool.android.services.UsbService.UsbBinder
+import org.w3c.dom.Text
+import java.lang.ref.WeakReference
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     private val premissionRequestCode = 100
+    private var usbService: UsbService? = null
+    private var display: TextView? = null
+    private var editText: EditText? = null
+    private var mHandler: UsbHandler? = null
+    private var locationSource: String = ""
+    private var locationSources: MutableList<String> = mutableListOf()
+    private var isGPSConnected: Boolean = false
+    private val usbConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
+            usbService = (arg1 as UsbBinder).service
+            usbService!!.setHandler(mHandler)
+        }
 
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            usbService = null
+        }
+    }
+
+    private fun updateLocationSource(source: String) {
+        locationSource = source
+    }
+
+    private fun updateLocationSources(sources: List<String>) {
+        locationSources = sources as MutableList<String>
+    }
+
+    private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            when (intent.action) {
+                UsbService.ACTION_USB_PERMISSION_GRANTED -> {
+                    Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show()
+                    val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_USB)
+                    locationSourcesSubject.onNext(locationSources)
+                    usbGpsStatus.onNext("invalid")
+                    isGPSConnected = true
+                    // findViewById<Switch>(R.id.switch1).isEnabled = true
+                }
+                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED -> Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show()
+                UsbService.ACTION_NO_USB -> Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show()
+                UsbService.ACTION_USB_DISCONNECTED -> {
+                    // if (activeLocationSourceSubject.value == Constants.LOCATION_SOURCE_USB)
+                    val removed: Boolean = locationSources.remove(Constants.LOCATION_SOURCE_USB)
+                    locationSourcesSubject.onNext(locationSources)
+                    usbGpsStatus.onNext("disconnected")
+                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                    Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show()
+                }
+                UsbService.ACTION_USB_NOT_SUPPORTED -> Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +121,71 @@ class MainActivity : AppCompatActivity() {
         Constants.DOWNLOAD_LOCTION = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()
 
         startLocationService()
+        DataFileRepository.initializeObservers()
+
+        mHandler = UsbHandler()
+
+        findViewById<Switch>(R.id.switch1).setOnClickListener {
+            locationSourceSwitchClicked()
+        }
+        locationSourceSwitchClicked()
+
+        locationSourcesSubject.subscribe {
+            updateLocationSources(it)
+//            if (!it.contains(Constants.LOCATION_SOURCE_INTERNAL) && locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
+//                findViewById<Switch>(R.id.switch1).isChecked = true
+//                findViewById<Switch>(R.id.switch1).isEnabled = false
+//                if (it.contains(Constants.LOCATION_SOURCE_USB)) {
+//                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
+//                }
+//
+//            }
+            if (!it.contains(Constants.LOCATION_SOURCE_USB) && locationSource == Constants.LOCATION_SOURCE_USB) {
+                findViewById<Switch>(R.id.switch1).isChecked = false
+                findViewById<Switch>(R.id.switch1).isEnabled = false
+                if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
+                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                }
+            }
+        }
+
+        activeLocationSourceSubject.subscribe {
+            updateLocationSource(it)
+            if (it == Constants.LOCATION_SOURCE_INTERNAL) {
+                findViewById<Switch>(R.id.switch1).isChecked = false
+                if (!isGPSConnected) {
+                    findViewById<Switch>(R.id.switch1).isEnabled = false
+                }
+            }
+            else { // if (usbLocationValid.value)
+                findViewById<Switch>(R.id.switch1).isEnabled = true
+                findViewById<Switch>(R.id.switch1).isChecked = true
+            }
+        }
+
+        usbGpsStatus.subscribe {
+            if (it == "valid") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
+                findViewById<Switch>(R.id.switch1).isEnabled = true
+                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_valid))
+//                findViewById<Switch>(R.id.switch1).isChecked = true
+//                locationSourceSwitchClicked()
+            }
+            else if (it == "invalid") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                findViewById<Switch>(R.id.switch1).isEnabled = false
+                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_invalid))
+//                findViewById<Switch>(R.id.switch1).isChecked = false
+//                locationSourceSwitchClicked()
+            }
+            else if (it == "disconnected") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                findViewById<Switch>(R.id.switch1).isEnabled = false
+                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_disconnected))
+//                findViewById<Switch>(R.id.switch1).isChecked = false
+//                locationSourceSwitchClicked()
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -74,6 +205,18 @@ class MainActivity : AppCompatActivity() {
                     premissionRequestCode)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setFilters() // Start listening notifications from UsbService
+        startService(UsbService::class.java, usbConnection, null) // Start UsbService(if it was not started before) and Bind it
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(mUsbReceiver)
+        unbindService(usbConnection)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -115,6 +258,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun locationSourceSwitchClicked() {
+        if (findViewById<Switch>(R.id.switch1).isChecked) {
+            // if (locationSource == Constants.LOCATION_SOURCE_USB)
+            activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
+        }
+        else {
+            activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+        }
+    }
+
     private fun isLocationServiceRunning(): Boolean {
         val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         // TODO: Update from deprecated function
@@ -146,4 +299,31 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun startService(service: Class<*>, serviceConnection: ServiceConnection, extras: Bundle?) {
+        if (!UsbService.SERVICE_CONNECTED) {
+            val startService = Intent(this, service)
+            if (extras != null && !extras.isEmpty) {
+                val keys = extras.keySet()
+                for (key in keys) {
+                    val extra = extras.getString(key)
+                    startService.putExtra(key, extra)
+                }
+            }
+            startService(startService)
+        }
+        val bindingIntent = Intent(this, service)
+        bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun setFilters() {
+        val filter = IntentFilter()
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED)
+        filter.addAction(UsbService.ACTION_NO_USB)
+        filter.addAction(UsbService.ACTION_USB_DISCONNECTED)
+        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED)
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED)
+        registerReceiver(mUsbReceiver, filter)
+    }
 }
+

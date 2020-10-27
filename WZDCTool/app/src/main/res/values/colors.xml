@@ -5,4 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="status_open">#32a852</color>
     <color name="status_closed">#c23434</color>
+    <color name="usb_status_disconnected">#BB0000</color>
+    <color name="usb_status_invalid">#BBBB00</color>
+    <color name="usb_status_valid">#00BB00</color>
 </resources>
