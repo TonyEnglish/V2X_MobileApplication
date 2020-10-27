@@ -38,6 +38,8 @@ class LocationService : Service() {
 
     // private lateinit var locationCallback: LocationCallback
     private var CHANNEL_ID: String = "location_notification_channel"
+    private var locationSource: String = ""
+    private var locationSources: MutableList<String> = mutableListOf()
 
     // var currentLocation = MutableLiveData<Location>()
 
@@ -50,20 +52,38 @@ class LocationService : Service() {
 //        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show()
 //    }
 
+    init {
+        DataClassesRepository.activeLocationSourceSubject.subscribe {
+            updateLocationSource(it)
+        }
+        DataClassesRepository.locationSourcesSubject.subscribe {
+            updateLocationSources(it)
+        }
+    }
+
+    private fun updateLocationSource(source: String) {
+        locationSource = source
+    }
+
+    private fun updateLocationSources(sources: List<String>) {
+        locationSources = sources as MutableList<String>
+    }
+
     var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            for (location in locationResult.locations){
+            if (locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
+                for (location in locationResult.locations){
+                    locationSubject.onNext(location)
+                    Log.v("LocationService", "Lat: ${location.latitude}, " +
+                            "Lon: ${location.longitude}, " + "elevation: ${location.altitude}, " +
+                            "accuracy: ${location.accuracy}")
 
-                locationSubject.onNext(location)
-                Log.v("LocationService", "Lat: ${location.latitude}, " +
-                        "Lon: ${location.longitude}, " + "elevation: ${location.altitude}, " +
-                        "accuracy: ${location.accuracy}")
-
-                // println(csvObj.toString())
-                //val time: Date, val num_sats: Int, val hdop: Double, val latitude: Double,
-                // val longitude: Double, val altitude: Double, val speed: Double,
-                // val heading: Double, val marker: String, val marker_value: String
+                    // println(csvObj.toString())
+                    //val time: Date, val num_sats: Int, val hdop: Double, val latitude: Double,
+                    // val longitude: Double, val altitude: Double, val speed: Double,
+                    // val heading: Double, val marker: String, val marker_value: String
+                }
             }
         }
     }
@@ -144,9 +164,16 @@ class LocationService : Service() {
             if (action != null) {
                 if (action == Constants.ACTION_START_LOCATION_SERVICE) {
                     startLocationService()
-                    DataFileRepository.initializeObservers()
+                    val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_INTERNAL)
+                    DataClassesRepository.locationSourcesSubject.onNext(locationSources)
+//                    DataClassesRepository.locationSourceValidSubject.onNext(true)
                 }
                 else if (action == Constants.ACTION_STOP_LOCATION_SERVICE) {
+                    if (locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
+                        val removed: Boolean = locationSources.remove(Constants.ACTION_STOP_LOCATION_SERVICE)
+                        DataClassesRepository.locationSourcesSubject.onNext(locationSources)
+                    }
+//                        DataClassesRepository.locationSourceValidSubject.onNext(false)
                     stopLocationService()
                 }
             }

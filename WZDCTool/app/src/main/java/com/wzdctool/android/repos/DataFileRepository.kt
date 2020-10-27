@@ -33,6 +33,7 @@ object DataFileRepository {
     private lateinit var prevLocation: Location
     lateinit var dataFileName: String
     var loggingData = false
+    var isFirstTime = true
     val formatter: SimpleDateFormat = SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SS")
 
 
@@ -51,28 +52,33 @@ object DataFileRepository {
     }
 
     fun initializeObservers() {
-        markerSubject.subscribe {
-            if (loggingData) {
-                markerQueue.add(it.marker)
-                markerValueQueue.add(it.value)
-            }
-            else if (it.marker == "Data Log" && it.value == "True") {
-                markerQueue.clear()
-                markerQueue.add(it.marker)
-                markerValueQueue.clear()
-                markerValueQueue.add(it.value)
-                createDataFile()
-                loggingData = true
-                // val csvObj = createCSVObj(prevLocation)
-            }
-        }
+        synchronized(this) {
+            if (isFirstTime) {
+                isFirstTime = false
+                markerSubject.subscribe {
+                    if (loggingData) {
+                        markerQueue.add(it.marker)
+                        markerValueQueue.add(it.value)
+                    }
+                    else if (it.marker == "Data Log" && it.value == "True") {
+                        markerQueue.clear()
+                        markerQueue.add(it.marker)
+                        markerValueQueue.clear()
+                        markerValueQueue.add(it.value)
+                        createDataFile()
+                        loggingData = true
+                        // val csvObj = createCSVObj(prevLocation)
+                    }
+                }
 
-        locationSubject.subscribe {
-            val csvObj = createCSVObj(it)
-            if (loggingData) {
-                writeToDataFile(csvObj)
+                locationSubject.subscribe {
+                    val csvObj = createCSVObj(it)
+                    if (loggingData) {
+                        writeToDataFile(csvObj)
+                    }
+                    prevLocation = it
+                }
             }
-            prevLocation = it
         }
     }
 
