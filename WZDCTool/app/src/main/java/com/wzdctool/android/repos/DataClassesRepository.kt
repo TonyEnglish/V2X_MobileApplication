@@ -26,6 +26,8 @@ object DataClassesRepository {
     val locationSourcesSubject: BehaviorSubject<List<String>> = BehaviorSubject.create<List<String>>()
     // val dataLoggingSubject = BehaviorSubject.create<Boolean>(false)
 
+
+
     val notificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     // val dataLoggingSubject = PublishSubject.createDefault<Boolean>() // MutableLiveData<Boolean>(false)
 

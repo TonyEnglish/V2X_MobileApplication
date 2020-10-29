@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.handlers.UsbHandler
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
@@ -97,9 +98,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
 //        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
+////            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+////                    .setAction("Action", null).show()
+////        }
 
         notificationSubject.subscribe {
             val mySnackbar = Snackbar.make(
@@ -211,6 +212,10 @@ class MainActivity : AppCompatActivity() {
         rsmStatus.subscribe {
             findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         }
+
+//        findViewById<Button>(R.id.action_settings).setOnClickListener {
+//            println("SETTINGS")
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -278,7 +283,10 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings ->  {
+                println("SETTINGS")
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
