@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -71,6 +69,13 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         R.id.lane2textView,
         R.id.lane3textView,
         R.id.lane4textView
+    )
+    val laneLayouts = listOf(
+        0,
+        R.id.lane1_ll,
+        R.id.lane2_ll,
+        R.id.lane3_ll,
+        R.id.lane4_ll
     )
     val laneLines = listOf(
         0,
@@ -150,13 +155,15 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
         for (lane in 1..viewModel.localUIObj.num_lanes) {
             val statusMsg = requireView().findViewById<TextView>(statusList[lane])
-            if (!laneStatLocal[lane]) {
-                statusMsg.text = resources.getString(R.string.status_open)
-                statusMsg.setTextColor(resources.getColor(R.color.status_open))
-            }
-            else {
-                statusMsg.text = resources.getString(R.string.status_closed)
-                statusMsg.setTextColor(resources.getColor(R.color.status_closed))
+            if (statusMsg.text != resources.getString(R.string.status_driven)) {
+                if (!laneStatLocal[lane]) {
+                    statusMsg.text = resources.getString(R.string.status_open)
+                    statusMsg.setTextColor(resources.getColor(R.color.status_open))
+                }
+                else {
+                    statusMsg.text = resources.getString(R.string.status_closed)
+                    statusMsg.setTextColor(resources.getColor(R.color.status_closed))
+                }
             }
         }
     }
@@ -167,18 +174,14 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<Button>(R.id.endBtn).visibility = View.INVISIBLE
             requireView().findViewById<Button>(R.id.ref).visibility = View.INVISIBLE
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_auto).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_auto).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_auto).toInt() + 10
+            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
             requireView().findViewById<Button>(R.id.startBtn).visibility = View.VISIBLE
             requireView().findViewById<Button>(R.id.endBtn).visibility = View.VISIBLE
             requireView().findViewById<Button>(R.id.ref).visibility = View.VISIBLE
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_manual).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_manual).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_manual).toInt() + 10
+            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }
     }
 
@@ -300,34 +303,49 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun ititializeLaneBtns(numLanes: Int, dataLane: Int) {
+        println("Data Lane: $dataLane")
+
+        //lane3_ll
+        //laneLine3_4
+
         requireView().findViewById<Button>(R.id.lane1btn).setOnClickListener {
             viewModel.laneClicked(1)
         }
 
-        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
-        carImageViewparams.endToEnd = buttons[dataLane]
-        carImageViewparams.startToStart = buttons[dataLane]
+//        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
+//        carImageViewparams.endToEnd = buttons[dataLane]
+//        carImageViewparams.startToStart = buttons[dataLane]
 
-        val textViewParams = requireView().findViewById<TextView>(statusList[dataLane])
-        textViewParams.visibility = View.GONE
+        val drivenStatusText = requireView().findViewById<TextView>(statusList[dataLane])
+        drivenStatusText.setText(drivenStatusText.text)
+        // println(drivenStatusText.text)
 
+        // val adapter = AdapterView<TextView>(this)
+
+        drivenStatusText.text = resources.getString(R.string.status_driven)
+        println(drivenStatusText.text)
+        drivenStatusText.setTextColor(resources.getColor(R.color.status_driven))
         requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
 
-        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
+//        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
         if (numLanes <= 1 ) {
             // TODO: Throw exception
             return
         }
         else if (numLanes > 1) {
             for (i in (min(numLanes, 4)+1)..4) {
-                val button = requireView().findViewById<ToggleButton>(buttons[i])
-                button.visibility = View.INVISIBLE
-                val status = requireView().findViewById<TextView>(statusList[i])
-                status.visibility = View.INVISIBLE
-                val textView = requireView().findViewById<TextView>(textViewList[i])
-                textView.visibility = View.INVISIBLE
+                val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
+                laneLayout.visibility = View.INVISIBLE
+
                 val laneLine = requireView().findViewById<ImageView>(laneLines[i-1])
                 laneLine.visibility = View.INVISIBLE
+
+//                val button = requireView().findViewById<ToggleButton>(buttons[i])
+//                button.visibility = View.INVISIBLE
+//                val status = requireView().findViewById<TextView>(statusList[i])
+//                status.visibility = View.INVISIBLE
+//                val textView = requireView().findViewById<TextView>(textViewList[i])
+//                textView.visibility = View.INVISIBLE
             }
             for (i in 2..min(numLanes, 4)) {
                 val button = requireView().findViewById<ToggleButton>(buttons[i])

@@ -13,6 +13,7 @@
 
     <string name="status_open">OPEN</string>
     <string name="status_closed">CLOSED</string>
+    <string name="status_driven">DRIVEN</string>
 
     <string-array name="config_files">
     </string-array>

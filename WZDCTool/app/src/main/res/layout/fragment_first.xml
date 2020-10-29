@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FirstFragment">
+    tools:context=".FirstFragment"
+    android:background="@color/background">
 
     <TextView
         android:id="@+id/textview_first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:fontFamily="sans-serif-black"
         android:text="Import Configuration File"
+        android:textColor="@color/text"
         android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -23,8 +25,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:backgroundTint="@color/colorAccent"
         android:enabled="false"
         android:text="@string/next"
+        android:textColor="@color/button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,13 +38,18 @@
         android:id="@+id/spinner2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
         android:layout_marginBottom="40dp"
         android:entries="@array/config_files"
         app:layout_constraintBottom_toTopOf="@+id/import_config"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        tools:listitem="@layout/support_simple_spinner_dropdown_item" />
+        tools:listitem="@layout/support_simple_spinner_dropdown_item"
+        android:backgroundTint="@color/colorAccent"/>
 
     <Button
         android:id="@+id/import_config"
@@ -50,7 +59,9 @@
         android:text="Import Config"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="@color/text" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
@@ -87,6 +98,7 @@
         android:layout_marginEnd="48dp"
         android:layout_marginRight="48dp"
         android:text="Manual\nDetection"
+        android:textColor="@color/text"
         app:layout_constraintEnd_toStartOf="@+id/switch1"
         app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
@@ -98,6 +110,7 @@
         android:layout_marginLeft="42dp"
         android:layout_marginTop="4dp"
         android:text="Automatic\nDetection"
+        android:textColor="@color/text"
         app:layout_constraintStart_toEndOf="@+id/switch1"
         app:layout_constraintTop_toTopOf="@+id/guideline8" />
 

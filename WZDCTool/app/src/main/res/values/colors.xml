@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#3A7CA5</color>
+    <color name="colorPrimaryDark">#2F6690</color>
+    <color name="colorAccent">#81C3D7</color>
+
     <color name="status_open">#32a852</color>
     <color name="status_closed">#c23434</color>
+    <color name="status_driven">#000000</color>
+
+    <color name="background">#D9DCD6</color>
+    <color name="text">#16425B</color>
+    <color name="text_disabled">#7016425B</color>
+  
     <color name="usb_status_disconnected">#DD0000</color>
     <color name="usb_status_invalid">#DDDD00</color>
     <color name="usb_status_valid">#00DD00</color>
