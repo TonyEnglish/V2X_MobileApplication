@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
@@ -68,15 +69,13 @@ class SecondFragmentViewModel : ViewModel() {
         val marker = MarkerObj("Data Log", "True")
         markerSubject.onNext(marker)
         dataLog.value = true
+        dataLoggingVar = true
     }
 
     fun stopDataCollection() {
         println("Data Logging Ended")
         val marker = MarkerObj("Data Log", "False")
         markerSubject.onNext(marker)
-        dataLog.value = false
-        gotRP.value = false
-        navigationLiveData.value = R.id.action_SecondFragment_to_FirstFragment
     }
 
     fun markRefPt() {
@@ -244,6 +243,11 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
+        dataLog.value = false
+        dataLoggingVar = false
+        gotRP.value = false
+        navigationLiveData.value = R.id.action_SecondFragment_to_FirstFragment
+
         viewModelScope.launch(Dispatchers.IO) {
             DataFileRepository.dataFileName =
                 "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
