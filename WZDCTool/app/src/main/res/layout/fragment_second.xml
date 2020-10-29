@@ -1,250 +1,276 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment2_rl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SecondFragment">
 
 
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-<!--        android:layout_marginTop="62dp"-->
-<!--        android:layout_marginBottom="10dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/lane_guideline"/>-->
+        android:layout_height="match_parent" />
 
-
-<!--    <androidx.constraintlayout.widget.Guideline-->
-<!--        android:id="@+id/guideline2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        app:layout_constraintGuide_begin="16dp" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/textView2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        android:text="Data Collection"-->
-<!--        android:textSize="24dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.497"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/guideline2" />-->
-
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/button_background"
         android:layout_width="match_parent"
-        android:layout_height="265dp"
-        android:background="#FFFFFF"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:alpha="0.7"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="-2dp"
-        tools:layout_editor_absoluteY="423dp">
+        android:background="#FFFFFF"
+        android:backgroundTint="@color/background"
+        android:orientation="vertical">
 
-    </FrameLayout>
+        <!-- Layout for lane UI components -->
+        <LinearLayout
+            android:id="@+id/lanes_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <!-- Lane 1 -->
+            <LinearLayout
+                android:id="@+id/lane1_ll"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/laneLine1_2"
-        android:layout_width="5dp"
-        android:layout_height="80dp"
-        android:src="@drawable/verticalline_thin_short"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/laneLine2_3"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="366dp" />
+                <TextView
+                    android:id="@+id/lane1textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Lane 1"
+                    android:textAlignment="center"
+                    android:textColor="@color/text" />
 
-    <ImageView
-        android:id="@+id/laneLine2_3"
-        android:layout_width="5dp"
-        android:layout_height="80dp"
-        android:src="@drawable/verticalline_thin_short"
-        app:layout_constraintEnd_toStartOf="@+id/laneLine3_4"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/laneLine1_2"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="364dp" />
+                <TextView
+                    android:id="@+id/lane1status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:text="@string/status_open"
+                    android:textAlignment="center"
+                    android:textColor="@color/status_open"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/laneLine3_4"
-        android:layout_width="5dp"
-        android:layout_height="80dp"
-        android:src="@drawable/verticalline_thin_short"
-        app:layout_constraintEnd_toStartOf="@+id/laneLine2_3"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="364dp" />
+                <ToggleButton
+                    android:id="@+id/lane1btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:enabled="false"
+                    android:text="ToggleButton"
+                    android:textColor="@color/button_text"
+                    android:textOff="CLOSE"
+                    android:textOn="OPEN" />
+            </LinearLayout>
 
-    <ToggleButton
-        android:id="@+id/wp"
-        android:layout_width="150dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="0dp"
-        android:enabled="false"
-        android:textOff="Workers not Present"
-        android:textOn="Workers Present"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/wp_guideline" />
+            <ImageView
+                android:id="@+id/laneLine1_2"
+                android:layout_width="5dp"
+                android:layout_height="80dp"
+                android:src="@drawable/verticalline_thin_short" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/wp_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="132dp" />
+            <!-- Lane 2 -->
+            <LinearLayout
+                android:id="@+id/lane2_ll"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
 
-    <Button
-        android:id="@+id/startBtn"
-        android:layout_width="130dp"
-        android:layout_height="60dp"
-        android:text="Start Data Collection"
-        app:layout_constraintEnd_toStartOf="@+id/ref"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/endBtn" />
+                <TextView
+                    android:id="@+id/lane2textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Lane 2"
+                    android:textAlignment="center"
+                    android:textColor="@color/text" />
 
-    <Button
-        android:id="@+id/endBtn"
-        android:layout_width="130dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="4dp"
-        android:enabled="false"
-        android:text="Stop Data Collection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/ref"
-        app:layout_constraintTop_toTopOf="@+id/guideline5" />
+                <TextView
+                    android:id="@+id/lane2status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:text="@string/status_open"
+                    android:textAlignment="center"
+                    android:textColor="@color/status_open"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="72dp" />
+                <ToggleButton
+                    android:id="@+id/lane2btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:enabled="false"
+                    android:text="ToggleButton"
+                    android:textColor="@color/button_text"
+                    android:textOff="CLOSE"
+                    android:textOn="OPEN" />
+            </LinearLayout>
 
-    <Button
-        android:id="@+id/ref"
-        android:layout_width="150dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="0dp"
-        android:enabled="false"
-        android:text="Mark Reference Point"
-        app:layout_constraintEnd_toStartOf="@+id/endBtn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/startBtn"
-        app:layout_constraintTop_toTopOf="@+id/endBtn" />
+            <ImageView
+                android:id="@+id/laneLine2_3"
+                android:layout_width="5dp"
+                android:layout_height="80dp"
+                android:src="@drawable/verticalline_thin_short" />
 
-    <TextView
-        android:id="@+id/lane1textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lane 1"
-        app:layout_constraintEnd_toEndOf="@+id/lane1btn"
-        app:layout_constraintStart_toStartOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="392dp" />
+            <!-- Lane 3 -->
+            <LinearLayout
+                android:id="@+id/lane3_ll"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/lane2textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lane 2"
-        app:layout_constraintEnd_toEndOf="@+id/lane2btn"
-        app:layout_constraintStart_toStartOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="392dp" />
+                <TextView
+                    android:id="@+id/lane3textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Lane 3"
+                    android:textAlignment="center"
+                    android:textColor="@color/text" />
 
-    <TextView
-        android:id="@+id/lane3textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lane 3"
-        app:layout_constraintEnd_toEndOf="@+id/lane3btn"
-        app:layout_constraintStart_toStartOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="392dp" />
+                <TextView
+                    android:id="@+id/lane3status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:text="@string/status_open"
+                    android:textAlignment="center"
+                    android:textColor="@color/status_open"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/lane4textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lane 4"
-        app:layout_constraintEnd_toEndOf="@+id/lane4btn"
-        app:layout_constraintStart_toStartOf="@+id/lane4btn"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="392dp" />
+                <ToggleButton
+                    android:id="@+id/lane3btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:enabled="false"
+                    android:text="ToggleButton"
+                    android:textColor="@color/button_text"
+                    android:textOff="CLOSE"
+                    android:textOn="OPEN" />
+            </LinearLayout>
 
-    <ToggleButton
-        android:id="@+id/lane1btn"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="75dp"
-        android:enabled="false"
-        android:text="ToggleButton"
-        android:textOff="CLOSE"
-        android:textOn="OPEN"
-        app:layout_constraintEnd_toStartOf="@+id/lane2btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
-        tools:layout_editor_absoluteY="450dp" />
+            <ImageView
+                android:id="@+id/laneLine3_4"
+                android:layout_width="5dp"
+                android:layout_height="80dp"
+                android:src="@drawable/verticalline_thin_short" />
 
-    <ToggleButton
-        android:id="@+id/lane2btn"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="75dp"
-        android:enabled="false"
-        android:text="ToggleButton"
-        android:textOff="CLOSE"
-        android:textOn="OPEN"
-        app:layout_constraintEnd_toStartOf="@+id/lane3btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
-        tools:layout_editor_absoluteY="450dp" />
+            <!-- Lane 4 -->
+            <LinearLayout
+                android:id="@+id/lane4_ll"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:orientation="vertical">
 
-    <ToggleButton
-        android:id="@+id/lane3btn"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="75dp"
-        android:enabled="false"
-        android:text="ToggleButton"
-        android:textOff="CLOSE"
-        android:textOn="OPEN"
-        app:layout_constraintEnd_toStartOf="@+id/lane4btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
-        tools:layout_editor_absoluteY="450dp" />
+                <TextView
+                    android:id="@+id/lane4textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Lane 4"
+                    android:textAlignment="center"
+                    android:textColor="@color/text" />
 
-    <ToggleButton
-        android:id="@+id/lane4btn"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="75dp"
-        android:enabled="false"
-        android:text="ToggleButton"
-        android:textOff="CLOSE"
-        android:textOn="OPEN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline"
-        tools:layout_editor_absoluteY="450dp" />
+                <TextView
+                    android:id="@+id/lane4status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:text="@string/status_open"
+                    android:textAlignment="center"
+                    android:textColor="@color/status_open"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
+                <ToggleButton
+                    android:id="@+id/lane4btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:enabled="false"
+                    android:text="ToggleButton"
+                    android:textColor="@color/button_text"
+                    android:textOff="CLOSE"
+                    android:textOn="OPEN" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Workers Present Button -->
+        <ToggleButton
+            android:id="@+id/wp"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/colorAccent"
+            android:enabled="false"
+            android:textColor="@color/button_text"
+            android:textOff="Workers not Present"
+            android:textOn="Workers Present" />
+
+        <!-- Manual buttons -->
+        <LinearLayout
+            android:id="@+id/manual_buttons_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/startBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Start Data Collection"
+                android:textColor="@color/button_text" />
+
+            <Button
+                android:id="@+id/ref"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:backgroundTint="@color/colorAccent"
+                android:enabled="false"
+                android:text="Mark Reference Point"
+                android:textColor="@color/button_text" />
+
+            <Button
+                android:id="@+id/endBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:backgroundTint="@color/colorAccent"
+                android:enabled="false"
+                android:text="Stop Data Collection"
+                android:textColor="@color/button_text" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Unused lane UI components, not incorporated into LL yet -->
     <ToggleButton
         android:id="@+id/lane5btn"
         android:layout_width="100dp"
@@ -254,8 +280,7 @@
         android:text="ToggleButton"
         android:textOff="Lane 5 Open"
         android:textOn="Lane 5 Closed"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        android:visibility="gone" />
 
     <ToggleButton
         android:id="@+id/lane6btn"
@@ -266,8 +291,7 @@
         android:text="ToggleButton"
         android:textOff="Lane 6 Open"
         android:textOn="Lane 6 Closed"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        android:visibility="gone" />
 
     <ToggleButton
         android:id="@+id/lane7btn"
@@ -278,8 +302,7 @@
         android:text="ToggleButton"
         android:textOff="Lane 7 Open"
         android:textOn="Lane 7 Closed"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        android:visibility="gone" />
 
     <ToggleButton
         android:id="@+id/lane8btn"
@@ -290,83 +313,15 @@
         android:text="ToggleButton"
         android:textOff="Lane 8 Open"
         android:textOn="Lane 8 Closed"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/lane_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="262dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="40dp" />
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/carImageView"
         android:layout_width="50dp"
         android:layout_height="80dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/caricon"
-        app:layout_constraintTop_toTopOf="@id/lane_guideline"
-        tools:layout_editor_absoluteY="373dp" />
+        android:backgroundTint="@color/text"
+        android:backgroundTintMode="multiply"
+        android:src="@drawable/caricon" />
 
-    <TextView
-        android:id="@+id/lane1status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/status_open"
-        android:textColor="@color/status_open"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/lane1btn"
-        app:layout_constraintStart_toStartOf="@+id/lane1btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
-
-    <TextView
-        android:id="@+id/lane2status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/status_open"
-        android:textColor="@color/status_open"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/lane2btn"
-        app:layout_constraintStart_toStartOf="@+id/lane2btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
-
-    <TextView
-        android:id="@+id/lane3status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/status_open"
-        android:textColor="@color/status_open"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/lane3btn"
-        app:layout_constraintStart_toStartOf="@+id/lane3btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
-
-    <TextView
-        android:id="@+id/lane4status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/status_open"
-        android:textColor="@color/status_open"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/lane4btn"
-        app:layout_constraintStart_toStartOf="@+id/lane4btn"
-        app:layout_constraintTop_toTopOf="@+id/lane_guideline" />
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
