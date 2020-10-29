@@ -166,18 +166,18 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<Button>(R.id.endBtn).visibility = View.INVISIBLE
             requireView().findViewById<Button>(R.id.ref).visibility = View.INVISIBLE
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_auto).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_auto).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_auto).toInt() + 10
+//            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_auto).toInt())
+//            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_auto).toInt())
+//            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_auto).toInt() + 10
         }
         else {
             requireView().findViewById<Button>(R.id.startBtn).visibility = View.VISIBLE
             requireView().findViewById<Button>(R.id.endBtn).visibility = View.VISIBLE
             requireView().findViewById<Button>(R.id.ref).visibility = View.VISIBLE
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_manual).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_manual).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_manual).toInt() + 10
+//            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_manual).toInt())
+//            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_manual).toInt())
+//            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_manual).toInt() + 10
         }
     }
 
@@ -249,7 +249,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
-        ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
+        // ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
 
         dataFileSubject.subscribe {
             viewModel.uploadDataFile(it)
