@@ -2,6 +2,7 @@ package com.wzdctool.android.repos
 
 import android.app.Activity
 import android.location.Location
+import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,7 +15,10 @@ import com.wzdctool.android.SecureKeys
 import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.LOCATION
 import com.wzdctool.android.dataclasses.MarkerObj
+import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import rx.subjects.BehaviorSubject
@@ -25,8 +29,8 @@ import java.util.*
 
 object DataFileRepository {
     val csvDataSubject = MutableLiveData<CSVObj>()
-    var markerSubject = BehaviorSubject.create<MarkerObj>()
-    var dataFileSubject = BehaviorSubject.create<String>()
+    var markerSubject = PublishSubject.create<MarkerObj>()
+    var dataFileSubject = PublishSubject.create<String>()
 
     private lateinit var dataPath: String
     private lateinit var osw: OutputStreamWriter
@@ -35,6 +39,24 @@ object DataFileRepository {
     var loggingData = false
     var isFirstTime = true
     val formatter: SimpleDateFormat = SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SS")
+
+    private var total_lanes: Int = 8
+
+    private var lane_stat = MutableList<Boolean>(8+1) {false}
+    private var wp_stat = false
+    private var got_rp = false
+
+    private var previousLine = ""
+
+    // private val messages: MutableList<String> = mutableListOf()
+
+    private val laneList: MutableList<String> = mutableListOf()
+    // var laneList = List<Boolean>(total_lanes+1) {false}
+    var line_num = 0
+
+    private val markerList: List<String> = listOf("Data Log", "RP", "WP+RP", "LC+RP", "WP", "LC", "LO", "")
+    private val markerValueDict: HashMap<String, List<String>> = hashMapOf("Data Log" to listOf("True", "False"), "RP" to listOf(""), "WP+RP" to listOf("True", "False"), "LC+RP" to laneList,
+            "WP" to listOf("True", "False"), "LC" to laneList, "LO" to laneList, "" to listOf(""))
 
 
     // var marker: String = ""
@@ -86,7 +108,7 @@ object DataFileRepository {
         val marker: String = if (markerQueue.size >= 1) markerQueue.remove() else ""
         val markerValue: String = if (markerValueQueue.size >= 1) markerValueQueue.remove() else ""
         val csvObj = CSVObj(
-            Date(location.time), 0, location.accuracy,
+            Date(location.time), location.extras.getInt("satellites"), location.accuracy,
             location.latitude, location.longitude, location.altitude, location.speed,
             location.bearing, marker, markerValue, false
         )
@@ -114,16 +136,51 @@ object DataFileRepository {
         osw.appendLine(
             csvHeaders.toString().replace("[", "").replace("]", "")
         )
+
+        // Initialize validation parameters
+        total_lanes = activeConfigSubject.value!!.LaneInfo.NumberOfLanes
+        for (i in 1..total_lanes) {
+            laneList.add(i.toString())
+        }
+        lane_stat = MutableList<Boolean>(total_lanes+1) {false}
+        var wp_stat = false
+        got_rp = false
+        line_num = 0
+        // messages.clear()
     }
 
     private fun writeToDataFile(message: CSVObj) {
         val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
         println(formattedMessage)
+
+        val messages = validateDataLine(formattedMessage, line_num)
+        if (messages.isNotEmpty()) {
+            // Line invalid
+            for (msg in messages) {
+                notificationSubject.onNext("Invalid data line: $msg")
+            }
+        }
+
+        // Remove duplicates
+        if (formattedMessage == previousLine) {
+            println("Skipping duplicate line")
+            return
+        }
+
         if (loggingData) osw.appendLine(formattedMessage)
         if (message.marker == "Data Log" && message.marker_value == "False") {
+            val lastMessages = validateLastDataLine(formattedMessage)
+            if (lastMessages.isNotEmpty()) {
+                for (msg in lastMessages) {
+                    notificationSubject.onNext("Cannot end data collection because: $msg")
+                }
+                return
+            }
             loggingData = false
             saveDataFile()
         }
+
+        previousLine = formattedMessage
     }
 
     private fun saveDataFile() {
@@ -131,39 +188,167 @@ object DataFileRepository {
         osw.close()
         println("File Size: ${File(dataPath).length()}")
         val dataFileDownloadsLocation: String = "${Constants.DOWNLOAD_LOCTION}/${dataPath.split(
-            '/'
+            "/"
         ).last()}"
         println("Download location: $dataFileDownloadsLocation")
         copy(dataPath, dataFileDownloadsLocation)
         File(dataPath).delete()
 
-//        Thread {
-//            println("Downloaded Configuration File")
-//            val output = uploadPathDataFile(dataFileDownloadsLocation, dataFileName)
-//            runOnUiThread {
-//                println("Running on Main thread")
-//                println(output)
-//                val mySnackbar = Snackbar.make(
-//                    findViewById<TextView>(R.id.textView),
-//                    "Uploaded Path Data",
-//                    5000
-//                )
-//                mySnackbar.show()
-//            }
-//        }.start()
-
         dataFileSubject.onNext(dataFileDownloadsLocation)
-
-        // viewModelScope.launch(Dispatchers.IO) {
-//        dataFileName = "path-data--${activeWZIDSubject.value}.csv"
-//        val output = uploadPathDataFile(dataFileDownloadsLocation, dataFileName)
-//        println(output)
-            // notificationText.postValue("Uploaded Path Data")
-            // ConfigurationRepository.activateConfig("config--road-name--description.json")
-        // }
-
-        // findNavController(SecondFragment()).navigate(R.id.action_SecondFragment_to_FirstFragment)
     }
+
+    private fun validateDataLine(line: String, lineNum: Int): List<String> {
+        val fields = line.split(",")
+        var valid = true
+        val messages: MutableList<String> = mutableListOf()
+
+        val time    = fields[0]
+        val sats    = fields[1].toInt()
+        val hdop    = fields[2].toDouble()
+        val lat     = fields[3].toDouble()
+        val lon     = fields[4].toDouble()
+        val elev    = fields[5].toDouble()
+        val speed   = fields[6].toDouble()
+        val heading = fields[7].toDouble()
+        val marker  = fields[8]
+        val value   = fields[9]
+
+        // Simple verification
+        if (! ("""([0-9]){4}\/(0[1-9]|1[0-2])\/([0-9]){2}-(0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9]):([0-9]){2}""").toRegex().matches(time)) {
+            messages.add("Line $lineNum: GPS date time gormat invalid: $time")
+        }
+        if (sats !in 0..12) {
+            messages.add("Line $lineNum: Number of sattelites invalid: $sats")
+        }
+        if (hdop <= 0) {
+            messages.add("Line $lineNum: HDOP format invalid: $hdop")
+        }
+        if (! (lat >= -90 && lat <= 90)) {
+            messages.add("Line $lineNum: Latitude invalid: $lat")
+        }
+        if (! (lon >= -180.0 && lon <= 180.0)) {
+            messages.add("Line $lineNum: Longitude invalid: $lon")
+        }
+        if (! (elev >= -4096.0 && elev <= 61439.0)) {
+            messages.add("Line $lineNum: Altitude invalid: $elev")
+        }
+        if (speed !in 0.0..8191.0) {
+            messages.add("Line $lineNum: Speed invalid: $speed")
+        }
+        if (heading !in 0.0..360.0) {
+            messages.add("Line $lineNum: Heading invalid: $heading")
+        }
+        // Verify marker + value combination is valid
+        if (markerValueDict[marker] != null) {
+            if (!markerValueDict[marker]!!.contains(value)) {
+                messages.add("Line $lineNum: Marker and value combination invalid. Marker: $marker, Value: $value")
+            }
+        }
+        else {
+            messages.add("Line $lineNum: Marker invalid: $marker")
+        }
+
+        ////// Advanced verification
+
+        // Verify Reference Point
+        if (marker == "RP" ||  marker == "LC+RP" ||  marker == "LC+WP") {
+            got_rp = true
+        }
+
+        if (value in markerValueDict["LC"]!!) { // Equivalent to checking markerValueDict["LO"]
+            // This means that value is an integer
+            // Verify lane closure continuity
+            if (marker == "LC" ||  marker == "LC+RP") {
+                if (lane_stat[value.toInt()]) {
+                    messages.add("Line $lineNum: Lane closure invalid, closed lane being closed: $marker: $value")
+                }
+                else {
+                    lane_stat[value.toInt()] = true
+                }
+            }
+            if (marker == "LO") {
+                if (!lane_stat[value.toInt()])
+                    messages.add("Line $lineNum: Lane opening invalid, open lane being opened: $marker: $value")
+                else {
+                    lane_stat[value.toInt()] = false
+                }
+            }
+            else {
+                // This error is caught by the basic validator
+            }
+        }
+
+        // Verify worker presence continuity
+        if (marker == "WP" ||  marker == "WP+RP") {
+            if (value == "True" || value == "False") {
+                if (wp_stat == value.toLowerCase(Locale.ROOT).toBoolean()) {
+                    messages.add("Line $lineNum: Worker Presence change invalid, wp: $wp_stat, value: $value")
+                }
+                else {
+                    wp_stat = !wp_stat
+                }
+            }
+        }
+        return messages
+    }
+
+    private fun validateLastDataLine(line: String): List<String> {
+        val fields = line.split(",")
+        var valid = true
+        val messages: MutableList<String> = mutableListOf()
+
+        if (!got_rp) {
+            messages.add("Reference point must be marked")
+        }
+
+        for (i in 1 until lane_stat.size) {
+            if (lane_stat[i]) {
+                messages.add("Lane $i still closed")
+            }
+        }
+
+        if (wp_stat) {
+            messages.add("Workers still present")
+        }
+
+        return messages
+    }
+
+//    private fun validateDataFile() {
+//
+//        var gotRP = false
+//        var i = 0
+//
+//        lane_stat = [0]*9
+//        wp_stat = False
+//        messages = []
+//        file_valid = True
+//        got_rp = False
+//        i = 0
+//        with open(veh_path_data_file, "r") as f:
+//        headers = f.readline()
+//        data = f.readline().rstrip("\n")
+//        while data:
+//        i += 1
+//        valid, msg, lane_stat, wp_stat, got_rp = validate_data_line(data, markerList, markerValueDict, lane_stat, wp_stat, got_rp)
+//        if (! valid):
+//        vileValid = False
+//        messages.append("Line " + str(i) + " " + msg)
+//
+//        data = f.readline().rstrip("\n")
+//
+//        if (! got_rp == True)
+//        file_valid = False
+//        messages.append(" No reference point found by end")
+//        if (! wp_stat == False)
+//        file_valid = False
+//        messages.append("Workers present not false at end")
+//        if (! lane_stat == [0]*9)
+//        file_valid = False
+//        messages.append("All lanes not open at end")
+//
+//        return messages
+//    }
 
     fun copy(src: String, dst: String) {
         val `in`: InputStream = FileInputStream(src)

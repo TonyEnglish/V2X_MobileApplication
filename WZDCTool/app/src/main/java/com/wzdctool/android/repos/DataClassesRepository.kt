@@ -21,6 +21,8 @@ object DataClassesRepository {
     val locationSubject: PublishSubject<Location> = PublishSubject.create<Location>()
     val activeLocationSourceSubject: BehaviorSubject<String> = BehaviorSubject.create<String>()
     val usbGpsStatus: BehaviorSubject<String> = BehaviorSubject.create<String>("disconnected")
+    val rsmStatus: BehaviorSubject<Boolean> = BehaviorSubject.create<Boolean>(true)
+    var dataLoggingVar = false
     val locationSourcesSubject: BehaviorSubject<List<String>> = BehaviorSubject.create<List<String>>()
     // val dataLoggingSubject = BehaviorSubject.create<Boolean>(false)
 

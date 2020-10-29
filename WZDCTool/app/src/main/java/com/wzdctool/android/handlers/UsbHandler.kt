@@ -1,6 +1,7 @@
 package com.wzdctool.android.handlers
 
 import android.location.Location
+import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import com.wzdctool.android.Constants
@@ -39,6 +40,10 @@ class UsbHandler : Handler() {
         locationSources = sources as MutableList<String>
     }
 
+    fun usbDisconnected() {
+        isFirstTime = true
+    }
+
     override fun handleMessage(msg: Message) {
         when (msg.what) {
             UsbService.MESSAGE_FROM_SERIAL_PORT -> {
@@ -62,9 +67,9 @@ class UsbHandler : Handler() {
                 if (key == "RMC") {
                     newLocation = parseRMC(data, prevLocation)
                     if (newLocation != null) {
-                        if (newLocation.altitude == 0.0 || newLocation.bearing == 0f) {
+                        if (isFirstTime && newLocation.bearing == 0f) {
                             isValid = false
-                            DataClassesRepository.notificationSubject.onNext("RMC Invalid")
+//                            DataClassesRepository.notificationSubject.onNext("RMC Invalid")
                         }
                         update = true   // Only update when RMC line is parsed
                     }
@@ -75,9 +80,9 @@ class UsbHandler : Handler() {
                 else if (key == "GGA") {
                     newLocation = parseGGA(data, prevLocation)
                     if (newLocation != null) {
-                        if (newLocation.altitude == 0.0) {
+                        if (isFirstTime && newLocation.altitude == 0.0) {
                             isValid = false
-                            DataClassesRepository.notificationSubject.onNext("GGA Invalid")
+//                            DataClassesRepository.notificationSubject.onNext("GGA Invalid")
                         }
                     }
                 }
@@ -155,25 +160,17 @@ class UsbHandler : Handler() {
         val s = NMEAData.split(',')
 
         if (s[RMCSTAT] != "A") {
-            // Toast.makeText(mActivity.get(), "Invalid Fix", Toast.LENGTH_LONG).show()
             return null
         }
-        // Toast.makeText(mActivity.get(), NMEAData, Toast.LENGTH_SHORT).show()
-
-        // val GPSDate = "20${s[RMCDATE].substring(4, 6)}/${s[RMCDATE].substring(2, 4)}/${s[RMCDATE].substring(0, 2)}"
 
         val timeString = s[RMCTIME] + '-' + s[RMCDATE]
         val date: Date? = formatParser.parse(timeString)
         val GPSDate = date?.time ?: Calendar.getInstance().time.time
-        // val GPSDate: Long = date ? date.time :
-
-        //  val GPSDate: Long = Calendar.getInstance().getTime().time
 
         //////
         //       Get Latitude and convert to decimal degrees
         //////
 
-        // var lats = 100.0
         val lats = s[RMCLAT].toDouble()
         var p1  = (lats / 100.0).toInt()
         var lat = (p1 + (lats - p1 * 100) / 60.0)
@@ -182,33 +179,31 @@ class UsbHandler : Handler() {
             lat = -lat
         }
         val GPSLat = lat
-//
+
 //        //////
 //        //       Get longitude and convert to decimal degrees
 //        //////
-//
+
         val lng = s[RMCLON].toDouble()
-        //var lng = 100.0
-//        if (s[RMCLON] != "") {
-//            lng = s[RMCLON].toDouble()
-//        }
-//        val lon  = lats / 100.0;
         p1  = (lng / 100.0).toInt()
         var lon = (p1+(lng-p1*100)/60.0)
         if (s[RMCLONEW] == "W") {
             lon = -lon
         }
         val GPSLon = lon
-//
+
 //        //////
 //        //       Get speed and heading...
 //        //////
-//
+
         val GPSSpeed = s[RMCKNOTS].toFloat()       // Speed in Knots
-        val GPSHeading = s[RMCANGLE].toFloat()
-//        val angleString = s[RMCANGLE]
-//        val GPSHeading = s[RMCANGLE].toFloat() // Direction angle
-//
+
+        var GPSHeading: Float? = null
+
+        if (s[RMCANGLE] != "") {
+            GPSHeading = s[RMCANGLE].toFloat()
+        }
+
         var newLocation = prevLocation
         if (newLocation == null) {
             newLocation = Location("")
@@ -218,15 +213,10 @@ class UsbHandler : Handler() {
         newLocation!!.latitude = GPSLat
         newLocation.longitude = GPSLon
         newLocation.speed = GPSSpeed
-        newLocation.bearing = GPSHeading
-        newLocation.latitude = GPSLat
+        if (GPSHeading != null) {
+            newLocation.bearing = GPSHeading
+        }
         newLocation.time = GPSDate
-        // Toast.makeText(mActivity.get(), "Valid Fix", Toast.LENGTH_LONG).show()
-        // Toast.makeText(mActivity.get(), "$GPSLat, $GPSLon; $GPSSpeed; $GPSHeading", Toast.LENGTH_SHORT).show() //$NMEAData;${s[RMCLAT]},${s[RMCLON]} $GPSSpeed;  "$GPSLat, $GPSLon; $GPSSpeed"
-
-        //////
-        //   Return to caller with value...
-        // Toast.makeText(mActivity.get(), "${newLocation.latitude}, ${newLocation.longitude}, ${newLocation.accuracy}", Toast.LENGTH_SHORT).show()
 
         return newLocation
     }
@@ -254,7 +244,6 @@ class UsbHandler : Handler() {
         val s = NMEAData.split(',')
 
         if (s[GSAStat].toInt() <= 1) {
-            // Toast.makeText(mActivity.get(), "Invalid Fix", Toast.LENGTH_LONG).show()
             return null
         }
 
@@ -267,8 +256,6 @@ class UsbHandler : Handler() {
 
 
         newLocation!!.accuracy = GPSHdop
-        // Toast.makeText(mActivity.get(), "$GPSHdop", Toast.LENGTH_SHORT).show() //$NMEAData;${s[RMCLAT]},${s[RMCLON]} $GPSSpeed;  "$GPSLat, $GPSLon; $GPSSpeed"
-        // Toast.makeText(mActivity.get(), "${newLocation.latitude}, ${newLocation.longitude}, ${newLocation.accuracy}", Toast.LENGTH_SHORT).show()
 
         return newLocation
     }
@@ -316,13 +303,8 @@ class UsbHandler : Handler() {
         val s = NMEAData.split(',')
 
         if (s[GGAFIXQUAL].toDouble() <= 0.0) {
-            // Toast.makeText(mActivity.get(), "Invalid Fix", Toast.LENGTH_SHORT).show()
             return null
         }
-        // Toast.makeText(mActivity.get(), "Valid GGA Fix: $NMEAData", Toast.LENGTH_SHORT).show()
-
-
-        // val GPSTime = s[GGAGMT][0:2]+":"+s[GGAGMT][2:4]+":"+s[GGAGMT][4:6]+":"+s[GGAGMT][7:9]
 
         //##
         //       Get # of satellites
@@ -332,21 +314,21 @@ class UsbHandler : Handler() {
         //##
         //       Get altitude in meters
         //##
-        val GPSAlt      = s[GGAALT].toDouble()
+        var GPSAlt: Double? = null
+        if (s[GGAALT] != "") {
+            GPSAlt = s[GGAALT].toDouble()
+        }
 //
         var newLocation = prevLocation
         if (newLocation == null) {
             newLocation = Location("")
         }
 
-        newLocation!!.altitude = GPSAlt
-
-//        var extras = newLocation.extras
-//        extras["sats"] =
-        // GPSLocation!!.time =
-
-//         Toast.makeText(mActivity.get(), "$GPSAlt", Toast.LENGTH_SHORT).show() //$NMEAData;${s[RMCLAT]},${s[RMCLON]} $GPSSpeed;  "$GPSLat, $GPSLon; $GPSSpeed"
-        // Toast.makeText(mActivity.get(), "${newLocation.latitude}, ${newLocation.longitude}, ${newLocation.accuracy}", Toast.LENGTH_SHORT).show()
+        if (GPSAlt != null) {
+            newLocation!!.altitude = GPSAlt
+        }
+        newLocation.extras = Bundle()
+        newLocation.extras.putInt("satellites", GPSSats)
 
         return newLocation
     }

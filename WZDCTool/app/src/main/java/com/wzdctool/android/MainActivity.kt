@@ -5,35 +5,33 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.*
 import android.content.pm.PackageManager
-import android.location.Location
-import android.os.*
-import android.provider.CalendarContract
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.Switch
-import android.widget.TextView
-import android.widget.Toast
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
+import com.wzdctool.android.handlers.UsbHandler
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
+import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
-import com.wzdctool.android.repos.DataFileRepository
-import com.wzdctool.android.handlers.UsbHandler
-import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
+import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
+import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.services.LocationService
 import com.wzdctool.android.services.UsbService
 import com.wzdctool.android.services.UsbService.UsbBinder
-import org.w3c.dom.Text
-import java.lang.ref.WeakReference
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -83,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                     locationSourcesSubject.onNext(locationSources)
                     usbGpsStatus.onNext("disconnected")
                     activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                    mHandler?.usbDisconnected()
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show()
                 }
                 UsbService.ACTION_USB_NOT_SUPPORTED -> Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show()
@@ -104,9 +103,9 @@ class MainActivity : AppCompatActivity() {
 
         notificationSubject.subscribe {
             val mySnackbar = Snackbar.make(
-                findViewById(R.id.toolbar),
-                it,
-                5000
+                    findViewById(R.id.toolbar),
+                    it,
+                    5000
             )
             mySnackbar.show()
         }
@@ -167,24 +166,50 @@ class MainActivity : AppCompatActivity() {
             if (it == "valid") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
                 findViewById<Switch>(R.id.switch1).isEnabled = true
-                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_valid))
+                val textView = findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
 //                findViewById<Switch>(R.id.switch1).isChecked = true
+//                locationSourceSwitchClicked()
 //                locationSourceSwitchClicked()
             }
             else if (it == "invalid") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                 findViewById<Switch>(R.id.switch1).isEnabled = false
-                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_invalid))
+                val textView = findViewById<TextView>(R.id.locationSourceOn)
+                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
+
+                val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+                anim.duration = 900 //You can manage the blinking time with this parameter
+                anim.startOffset = 20
+                anim.repeatMode = Animation.REVERSE
+                anim.repeatCount = Animation.INFINITE
+                textView.startAnimation(anim)
 //                findViewById<Switch>(R.id.switch1).isChecked = false
 //                locationSourceSwitchClicked()
             }
             else if (it == "disconnected") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                 findViewById<Switch>(R.id.switch1).isEnabled = false
-                findViewById<TextView>(R.id.locationSourceOn).setTextColor(resources.getColor(R.color.usb_status_disconnected))
+                val textView = findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
 //                findViewById<Switch>(R.id.switch1).isChecked = false
 //                locationSourceSwitchClicked()
             }
+        }
+
+        locationSubject.subscribe {
+            if (rsmStatus.value && it.accuracy > 2) {
+                rsmStatus.onNext(false)
+            }
+            else if (!dataLoggingVar && it.accuracy <= 2) {
+                rsmStatus.onNext(true)
+            }
+        }
+
+        rsmStatus.subscribe {
+            findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         }
     }
 
@@ -193,8 +218,8 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
             ) -> {
                 // You can use the API that requires the permission.
                 // performAction(...)
@@ -202,7 +227,7 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 // You can directly ask for the permission.
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    premissionRequestCode)
+                        premissionRequestCode)
             }
         }
     }

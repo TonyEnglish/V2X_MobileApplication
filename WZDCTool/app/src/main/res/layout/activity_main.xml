@@ -10,6 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#5350ba"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
@@ -21,7 +22,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="90dp">
 
             <TextView
                 android:id="@+id/activeConfigTextView"
@@ -33,12 +34,12 @@
 
             <TextView
                 android:id="@+id/locationSourceOff"
-                android:layout_width="300px"
+                android:layout_width="340px"
                 android:layout_height="wrap_content"
                 android:text="Internal GPS"
+                android:textColor="@color/usb_status_valid"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/usb_status_valid"
                 app:layout_constraintBottom_toBottomOf="@+id/guideline2"
                 app:layout_constraintEnd_toStartOf="@+id/switch1"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -62,9 +63,9 @@
                 android:layout_width="250px"
                 android:layout_height="wrap_content"
                 android:text="USB GPS"
+                android:textColor="@color/usb_status_disconnected"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/usb_status_disconnected"
                 app:layout_constraintBottom_toBottomOf="@+id/guideline2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -76,6 +77,42 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_begin="60dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".25" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".60" />
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WZDx"
+                android:checked="true"
+                android:textSize="20sp"
+                android:enabled="false"
+                app:layout_constraintStart_toStartOf="@+id/guideline7"
+                app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RSM"
+                android:checked="true"
+                android:textSize="20sp"
+                android:enabled="false"
+                app:layout_constraintStart_toStartOf="@+id/guideline8"
+                app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
