@@ -235,13 +235,14 @@
             android:id="@+id/manual_buttons_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
 
             <Button
                 android:id="@+id/startBtn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.3"
+                android:layout_weight="0.33"
                 android:backgroundTint="@color/colorAccent"
                 android:text="Start Data Collection"
                 android:textColor="@color/button_text" />
@@ -250,7 +251,7 @@
                 android:id="@+id/ref"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.4"
+                android:layout_weight="0.35"
                 android:backgroundTint="@color/colorAccent"
                 android:enabled="false"
                 android:text="Mark Reference Point"
@@ -260,7 +261,7 @@
                 android:id="@+id/endBtn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.3"
+                android:layout_weight="0.32"
                 android:backgroundTint="@color/colorAccent"
                 android:enabled="false"
                 android:text="Stop Data Collection"
