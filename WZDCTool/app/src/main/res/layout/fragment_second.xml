@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:alpha="0.7"
+        android:alpha="0.9"
         android:background="#FFFFFF"
         android:backgroundTint="@color/background"
         android:orientation="vertical">
@@ -269,9 +269,22 @@
 
         </LinearLayout>
 
+
     </LinearLayout>
 
     <!-- Unused lane UI components, not incorporated into LL yet -->
+
+    <ImageView
+        android:id="@+id/carImageView"
+        android:layout_width="50dp"
+        android:layout_height="80dp"
+        android:layout_weight="0.20"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"
+        android:backgroundTint="@color/text"
+        android:backgroundTintMode="multiply"
+        android:src="@drawable/caricon" />
+
     <ToggleButton
         android:id="@+id/lane5btn"
         android:layout_width="100dp"
@@ -315,14 +328,5 @@
         android:textOff="Lane 8 Open"
         android:textOn="Lane 8 Closed"
         android:visibility="gone" />
-
-    <ImageView
-        android:id="@+id/carImageView"
-        android:layout_width="50dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="5dp"
-        android:backgroundTint="@color/text"
-        android:backgroundTintMode="multiply"
-        android:src="@drawable/caricon" />
 
 </RelativeLayout>
