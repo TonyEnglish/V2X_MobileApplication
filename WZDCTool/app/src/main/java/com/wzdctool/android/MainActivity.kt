@@ -246,11 +246,15 @@ class MainActivity : AppCompatActivity() {
 
         toolbarActiveSubject.subscribe {
             if (it) {
-                findViewById<ConstraintLayout>(R.id.toolbar_stuffs).visibility = View.VISIBLE
+                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.VISIBLE
+                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.VISIBLE
+                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.VISIBLE
                 // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 90
             }
             else {
-                findViewById<ConstraintLayout>(R.id.toolbar_stuffs).visibility = View.GONE
+                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.GONE
+                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.GONE
+                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.GONE
                 // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
             }
         }

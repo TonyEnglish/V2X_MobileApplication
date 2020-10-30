@@ -101,7 +101,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         mMapView.onCreate(savedInstanceState)
         mMapView.getMapAsync(this)
 
-        view.findViewById<Button>(R.id.wp).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.wp).setOnClickListener {
             if (viewModel.wpStat) {
                 println("Workers Not Present")
                 viewModel.wpStat = false
@@ -122,8 +122,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<Button>(R.id.startBtn).isEnabled = false
-            requireView().findViewById<Button>(R.id.ref).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = true
         }
     }
 
@@ -132,9 +135,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
+            requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
-            requireView().findViewById<Button>(R.id.wp).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
@@ -145,9 +150,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<Button>(R.id.ref).isEnabled = false
-            requireView().findViewById<Button>(R.id.endBtn).isEnabled = true
-            requireView().findViewById<Button>(R.id.wp).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
@@ -172,15 +177,15 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     fun collectionModeUI() {
         if (viewModel.automaticDetection.value!!) {
-            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.INVISIBLE
-            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.INVISIBLE
-            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.INVISIBLE
+//            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.INVISIBLE
+//            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.INVISIBLE
+//            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.INVISIBLE
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
-            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
