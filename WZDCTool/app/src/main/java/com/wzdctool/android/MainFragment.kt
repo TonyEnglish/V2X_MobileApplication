@@ -9,7 +9,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.Switch
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
 
 class MainFragment : Fragment() {
 
@@ -38,6 +41,13 @@ class MainFragment : Fragment() {
         view.findViewById<Button>(R.id.createMapButton).setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_FirstFragment)
         }
+
+        if (currentConnectionStringSubject.value != null) {
+            view.findViewById<Button>(R.id.createMapButton).isEnabled = true
+        }
+
+        DataClassesRepository.toolbarActiveSubject.onNext(false)
+        // requireActivity().findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
 
     }
 

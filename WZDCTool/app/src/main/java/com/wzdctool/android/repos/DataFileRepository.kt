@@ -1,27 +1,17 @@
 package com.wzdctool.android.repos
 
-import android.app.Activity
 import android.location.Location
-import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.microsoft.azure.storage.CloudStorageAccount
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
-import com.wzdctool.android.SecureKeys
 import com.wzdctool.android.dataclasses.CSVObj
-import com.wzdctool.android.dataclasses.LOCATION
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
-import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import java.io.*
 import java.text.SimpleDateFormat
@@ -368,14 +358,17 @@ object DataFileRepository {
     fun uploadPathDataFile(filePath: String, fileName: String): String {
         try {
             // Retrieve storage account from connection-string.
+            if (azureInfoRepository.currentConnectionStringSubject.value == null) {
+                return ""
+            }
             val storageAccount: CloudStorageAccount =
-                CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
+                CloudStorageAccount.parse(azureInfoRepository.currentConnectionStringSubject.value)
 
             // Create the blob client.
             val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
 
             // Retrieve reference to a previously created container.
-            val container: CloudBlobContainer = blobClient.getContainerReference("workzoneuploads")
+            val container: CloudBlobContainer = blobClient.getContainerReference(Constants.AZURE_PATH_DATA_UPLOADS_CONTAINER)
 
             // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
             val blob: CloudBlockBlob = container.getBlockBlobReference(fileName)

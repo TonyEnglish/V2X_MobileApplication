@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Map Work Zone"
             android:backgroundTint="@color/colorAccent"
+            android:enabled="false"
             android:textColor="@color/button_text"
             android:layout_marginBottom="10sp" />
 
@@ -41,7 +42,7 @@
             android:layout_height="wrap_content"
             android:text="Settings"
             android:backgroundTint="@color/colorAccent"
-            android:textColor="@color/button_text" />
+            android:textColor="@color/button_text"/>
 
     </LinearLayout>
 

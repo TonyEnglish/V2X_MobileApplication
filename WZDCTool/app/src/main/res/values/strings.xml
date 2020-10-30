@@ -15,6 +15,9 @@
     <string name="status_closed">CLOSED</string>
     <string name="status_driven">DRIVEN</string>
 
+    <string name="preference_account_name">preference_account_name</string>
+    <string name="preference_account_key">preference_account_key</string>
+
     <string-array name="config_files">
     </string-array>
 </resources>

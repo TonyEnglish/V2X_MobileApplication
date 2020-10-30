@@ -11,15 +11,17 @@ import android.os.Environment
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.wzdctool.android.dataclasses.azureInfoObj
 import com.wzdctool.android.handlers.UsbHandler
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
@@ -28,8 +30,12 @@ import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
+import com.wzdctool.android.repos.DataClassesRepository.toolbarActiveSubject
 import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
 import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
+import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
+import com.wzdctool.android.repos.azureInfoRepository.updateConnectionStringFromObj
 import com.wzdctool.android.services.LocationService
 import com.wzdctool.android.services.UsbService
 import com.wzdctool.android.services.UsbService.UsbBinder
@@ -213,9 +219,41 @@ class MainActivity : AppCompatActivity() {
             findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         }
 
-//        findViewById<Button>(R.id.action_settings).setOnClickListener {
-//            println("SETTINGS")
-//        }
+        // TODO: Do not re-save values to saved preferences on initial load
+        currentAzureInfoSubject.subscribe {
+            updateConnectionStringFromObj(it)
+            val sharedPref = getPreferences(Context.MODE_PRIVATE)
+            with (sharedPref.edit()) {
+                putString(getString(R.string.preference_account_name), it.account_name)
+                putString(getString(R.string.preference_account_key), it.account_key)
+                apply()
+            }
+            println(sharedPref.getString(resources.getString(R.string.preference_account_name), null))
+            println(sharedPref.getString(resources.getString(R.string.preference_account_key), null))
+        }
+
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        if (sharedPref != null) {
+            println(sharedPref.getString(resources.getString(R.string.preference_account_name), null))
+            println(sharedPref.getString(resources.getString(R.string.preference_account_key), null))
+            val accountName = sharedPref.getString(resources.getString(R.string.preference_account_name), null)
+            val accountKey = sharedPref.getString(resources.getString(R.string.preference_account_key), null)
+
+            if (accountName != null && accountKey != null) {
+                currentAzureInfoSubject.onNext(azureInfoObj(accountName, accountKey))
+            }
+        }
+
+        toolbarActiveSubject.subscribe {
+            if (it) {
+                findViewById<ConstraintLayout>(R.id.toolbar_stuffs).visibility = View.VISIBLE
+                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 90
+            }
+            else {
+                findViewById<ConstraintLayout>(R.id.toolbar_stuffs).visibility = View.GONE
+                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

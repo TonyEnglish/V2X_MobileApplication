@@ -25,13 +25,13 @@
             android:id="@+id/editTextAccountName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="STUFF"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="neaeraio..."
+            android:text=""
             android:textColor="@color/colorPrimary"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:autofillHints="storage" />
 
         <TextView
             android:layout_width="match_parent"
@@ -40,20 +40,27 @@
             android:textColor="@color/text"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginTop="50dp"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="30dp"/>
 
         <EditText
             android:id="@+id/editTextAccountKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="STUFF"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="gSFq2szM88ag0BV..."
             android:textColor="@color/colorPrimary"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:text=""
+            android:autofillHints="storage key" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Save" />
 
     </LinearLayout>
 

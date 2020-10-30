@@ -4,17 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.Spinner
+import android.widget.Switch
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
-import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.ConfigurationRepository.configListSubject
-import com.wzdctool.android.repos.DataFileRepository.getConfigName
+import com.wzdctool.android.repos.DataClassesRepository.toolbarActiveSubject
 
 
 /**
@@ -32,14 +34,14 @@ class FirstFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("onCreateView")
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_first, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        println("onViewCreated")
+
+        toolbarActiveSubject.onNext(true)
 
         view.findViewById<Button>(R.id.button_first).setOnClickListener {
             viewModel.updateDataCollectionObj()
@@ -61,11 +63,12 @@ class FirstFragment : Fragment() {
 //            if (activeConfigSubject.value != null)
 //                viewModel.updateDataCollectionObj()
         }
+        // .layoutParams.height = 90
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        println("onActivityCreated")
         viewModel = ViewModelProvider(this).get(FirstFragmentViewModel::class.java)
 
         val spinnerObserver = Observer<List<String>> {
