@@ -57,10 +57,14 @@
 
         <Button
             android:id="@+id/saveButton"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="50dp"
-            android:text="Save" />
+            android:backgroundTint="@color/colorAccent"
+            android:text="Save"
+            android:textColor="@color/text"
+            android:textSize="18sp" />
 
     </LinearLayout>
 

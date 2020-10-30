@@ -28,23 +28,25 @@
 
         <Button
             android:id="@+id/createMapButton"
-            android:layout_width="200sp"
+            android:layout_width="300sp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10sp"
             android:backgroundTint="@color/colorAccent"
-            android:drawableLeft="@drawable/ic_baseline_pin_drop_24"
+            android:drawableLeft="@drawable/ic_construction_worker"
             android:enabled="true"
             android:text="Map Work Zone"
-            android:textColor="@color/button_text" />
+            android:textColor="@color/button_text"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/settingsButton"
-            android:layout_width="200sp"
+            android:layout_width="300sp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorAccent"
             android:drawableLeft="@drawable/ic_baseline_settings_24"
             android:text="Settings"
-            android:textColor="@color/button_text" />
+            android:textColor="@color/button_text"
+            android:textSize="18sp" />
 
     </LinearLayout>
 

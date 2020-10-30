@@ -218,19 +218,6 @@
 
         </LinearLayout>
 
-        <!-- Workers Present Button -->
-        <ToggleButton
-            android:id="@+id/wp"
-            android:layout_width="150dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/colorAccent"
-            android:enabled="false"
-            android:textColor="@color/button_text"
-            android:textOff="Workers not Present"
-            android:textOn="Workers Present" />
-
-        <!-- Manual buttons -->
         <LinearLayout
             android:id="@+id/manual_buttons_ll"
             android:layout_width="match_parent"
@@ -238,33 +225,46 @@
             android:orientation="horizontal"
             android:layout_marginBottom="5dp">
 
-            <Button
+            <ImageButton
+                android:id="@+id/wp"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/colorAccent"
+                android:src="@drawable/ic_construction_worker_small"
+                android:enabled="false"
+                android:textColor="@color/button_text" />
+
+            <ImageButton
                 android:id="@+id/startBtn"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_weight="0.33"
                 android:backgroundTint="@color/colorAccent"
-                android:text="Start Data Collection"
-                android:textColor="@color/button_text" />
+                android:src="@drawable/ic_baseline_play_arrow_24"
+                android:textColor="@color/button_text"
+                android:visibility="visible"
+                android:layout_above="@id/button_background" />
 
-            <Button
-                android:id="@+id/ref"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.35"
-                android:backgroundTint="@color/colorAccent"
-                android:enabled="false"
-                android:text="Mark Reference Point"
-                android:textColor="@color/button_text" />
-
-            <Button
+            <ImageButton
                 android:id="@+id/endBtn"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.32"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:backgroundTint="@color/primary_active"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_stop_24"
+                android:textColor="@color/button_text"
+                android:layout_above="@id/button_background" />
+
+            <ImageButton
+                android:id="@+id/ref"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
                 android:backgroundTint="@color/colorAccent"
-                android:enabled="false"
-                android:text="Stop Data Collection"
+                android:src="@drawable/ic_baseline_pin_drop_24"
                 android:textColor="@color/button_text" />
 
         </LinearLayout>
