@@ -143,29 +143,29 @@ object DataFileRepository {
         val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
         println(formattedMessage)
 
-        val messages = validateDataLine(formattedMessage, line_num)
-        if (messages.isNotEmpty()) {
-            // Line invalid
-            for (msg in messages) {
-                notificationSubject.onNext("Invalid data line: $msg")
-            }
-        }
+//        val messages = validateDataLine(formattedMessage, line_num)
+//        if (messages.isNotEmpty()) {
+//            // Line invalid
+//            for (msg in messages) {
+//                notificationSubject.onNext("Invalid data line: $msg")
+//            }
+//        }
 
         // Remove duplicates
-        if (formattedMessage == previousLine) {
-            println("Skipping duplicate line")
-            return
-        }
+//        if (formattedMessage == previousLine) {
+//            println("Skipping duplicate line")
+//            return
+//        }
 
         if (loggingData) osw.appendLine(formattedMessage)
-        if (message.marker == "Data Log" && message.marker_value == "False") {
-            val lastMessages = validateLastDataLine(formattedMessage)
-            if (lastMessages.isNotEmpty()) {
-                for (msg in lastMessages) {
-                    notificationSubject.onNext("Cannot end data collection because: $msg")
-                }
-                return
-            }
+        if (message.marker == "Data Log" && message.marker_value == "False") { //loggingData &&
+//            val lastMessages = validateLastDataLine(formattedMessage)
+//            if (lastMessages.isNotEmpty()) {
+//                for (msg in lastMessages) {
+//                    notificationSubject.onNext("Cannot end data collection because: $msg")
+//                }
+//                return
+//            }
             loggingData = false
             saveDataFile()
         }

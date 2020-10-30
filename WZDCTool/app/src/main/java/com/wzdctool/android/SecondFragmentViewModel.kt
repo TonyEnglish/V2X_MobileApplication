@@ -18,6 +18,7 @@ import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,16 +95,20 @@ class SecondFragmentViewModel : ViewModel() {
         if (dataLog.value!!) {
             if (!gotRP.value!!) {
                 val distance = distDeg(localUIObj.start_coord, currCoord)
-                if (prevDistance < distance) {
+                if (prevDistance != 0.0 && prevDistance < distance) {
                     markRefPt()
+                    prevDistance = 0.0
                 }
-                prevDistance = distance
+                else {
+                    prevDistance = distance
+                }
             }
             else {
                 val distance = distDeg(localUIObj.end_coord, currCoord)
-                if (distance <= 50) {
+                if (distance < 50) { //prevDistance != 0.0 && prevDistance < distance &&
                     stopDataCollection()
                 }
+                // prevDistance = distance
             }
         }
         else if (!dataLog.value!!) {
@@ -248,12 +253,14 @@ class SecondFragmentViewModel : ViewModel() {
         gotRP.value = false
         navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
 
+        dataFileName =
+            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
+        val uploadFileName = dataFileName //if (automaticDetection.value!!) { dataFileName } else { dataFileName.replace(".csv", "--update-image.csv") }
+
         viewModelScope.launch(Dispatchers.IO) {
-            DataFileRepository.dataFileName =
-                "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
             val output = DataFileRepository.uploadPathDataFile(
                 fileName,
-                DataFileRepository.dataFileName
+                uploadFileName
             )
             println(output)
             notificationSubject.onNext("Path data file uploaded")
