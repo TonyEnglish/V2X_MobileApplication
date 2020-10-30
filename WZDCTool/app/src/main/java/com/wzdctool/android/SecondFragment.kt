@@ -132,9 +132,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<Button>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
             requireView().findViewById<Button>(R.id.wp).isEnabled = false
-            requireView().findViewById<Button>(R.id.startBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
@@ -172,16 +172,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     fun collectionModeUI() {
         if (viewModel.automaticDetection.value!!) {
-            requireView().findViewById<Button>(R.id.startBtn).visibility = View.INVISIBLE
-            requireView().findViewById<Button>(R.id.endBtn).visibility = View.INVISIBLE
-            requireView().findViewById<Button>(R.id.ref).visibility = View.INVISIBLE
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.INVISIBLE
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.INVISIBLE
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.INVISIBLE
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
-            requireView().findViewById<Button>(R.id.startBtn).visibility = View.VISIBLE
-            requireView().findViewById<Button>(R.id.endBtn).visibility = View.VISIBLE
-            requireView().findViewById<Button>(R.id.ref).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }
@@ -286,15 +286,15 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         })
 
         // if (!viewModel.automaticDetection) {
-        requireView().findViewById<Button>(R.id.startBtn).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.startBtn).setOnClickListener {
             viewModel.startDataCollection()
         }
 
-        requireView().findViewById<Button>(R.id.endBtn).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.endBtn).setOnClickListener {
             viewModel.stopDataCollection()
         }
 
-        requireView().findViewById<Button>(R.id.ref).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
         // }
