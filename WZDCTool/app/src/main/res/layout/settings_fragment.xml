@@ -8,36 +8,52 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/background">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Azure Account Name" />
+            android:text="Azure Account Name"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"/>
 
         <EditText
             android:id="@+id/editTextAccountName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints="STUFF"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="neaeraio..."
-            android:autofillHints="STUFF" />
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Azure Account Key"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="50dp"
-            android:text="Azure Account Key" />
+            android:layout_marginLeft="5dp"/>
 
         <EditText
             android:id="@+id/editTextAccountKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints="STUFF"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="gSFq2szM88ag0BV..."
-            android:autofillHints="STUFF" />
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"/>
 
     </LinearLayout>
 

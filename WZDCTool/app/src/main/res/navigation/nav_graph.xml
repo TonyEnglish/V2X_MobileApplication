@@ -33,7 +33,9 @@
         tools:layout="@layout/settings_fragment">
         <action
             android:id="@+id/action_SettingsFragment_to_MainFragment"
-            app:destination="@id/MainFragment" />
+            app:destination="@id/MainFragment"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top" />
     </fragment>
     <fragment
         android:id="@+id/MainFragment"
@@ -42,9 +44,13 @@
         tools:layout="@layout/main_fragment">
         <action
             android:id="@+id/action_MainFragment_to_SettingsFragment"
-            app:destination="@id/SettingsFragment" />
+            app:destination="@id/SettingsFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom" />
         <action
             android:id="@+id/action_MainFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/FirstFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
     </fragment>
 </navigation>
