@@ -31,6 +31,7 @@
                 android:layout_height="30dp"
                 android:text="Active Config: NONE"
                 android:textSize="20sp"
+                android:singleLine="true"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView

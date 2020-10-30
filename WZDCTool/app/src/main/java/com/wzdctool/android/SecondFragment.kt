@@ -133,11 +133,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
         else {
             requireView().findViewById<Button>(R.id.endBtn).isEnabled = false
-            requireView().findViewById<Button>(R.id.wp).isEnabled = false
             requireView().findViewById<Button>(R.id.startBtn).isEnabled = true
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
+        requireView().findViewById<Button>(R.id.wp).isEnabled = false
     }
 
     fun markRefPtUI() {
@@ -147,11 +147,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         else {
             requireView().findViewById<Button>(R.id.ref).isEnabled = false
             requireView().findViewById<Button>(R.id.endBtn).isEnabled = true
-            requireView().findViewById<Button>(R.id.wp).isEnabled = true
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
                 requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
+        requireView().findViewById<Button>(R.id.wp).isEnabled = true
     }
 
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
@@ -190,6 +190,23 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         mMap.isMyLocationEnabled = true
         viewModel.initMap(mMap, mMapView)
 
