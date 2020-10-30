@@ -95,6 +95,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        DataClassesRepository.toolbarActiveSubject.onNext(true)
+
         mMapView = view.findViewById(R.id.mapView)
         mMapView.onCreate(savedInstanceState)
         mMapView.getMapAsync(this)

@@ -246,7 +246,7 @@ class SecondFragmentViewModel : ViewModel() {
         dataLog.value = false
         dataLoggingVar = false
         gotRP.value = false
-        navigationLiveData.value = R.id.action_SecondFragment_to_FirstFragment
+        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
 
         viewModelScope.launch(Dispatchers.IO) {
             DataFileRepository.dataFileName =
