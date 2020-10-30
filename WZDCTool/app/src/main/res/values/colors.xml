@@ -11,6 +11,8 @@
     <color name="background">#D9DCD6</color>
     <color name="text">#16425B</color>
     <color name="text_disabled">#7016425B</color>
+
+    <color name="primary_active">#00A6D8</color>
   
     <color name="usb_status_disconnected">#DD0000</color>
     <color name="usb_status_invalid">#DDDD00</color>

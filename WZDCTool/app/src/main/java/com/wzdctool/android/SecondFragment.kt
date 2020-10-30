@@ -105,12 +105,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             if (viewModel.wpStat) {
                 println("Workers Not Present")
                 viewModel.wpStat = false
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_small))
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(R.color.colorAccent)
                 val marker = MarkerObj("WP", "False")
                 markerSubject.onNext(marker)
             }
             else {
                 println("Workers Present")
                 viewModel.wpStat = true
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_noworker))
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(R.color.primary_active)
                 val marker = MarkerObj("WP", "True")
                 markerSubject.onNext(marker)
             }
@@ -135,7 +139,6 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
@@ -143,6 +146,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
+        requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
     }
 
     fun markRefPtUI() {
@@ -152,11 +156,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         else {
             requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = true
-            requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
                 requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
+        requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
     }
 
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
@@ -166,10 +170,12 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 if (!laneStatLocal[lane]) {
                     statusMsg.text = resources.getString(R.string.status_open)
                     statusMsg.setTextColor(resources.getColor(R.color.status_open))
+                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(R.color.colorAccent)
                 }
                 else {
                     statusMsg.text = resources.getString(R.string.status_closed)
                     statusMsg.setTextColor(resources.getColor(R.color.status_closed))
+                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(R.color.primary_active)
                 }
             }
         }
@@ -177,16 +183,17 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     fun collectionModeUI() {
         if (viewModel.automaticDetection.value!!) {
-//            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.INVISIBLE
-//            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.INVISIBLE
-//            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.INVISIBLE
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 
-            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
+//            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
+            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }

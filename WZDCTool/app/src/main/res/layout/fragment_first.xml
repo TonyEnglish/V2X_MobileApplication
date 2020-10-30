@@ -71,14 +71,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="325dp" />
+        app:layout_constraintGuide_begin="253dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="81dp" />
+        app:layout_constraintGuide_begin="29dp" />
 
     <Switch
         android:id="@+id/switch1"
@@ -126,5 +126,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="167dp" />
+        app:layout_constraintGuide_begin="95dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

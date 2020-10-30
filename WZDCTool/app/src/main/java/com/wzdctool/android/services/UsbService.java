@@ -158,6 +158,8 @@ public class UsbService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // TODO: java.lang.RuntimeException: Unable to stop service com.wzdctool.android.services.UsbService@2345fb3: java.lang.NullPointerException: Attempt to invoke virtual method 'void com.felhr.usbserial.UsbSerialDevice.close()' on a null object reference
         serialPort.close();
         unregisterReceiver(usbReceiver);
         UsbService.SERVICE_CONNECTED = false;

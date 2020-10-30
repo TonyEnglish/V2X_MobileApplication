@@ -250,9 +250,9 @@
             <ImageButton
                 android:id="@+id/endBtn"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_weight="0.33"
-                android:backgroundTint="@color/colorAccent"
+                android:backgroundTint="@color/primary_active"
                 android:visibility="gone"
                 android:src="@drawable/ic_baseline_stop_24"
                 android:textColor="@color/button_text"
@@ -264,7 +264,6 @@
                 android:layout_height="60dp"
                 android:layout_weight="0.33"
                 android:backgroundTint="@color/colorAccent"
-                android:enabled="false"
                 android:src="@drawable/ic_baseline_pin_drop_24"
                 android:textColor="@color/button_text" />
 
