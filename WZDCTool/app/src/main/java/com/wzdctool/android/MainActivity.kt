@@ -30,6 +30,7 @@ import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toolbarActiveSubject
 import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
 import com.wzdctool.android.repos.DataFileRepository
@@ -110,11 +111,15 @@ class MainActivity : AppCompatActivity() {
 
         notificationSubject.subscribe {
             val mySnackbar = Snackbar.make(
-                    findViewById(R.id.toolbar),
-                    it,
-                    5000
+                findViewById(R.id.toolbar),
+                it,
+                5000
             )
             mySnackbar.show()
+        }
+
+        toastNotificationSubject.subscribe {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         }
 
         val configObserver = Observer<String> {

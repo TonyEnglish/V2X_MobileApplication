@@ -12,6 +12,7 @@ import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import rx.subjects.PublishSubject
 import java.io.*
 import java.text.SimpleDateFormat
@@ -35,6 +36,8 @@ object DataFileRepository {
     private var lane_stat = MutableList<Boolean>(8+1) {false}
     private var wp_stat = false
     private var got_rp = false
+
+    private var end_when_ready = false
 
     private var previousLine = ""
 
@@ -143,34 +146,69 @@ object DataFileRepository {
         val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
         println(formattedMessage)
 
-//        val messages = validateDataLine(formattedMessage, line_num)
+        validateDataLine(formattedMessage, line_num)
+//        val messages =
 //        if (messages.isNotEmpty()) {
 //            // Line invalid
 //            for (msg in messages) {
-//                notificationSubject.onNext("Invalid data line: $msg")
+//                toastNotificationSubject.onNext("Invalid data line: $msg")
 //            }
 //        }
 
         // Remove duplicates
-//        if (formattedMessage == previousLine) {
-//            println("Skipping duplicate line")
-//            return
-//        }
+        if (formattedMessage != previousLine && loggingData) {
+            // Ignores duplicate lines
+            if (message.marker == "Data Log" && message.marker_value == "False") {
+                // Verify that app state is valid (lane closures and worker presence
+                val lastMessages = validateLastDataLine(formattedMessage)
+                if (lastMessages.isNotEmpty()) {
+                    // App state invalid, do not end data collection
+                    // Print messages and remove 'Data Log False' from message
+                    for (msg in lastMessages) {
+                        toastNotificationSubject.onNext("Cannot end data collection because: $msg")
+                    }
 
-        if (loggingData) osw.appendLine(formattedMessage)
-        if (message.marker == "Data Log" && message.marker_value == "False") { //loggingData &&
-//            val lastMessages = validateLastDataLine(formattedMessage)
-//            if (lastMessages.isNotEmpty()) {
-//                for (msg in lastMessages) {
-//                    notificationSubject.onNext("Cannot end data collection because: $msg")
-//                }
-//                return
-//            }
-            loggingData = false
-            saveDataFile()
+                    // Recreate message without marker and marker_value
+                    val updatedMessage = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},,"
+                    if (updatedMessage != previousLine) {
+                        osw.appendLine(updatedMessage)
+                        previousLine = updatedMessage
+                    }
+                    end_when_ready = true
+                }
+                else {
+                    // App state valid, write line to file and end data collection/upload data file
+                    osw.appendLine(formattedMessage)
+                    previousLine = formattedMessage
+                    loggingData = false
+                    end_when_ready = false
+                    saveDataFile()
+                }
+            }
+            else if (end_when_ready) {
+                val lastMessages = validateLastDataLine(formattedMessage)
+                if (lastMessages.isEmpty()) {
+                    // App state valid, ensure last message written to file has Data Log False
+                    if (message.marker != "") {
+                        // Add Data Log False, write line to file and end data collection/upload data file
+                        val updatedMessage = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},Data Log,False"
+                        osw.appendLine(updatedMessage)
+                        loggingData = false
+                        end_when_ready = false
+                        saveDataFile()
+                    }
+                    else {
+                        osw.appendLine(formattedMessage)
+                        previousLine = formattedMessage
+                    }
+                }
+            }
+            else {
+                // Nothing special, just write line to data file
+                osw.appendLine(formattedMessage)
+                previousLine = formattedMessage
+            }
         }
-
-        previousLine = formattedMessage
     }
 
     private fun saveDataFile() {

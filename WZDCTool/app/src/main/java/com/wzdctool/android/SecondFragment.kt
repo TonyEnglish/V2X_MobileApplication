@@ -126,11 +126,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
+//            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
-            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
-            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
-            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = true
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = true
         }
     }
 
@@ -139,9 +139,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
-            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
+//            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
@@ -154,8 +154,10 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
-            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = true
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
@@ -192,8 +194,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         else {
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
-            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
-            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }

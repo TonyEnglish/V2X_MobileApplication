@@ -264,6 +264,7 @@
                 android:layout_height="60dp"
                 android:layout_weight="0.33"
                 android:backgroundTint="@color/colorAccent"
+                android:visibility="gone"
                 android:src="@drawable/ic_baseline_pin_drop_24"
                 android:textColor="@color/button_text" />
 

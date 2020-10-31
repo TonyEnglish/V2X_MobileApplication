@@ -32,6 +32,8 @@ class SecondFragmentViewModel : ViewModel() {
     private var prevDistance = 0.0
     var automaticDetection = MutableLiveData<Boolean>()
 
+    var hasSetDataLogFalseMarker = false
+
     // var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
     var currWpStat = false
@@ -75,8 +77,11 @@ class SecondFragmentViewModel : ViewModel() {
 
     fun stopDataCollection() {
         println("Data Logging Ended")
-        val marker = MarkerObj("Data Log", "False")
-        markerSubject.onNext(marker)
+        if (!hasSetDataLogFalseMarker) {
+            hasSetDataLogFalseMarker = true
+            val marker = MarkerObj("Data Log", "False")
+            markerSubject.onNext(marker)
+        }
     }
 
     fun markRefPt() {
@@ -255,7 +260,13 @@ class SecondFragmentViewModel : ViewModel() {
 
         dataFileName =
             "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
-        val uploadFileName = dataFileName //if (automaticDetection.value!!) { dataFileName } else { dataFileName.replace(".csv", "--update-image.csv") }
+        val uploadFileName =
+            if (automaticDetection.value!!) {
+                dataFileName
+            }
+            else {
+                dataFileName.replace(".csv", "--update-image.csv")
+            }
 
         viewModelScope.launch(Dispatchers.IO) {
             val output = DataFileRepository.uploadPathDataFile(
