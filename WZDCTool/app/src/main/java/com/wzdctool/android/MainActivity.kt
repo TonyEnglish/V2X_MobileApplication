@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         activeLocationSourceSubject.subscribe {
-            toastNotificationSubject.onNext(it)
+//            toastNotificationSubject.onNext(it)
         }
 
         // TODO: Do not re-save values to saved preferences on initial load

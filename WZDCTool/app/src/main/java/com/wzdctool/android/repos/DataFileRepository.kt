@@ -71,6 +71,7 @@ object DataFileRepository {
             if (isFirstTime) {
                 isFirstTime = false
                 markerSubject.subscribe {
+//                    toastNotificationSubject.onNext("${it.marker}: ${it.value}")
                     if (loggingData) {
                         markerQueue.add(it.marker)
                         markerValueQueue.add(it.value)
@@ -81,15 +82,15 @@ object DataFileRepository {
                         markerValueQueue.clear()
                         markerValueQueue.add(it.value)
                         createDataFile()
-                        toastNotificationSubject.onNext("Logging Data")
+                        // toastNotificationSubject.onNext("Logging Data")
                         loggingData = true
                         // val csvObj = createCSVObj(prevLocation)
                     }
                 }
 
                 locationSubject.subscribe {
-                    val csvObj = createCSVObj(it)
                     if (loggingData) {
+                        val csvObj = createCSVObj(it)
                         writeToDataFile(csvObj)
                     }
                     prevLocation = it
