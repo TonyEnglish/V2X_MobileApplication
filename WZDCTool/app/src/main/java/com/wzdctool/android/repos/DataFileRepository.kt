@@ -155,6 +155,7 @@ object DataFileRepository {
 //            }
 //        }
 
+        println(loggingData)
         // Remove duplicates
         if (formattedMessage != previousLine && loggingData) {
             // Ignores duplicate lines
@@ -162,6 +163,7 @@ object DataFileRepository {
                 // Verify that app state is valid (lane closures and worker presence
                 val lastMessages = validateLastDataLine(formattedMessage)
                 if (lastMessages.isNotEmpty()) {
+                    end_when_ready = true
                     // App state invalid, do not end data collection
                     // Print messages and remove 'Data Log False' from message
                     for (msg in lastMessages) {
@@ -174,7 +176,6 @@ object DataFileRepository {
                         osw.appendLine(updatedMessage)
                         previousLine = updatedMessage
                     }
-                    end_when_ready = true
                 }
                 else {
                     // App state valid, write line to file and end data collection/upload data file
@@ -186,10 +187,12 @@ object DataFileRepository {
                 }
             }
             else if (end_when_ready) {
+                println("Attmepting to end")
                 val lastMessages = validateLastDataLine(formattedMessage)
                 if (lastMessages.isEmpty()) {
                     // App state valid, ensure last message written to file has Data Log False
                     if (message.marker != "") {
+                        println(message)
                         // Add Data Log False, write line to file and end data collection/upload data file
                         val updatedMessage = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},Data Log,False"
                         osw.appendLine(updatedMessage)
@@ -321,8 +324,7 @@ object DataFileRepository {
     }
 
     private fun validateLastDataLine(line: String): List<String> {
-        val fields = line.split(",")
-        var valid = true
+//        val fields = line.split(",")
         val messages: MutableList<String> = mutableListOf()
 
         if (!got_rp) {

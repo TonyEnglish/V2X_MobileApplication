@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
+import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.ConfigurationRepository.configListSubject
 import com.wzdctool.android.repos.DataClassesRepository.toolbarActiveSubject
 
@@ -63,6 +64,7 @@ class FirstFragment : Fragment() {
 //            if (activeConfigSubject.value != null)
 //                viewModel.updateDataCollectionObj()
         }
+
         // .layoutParams.height = 90
 
     }
@@ -86,6 +88,15 @@ class FirstFragment : Fragment() {
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.adapter = spinnerAdapter
             spinnerAdapter.notifyDataSetChanged()
+
+            // println("Setting to index of: config--${activeWZIDSubject.value}.json")
+
+            try {
+                spinner.setSelection(configListSubject.value!!.indexOf("config--${activeWZIDSubject.value}.json"))
+            }
+            catch (e: Exception) {
+                println(e)
+            }
         }
         configListSubject.observe(viewLifecycleOwner, spinnerObserver)
 

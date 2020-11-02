@@ -17,6 +17,7 @@ import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
@@ -73,9 +74,11 @@ class SecondFragmentViewModel : ViewModel() {
         markerSubject.onNext(marker)
         dataLog.value = true
         dataLoggingVar = true
+        hasSetDataLogFalseMarker = false
     }
 
     fun stopDataCollection() {
+        toastNotificationSubject.onNext("Stopping data collection")
         println("Data Logging Ended")
         if (!hasSetDataLogFalseMarker) {
             hasSetDataLogFalseMarker = true
@@ -102,7 +105,7 @@ class SecondFragmentViewModel : ViewModel() {
                 val distance = distDeg(localUIObj.start_coord, currCoord)
                 if (prevDistance != 0.0 && prevDistance < distance) {
                     markRefPt()
-                    prevDistance = 0.0
+//                    prevDistance = 0.0
                 }
                 else {
                     prevDistance = distance

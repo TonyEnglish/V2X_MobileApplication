@@ -3,6 +3,7 @@ package com.wzdctool.android.handlers
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import com.wzdctool.android.Constants
 import com.wzdctool.android.repos.DataClassesRepository
@@ -94,11 +95,13 @@ class UsbHandler : Handler() {
                     if (isFirstTime) {
                         isFirstTime = false
                         DataClassesRepository.usbGpsStatus.onNext("valid")
+                        notificationSubject.onNext("${DataFileRepository.formatter.format(newLocation.time)},${newLocation.accuracy},${newLocation.latitude},${newLocation.longitude},${newLocation.altitude},${newLocation.speed},${newLocation.bearing}")
+                        compareToLastCoord(newLocation.time)
                     }
                     if (locationSource == Constants.LOCATION_SOURCE_USB) {
                         DataClassesRepository.locationSubject.onNext(newLocation)
                     }
-                    prevLocation = newLocation
+                     prevLocation = newLocation
                 }
                 else if (usbGpsStatus_local == "valid"){
                     DataClassesRepository.usbGpsStatus.onNext("invalid")
@@ -112,9 +115,23 @@ class UsbHandler : Handler() {
             }
         }
         catch (e:Exception) {
-            DataClassesRepository.notificationSubject.onNext("Error: ${e.message}")
+            // DataClassesRepository.notificationSubject.onNext("Error: ${e.message}")
             // Toast.makeText(mActivity.get(), "Error: ${e.message}. ${e.stackTrace}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun compareToLastCoord(prevTime: Long) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            // Compare time from 5000 ms ago to the most recent location time
+            if (prevTime != prevLocation.time) {
+                notificationSubject.onNext("$prevTime : ${prevLocation.time}")
+                compareToLastCoord(prevLocation.time)
+            }
+            else {
+                notificationSubject.onNext("Invalidating GPS because no valid position found over 5 seconds")
+                DataClassesRepository.usbGpsStatus.onNext("invalid")
+            }
+        }, 5000)
     }
 
     private fun parseRMC(NMEAData: String, prevLocation: Location?): Location? {

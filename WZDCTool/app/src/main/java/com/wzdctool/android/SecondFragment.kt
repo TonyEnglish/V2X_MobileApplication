@@ -2,11 +2,13 @@ package com.wzdctool.android
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -27,6 +29,7 @@ import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import com.wzdctool.android.services.LocationService
+import rx.Subscription
 import kotlin.math.*
 
 
@@ -44,6 +47,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     private lateinit var localUIObj: SecondFragmentUIObj
     private lateinit var mMap: GoogleMap
     private lateinit var mMapView: MapView
+    private lateinit var locationSubscription: Subscription
 
     val buttons = listOf(
         0,
@@ -92,6 +96,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         return inflater.inflate(R.layout.fragment_second, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -165,6 +170,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
         for (lane in 1..viewModel.localUIObj.num_lanes) {
             val statusMsg = requireView().findViewById<TextView>(statusList[lane])
@@ -225,20 +231,27 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         viewModel.initMap(mMap, mMapView)
 
         if (viewModel.automaticDetection.value!!) {
-            locationSubject.subscribe{
+            locationSubscription = locationSubject.subscribe{
+                println("called")
                 viewModel.updateMapLocation(it, mMap)
                 viewModel.checkLocation(it)
             }
         }
         else {
-            locationSubject.subscribe{
+            locationSubscription = locationSubject.subscribe{
+                println("called")
                 viewModel.updateMapLocation(it, mMap)
             }
         }
 
+
 //        val currLocation = LatLng(locationSubject.value.latitude, locationSubject.value.longitude)
 //        val center = CameraUpdateFactory.newLatLngZoom(currLocation, viewModel.zoom.toFloat())
 //        mMap.animateCamera(center, 10, null);
+    }
+
+    private fun onEnd() {
+        locationSubscription.unsubscribe()
     }
 
     override fun onResume() {
@@ -281,6 +294,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
@@ -292,7 +306,10 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             viewModel.uploadDataFile(it)
         }
 
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, {   findNavController().navigate(it)    })
+        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
+            onEnd()
+            findNavController().navigate(it)
+        })
 
         viewModel.dataLog.observe(viewLifecycleOwner, {
             if (it)
