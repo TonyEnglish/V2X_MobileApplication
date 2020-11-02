@@ -33,7 +33,7 @@
             android:layout_marginBottom="10sp"
             android:backgroundTint="@color/colorAccent"
             android:drawableLeft="@drawable/ic_construction_worker"
-            android:enabled="true"
+            android:enabled="false"
             android:text="Map Work Zone"
             android:textColor="@color/button_text"
             android:textSize="18sp" />

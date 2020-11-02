@@ -44,7 +44,7 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/gpsSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -173,14 +173,12 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_begin="120dp" />
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:checked="true"
-            android:textOff="Off"
-            android:textOn="On"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"

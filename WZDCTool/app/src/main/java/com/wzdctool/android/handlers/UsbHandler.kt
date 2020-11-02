@@ -124,7 +124,7 @@ class UsbHandler : Handler() {
         Handler(Looper.getMainLooper()).postDelayed({
             // Compare time from 5000 ms ago to the most recent location time
             if (prevTime != prevLocation.time) {
-                notificationSubject.onNext("$prevTime : ${prevLocation.time}")
+//                notificationSubject.onNext("$prevTime : ${prevLocation.time}")
                 compareToLastCoord(prevLocation.time)
             }
             else {

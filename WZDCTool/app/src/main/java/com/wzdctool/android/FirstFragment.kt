@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.CompoundButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +17,6 @@ import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.ConfigurationRepository.configListSubject
-import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
@@ -65,14 +65,24 @@ class FirstFragment : Fragment() {
             val configName: String = configSpinner.selectedItem.toString()
             viewModel.activateConfig(configName, activity?.filesDir.toString())
         }
-        view.findViewById<Switch>(R.id.switch1).setOnClickListener {
-            viewModel.automaticDetection = view.findViewById<Switch>(R.id.switch1).isChecked
-//            if (activeConfigSubject.value != null)
-//                viewModel.updateDataCollectionObj()
+
+        println("Printing Before")
+//        view.findViewById<SwitchCompat>(R.id.switch1).setOnClickListener{
+//            println("isChecked: ${view.findViewById<SwitchCompat>(R.id.switch1).isChecked}")
+//            viewModel.automaticDetection = view.findViewById<SwitchCompat>(R.id.switch1).isChecked
+////            if (activeConfigSubject.value != null)
+////                viewModel.updateDataCollectionObj()
+//        }
+
+        view.findViewById<SwitchCompat>(R.id.switch1).setOnCheckedChangeListener { _, isChecked ->
+            println("isChecked: $isChecked")
+            viewModel.automaticDetection = isChecked
+            // do something, the isChecked will be
+            // true if the switch is in the On position
         }
 
 
-        view.findViewById<Switch>(R.id.gpsSwitch).setOnClickListener {
+        view.findViewById<SwitchCompat>(R.id.gpsSwitch).setOnClickListener {
             locationSourceSwitchClicked()
         }
         locationSourceSwitchClicked()
@@ -98,8 +108,8 @@ class FirstFragment : Fragment() {
 //
 //            }
             if (!it.contains(Constants.LOCATION_SOURCE_USB) && activeLocationSourceSubject.value!! == Constants.LOCATION_SOURCE_USB) {
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isChecked = false
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = false
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isChecked = false
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
                     activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                 }
@@ -109,31 +119,29 @@ class FirstFragment : Fragment() {
         subscriptions.add(activeLocationSourceSubject.subscribe {
 //            updateLocationSource(it)
             if (it == Constants.LOCATION_SOURCE_INTERNAL) {
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isChecked = false
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isChecked = false
                 if (locationSourcesSubject.value!!.contains(Constants.LOCATION_SOURCE_USB)) {
-                    requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = false
+                    requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 }
-            }
-            else { // if (usbLocationValid.value)
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = true
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isChecked = true
+            } else { // if (usbLocationValid.value)
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = true
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isChecked = true
             }
         })
 
         subscriptions.add(usbGpsStatus.subscribe {
             if (it == "valid") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = true
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = true
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.clearAnimation()
                 textView.setTextColor(resources.getColor(R.color.usb_status_valid))
 //                findViewById<Switch>(R.id.switch1).isChecked = true
 //                locationSourceSwitchClicked()
 //                locationSourceSwitchClicked()
-            }
-            else if (it == "invalid") {
+            } else if (it == "invalid") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = false
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
 
@@ -145,10 +153,9 @@ class FirstFragment : Fragment() {
                 textView.startAnimation(anim)
 //                findViewById<Switch>(R.id.switch1).isChecked = false
 //                locationSourceSwitchClicked()
-            }
-            else if (it == "disconnected") {
+            } else if (it == "disconnected") {
                 activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                requireView().findViewById<Switch>(R.id.gpsSwitch).isEnabled = false
+                requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.clearAnimation()
                 textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
@@ -160,8 +167,7 @@ class FirstFragment : Fragment() {
         subscriptions.add(locationSubject.subscribe {
             if (rsmStatus.value && it.accuracy > 2) {
                 rsmStatus.onNext(false)
-            }
-            else if (!dataLoggingVar && it.accuracy <= 2) {
+            } else if (!dataLoggingVar && it.accuracy <= 2) {
                 rsmStatus.onNext(true)
             }
         })
@@ -177,7 +183,7 @@ class FirstFragment : Fragment() {
     }
 
     private fun locationSourceSwitchClicked() {
-        if (requireView().findViewById<Switch>(R.id.gpsSwitch).isChecked) {
+        if (requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isChecked) {
             // if (locationSource == Constants.LOCATION_SOURCE_USB)
             activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
         }

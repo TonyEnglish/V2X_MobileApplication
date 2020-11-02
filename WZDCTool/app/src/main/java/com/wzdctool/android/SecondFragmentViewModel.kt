@@ -78,7 +78,7 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun stopDataCollection() {
-        toastNotificationSubject.onNext("Stopping data collection")
+        // toastNotificationSubject.onNext("Stopping data collection")
         println("Data Logging Ended")
         if (!hasSetDataLogFalseMarker) {
             hasSetDataLogFalseMarker = true
