@@ -148,7 +148,7 @@ object DataFileRepository {
         val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
         println(formattedMessage)
 
-        validateDataLine(formattedMessage, line_num)
+//        validateDataLine(formattedMessage, line_num)
 //        val messages =
 //        if (messages.isNotEmpty()) {
 //            // Line invalid
@@ -159,12 +159,12 @@ object DataFileRepository {
 
         println(loggingData)
         // Remove duplicates
-        if (formattedMessage != previousLine && loggingData) {
+        if (loggingData) { //formattedMessage != previousLine &&
             // Ignores duplicate lines
             if (message.marker == "Data Log" && message.marker_value == "False") {
                 // Verify that app state is valid (lane closures and worker presence
-                val lastMessages = validateLastDataLine(formattedMessage)
-                if (lastMessages.isNotEmpty()) {
+                val lastMessages = "" //validateLastDataLine(formattedMessage)
+                if (lastMessages.isNotEmpty() && false) {
                     end_when_ready = true
                     // App state invalid, do not end data collection
                     // Print messages and remove 'Data Log False' from message
@@ -188,7 +188,7 @@ object DataFileRepository {
                     saveDataFile()
                 }
             }
-            else if (end_when_ready) {
+            else if (end_when_ready && false) {
                 println("Attmepting to end")
                 val lastMessages = validateLastDataLine(formattedMessage)
                 if (lastMessages.isEmpty()) {
