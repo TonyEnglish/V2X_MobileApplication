@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".SecondFragment">
 
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
@@ -244,19 +243,7 @@
                 android:backgroundTint="@color/colorAccent"
                 android:src="@drawable/ic_baseline_play_arrow_24"
                 android:textColor="@color/button_text"
-                android:visibility="visible"
-                android:layout_above="@id/button_background" />
-
-            <ImageButton
-                android:id="@+id/endBtn"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="0.33"
-                android:backgroundTint="@color/primary_active"
-                android:visibility="gone"
-                android:src="@drawable/ic_baseline_stop_24"
-                android:textColor="@color/button_text"
-                android:layout_above="@id/button_background" />
+                android:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/ref"
@@ -266,6 +253,16 @@
                 android:backgroundTint="@color/colorAccent"
                 android:visibility="gone"
                 android:src="@drawable/ic_baseline_pin_drop_24"
+                android:textColor="@color/button_text" />
+
+            <ImageButton
+                android:id="@+id/endBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:backgroundTint="@color/primary_active"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_stop_24"
                 android:textColor="@color/button_text" />
 
         </LinearLayout>
