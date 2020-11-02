@@ -173,7 +173,7 @@ class SecondFragmentViewModel : ViewModel() {
 
     fun calcZoomLevel(north: Double, south: Double, east: Double, west: Double, pixelWidth: Int, pixelHeight: Int): Int {
         val GLOBE_WIDTH = 256
-        val ZOOM_MAX = 21
+        val ZOOM_MAX = 21 - 7
         var angle = east - west
         if (angle < 0) {
             angle += 360
