@@ -106,6 +106,7 @@ class SecondFragmentViewModel : ViewModel() {
             if (!gotRP.value!!) {
                 val distance = distDeg(localUIObj.start_coord, currCoord)
                 if (prevDistance != 0.0 && prevDistance < distance) {
+                    toastNotificationSubject.onNext("Starting Data Collection")
                     markRefPt()
 //                    prevDistance = 0.0
                 }
