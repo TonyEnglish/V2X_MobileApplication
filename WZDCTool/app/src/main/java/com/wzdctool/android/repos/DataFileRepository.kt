@@ -81,6 +81,7 @@ object DataFileRepository {
                         markerValueQueue.clear()
                         markerValueQueue.add(it.value)
                         createDataFile()
+                        toastNotificationSubject.onNext("Logging Data")
                         loggingData = true
                         // val csvObj = createCSVObj(prevLocation)
                     }

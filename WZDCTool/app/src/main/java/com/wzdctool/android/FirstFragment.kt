@@ -110,9 +110,6 @@ class FirstFragment : Fragment() {
             if (!it.contains(Constants.LOCATION_SOURCE_USB) && activeLocationSourceSubject.value!! == Constants.LOCATION_SOURCE_USB) {
                 requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isChecked = false
                 requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
-                if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
-                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                }
             }
         })
 
@@ -131,16 +128,11 @@ class FirstFragment : Fragment() {
 
         subscriptions.add(usbGpsStatus.subscribe {
             if (it == "valid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
                 requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = true
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.clearAnimation()
                 textView.setTextColor(resources.getColor(R.color.usb_status_valid))
-//                findViewById<Switch>(R.id.switch1).isChecked = true
-//                locationSourceSwitchClicked()
-//                locationSourceSwitchClicked()
             } else if (it == "invalid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                 requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
@@ -151,24 +143,11 @@ class FirstFragment : Fragment() {
                 anim.repeatMode = Animation.REVERSE
                 anim.repeatCount = Animation.INFINITE
                 textView.startAnimation(anim)
-//                findViewById<Switch>(R.id.switch1).isChecked = false
-//                locationSourceSwitchClicked()
             } else if (it == "disconnected") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                 requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
                 val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
                 textView.clearAnimation()
                 textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
-//                findViewById<Switch>(R.id.switch1).isChecked = false
-//                locationSourceSwitchClicked()
-            }
-        })
-
-        subscriptions.add(locationSubject.subscribe {
-            if (rsmStatus.value && it.accuracy > 2) {
-                rsmStatus.onNext(false)
-            } else if (!dataLoggingVar && it.accuracy <= 2) {
-                rsmStatus.onNext(true)
             }
         })
 

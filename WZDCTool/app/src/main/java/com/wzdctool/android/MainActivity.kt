@@ -17,6 +17,7 @@ import android.view.animation.Animation
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -40,6 +41,7 @@ import com.wzdctool.android.repos.azureInfoRepository.updateConnectionStringFrom
 import com.wzdctool.android.services.LocationService
 import com.wzdctool.android.services.UsbService
 import com.wzdctool.android.services.UsbService.UsbBinder
+import rx.Subscription
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var editText: EditText? = null
     private var mHandler: UsbHandler? = null
     private var isGPSConnected: Boolean = false
+    private val subscriptions: MutableList<Subscription> = mutableListOf()
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
             usbService = (arg1 as UsbBinder).service
@@ -124,7 +127,35 @@ class MainActivity : AppCompatActivity() {
 
         mHandler = UsbHandler()
 
+        subscriptions.add(locationSubject.subscribe {
+            if (rsmStatus.value && it.accuracy > 2) {
+                rsmStatus.onNext(false)
+            } else if (!dataLoggingVar && it.accuracy <= 2) {
+                rsmStatus.onNext(true)
+            }
+        })
 
+        subscriptions.add(locationSourcesSubject.subscribe {
+            if (!it.contains(Constants.LOCATION_SOURCE_USB) && activeLocationSourceSubject.value!! == Constants.LOCATION_SOURCE_USB) {
+                if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
+                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+                }
+            }
+        })
+
+        subscriptions.add(usbGpsStatus.subscribe {
+            if (it == "valid") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
+            } else if (it == "invalid") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+            } else if (it == "disconnected") {
+                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+            }
+        })
+
+        activeLocationSourceSubject.subscribe {
+            toastNotificationSubject.onNext(it)
+        }
 
         // TODO: Do not re-save values to saved preferences on initial load
         currentAzureInfoSubject.subscribe {

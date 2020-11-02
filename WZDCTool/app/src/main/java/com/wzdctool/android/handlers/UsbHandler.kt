@@ -7,7 +7,9 @@ import android.os.Looper
 import android.os.Message
 import com.wzdctool.android.Constants
 import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.services.UsbService
 import java.text.SimpleDateFormat
@@ -94,8 +96,8 @@ class UsbHandler : Handler() {
                 if (update && newLocation != null && isValid) {
                     if (isFirstTime) {
                         isFirstTime = false
-                        DataClassesRepository.usbGpsStatus.onNext("valid")
-                        notificationSubject.onNext("${DataFileRepository.formatter.format(newLocation.time)},${newLocation.accuracy},${newLocation.latitude},${newLocation.longitude},${newLocation.altitude},${newLocation.speed},${newLocation.bearing}")
+                        usbGpsStatus.onNext("valid")
+//                        notificationSubject.onNext("${DataFileRepository.formatter.format(newLocation.time)},${newLocation.accuracy},${newLocation.latitude},${newLocation.longitude},${newLocation.altitude},${newLocation.speed},${newLocation.bearing}")
                         compareToLastCoord(newLocation.time)
                     }
                     if (locationSource == Constants.LOCATION_SOURCE_USB) {
@@ -103,9 +105,9 @@ class UsbHandler : Handler() {
                     }
                      prevLocation = newLocation
                 }
-                else if (usbGpsStatus_local == "valid"){
-                    DataClassesRepository.usbGpsStatus.onNext("invalid")
-                }
+//                else if (usbGpsStatus_local == "valid"){
+//                    DataClassesRepository.usbGpsStatus.onNext("invalid")
+//                }
 //                else {
 //                    notificationSubject.onNext("Invalid Position")
 //                }
@@ -123,13 +125,15 @@ class UsbHandler : Handler() {
     private fun compareToLastCoord(prevTime: Long) {
         Handler(Looper.getMainLooper()).postDelayed({
             // Compare time from 5000 ms ago to the most recent location time
-            if (prevTime != prevLocation.time) {
+            if (activeLocationSourceSubject.value == Constants.LOCATION_SOURCE_USB) {
+                if (prevTime != prevLocation.time) {
 //                notificationSubject.onNext("$prevTime : ${prevLocation.time}")
-                compareToLastCoord(prevLocation.time)
-            }
-            else {
-                notificationSubject.onNext("Invalidating GPS because no valid position found over 5 seconds")
-                DataClassesRepository.usbGpsStatus.onNext("invalid")
+                    compareToLastCoord(prevLocation.time)
+                }
+                else {
+                    notificationSubject.onNext("Invalidating GPS because no valid position found over 5 seconds")
+                    usbGpsStatus.onNext("disconnected")
+                }
             }
         }, 5000)
     }
