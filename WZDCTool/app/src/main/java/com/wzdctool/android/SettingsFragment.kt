@@ -33,8 +33,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        DataClassesRepository.toolbarActiveSubject.onNext(false)
-
         view.findViewById<Button>(R.id.saveButton).setOnClickListener {
             processAzureSettings()
         }

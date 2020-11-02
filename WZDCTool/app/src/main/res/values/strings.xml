@@ -18,7 +18,8 @@
     <string name="preference_account_name">preference_account_name</string>
     <string name="preference_account_key">preference_account_key</string>
   
-    <string-array name="config_files"></string-array>
+    <string-array name="config_files"><item>Loading Configuration File List</item></string-array>
+
     <string name="title_activity_home">HomeActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

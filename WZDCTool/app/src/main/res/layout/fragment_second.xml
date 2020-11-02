@@ -17,8 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:alpha="0.9"
-        android:background="#FFFFFF"
+        android:background="#44FFFFFF"
         android:backgroundTint="@color/background"
         android:orientation="vertical">
 
@@ -27,6 +26,7 @@
             android:id="@+id/lanes_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <!-- Lane 1 -->
@@ -233,6 +233,7 @@
                 android:backgroundTint="@color/colorAccent"
                 android:src="@drawable/ic_construction_worker_small"
                 android:enabled="false"
+                android:visibility="gone"
                 android:textColor="@color/button_text" />
 
             <ImageButton

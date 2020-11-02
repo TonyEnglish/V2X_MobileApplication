@@ -48,8 +48,6 @@ class MainActivity : AppCompatActivity() {
     private var display: TextView? = null
     private var editText: EditText? = null
     private var mHandler: UsbHandler? = null
-    private var locationSource: String = ""
-    private var locationSources: MutableList<String> = mutableListOf()
     private var isGPSConnected: Boolean = false
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
@@ -62,31 +60,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateLocationSource(source: String) {
-        locationSource = source
-    }
-
-    private fun updateLocationSources(sources: List<String>) {
-        locationSources = sources as MutableList<String>
-    }
-
     private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
                 UsbService.ACTION_USB_PERMISSION_GRANTED -> {
                     Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show()
+                    val locationSources = (locationSourcesSubject.value!! as MutableList<String>)
                     val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_USB)
-                    locationSourcesSubject.onNext(locationSources)
+                    if (added)
+                        locationSourcesSubject.onNext(locationSources)
                     usbGpsStatus.onNext("invalid")
                     isGPSConnected = true
-                    // findViewById<Switch>(R.id.switch1).isEnabled = true
                 }
                 UsbService.ACTION_USB_PERMISSION_NOT_GRANTED -> Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show()
                 UsbService.ACTION_NO_USB -> Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show()
                 UsbService.ACTION_USB_DISCONNECTED -> {
                     // if (activeLocationSourceSubject.value == Constants.LOCATION_SOURCE_USB)
+                    val locationSources = (locationSourcesSubject.value!! as MutableList<String>)
                     val removed: Boolean = locationSources.remove(Constants.LOCATION_SOURCE_USB)
-                    locationSourcesSubject.onNext(locationSources)
+                    if (removed)
+                        locationSourcesSubject.onNext(locationSources)
                     usbGpsStatus.onNext("disconnected")
                     activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
                     mHandler?.usbDisconnected()
@@ -122,11 +115,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         }
 
-        val configObserver = Observer<String> {
-            findViewById<TextView>(R.id.activeConfigTextView).text = "Active Config: $it"
-        }
-        activeWZIDSubject.observe(this, configObserver)
-
         Constants.CONFIG_DIRECTORY = filesDir.toString()
         Constants.DATA_FILE_DIRECTORY = filesDir.toString()
         Constants.DOWNLOAD_LOCTION = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()
@@ -136,93 +124,7 @@ class MainActivity : AppCompatActivity() {
 
         mHandler = UsbHandler()
 
-        findViewById<Switch>(R.id.switch1).setOnClickListener {
-            locationSourceSwitchClicked()
-        }
-        locationSourceSwitchClicked()
 
-        locationSourcesSubject.subscribe {
-            updateLocationSources(it)
-//            if (!it.contains(Constants.LOCATION_SOURCE_INTERNAL) && locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
-//                findViewById<Switch>(R.id.switch1).isChecked = true
-//                findViewById<Switch>(R.id.switch1).isEnabled = false
-//                if (it.contains(Constants.LOCATION_SOURCE_USB)) {
-//                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
-//                }
-//
-//            }
-            if (!it.contains(Constants.LOCATION_SOURCE_USB) && locationSource == Constants.LOCATION_SOURCE_USB) {
-                findViewById<Switch>(R.id.switch1).isChecked = false
-                findViewById<Switch>(R.id.switch1).isEnabled = false
-                if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
-                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                }
-            }
-        }
-
-        activeLocationSourceSubject.subscribe {
-            updateLocationSource(it)
-            if (it == Constants.LOCATION_SOURCE_INTERNAL) {
-                findViewById<Switch>(R.id.switch1).isChecked = false
-                if (!isGPSConnected) {
-                    findViewById<Switch>(R.id.switch1).isEnabled = false
-                }
-            }
-            else { // if (usbLocationValid.value)
-                findViewById<Switch>(R.id.switch1).isEnabled = true
-                findViewById<Switch>(R.id.switch1).isChecked = true
-            }
-        }
-
-        usbGpsStatus.subscribe {
-            if (it == "valid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
-                findViewById<Switch>(R.id.switch1).isEnabled = true
-                val textView = findViewById<TextView>(R.id.locationSourceOn)
-                textView.clearAnimation()
-                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
-//                findViewById<Switch>(R.id.switch1).isChecked = true
-//                locationSourceSwitchClicked()
-//                locationSourceSwitchClicked()
-            }
-            else if (it == "invalid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                findViewById<Switch>(R.id.switch1).isEnabled = false
-                val textView = findViewById<TextView>(R.id.locationSourceOn)
-                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
-
-                val anim: Animation = AlphaAnimation(0.0f, 1.0f)
-                anim.duration = 900 //You can manage the blinking time with this parameter
-                anim.startOffset = 20
-                anim.repeatMode = Animation.REVERSE
-                anim.repeatCount = Animation.INFINITE
-                textView.startAnimation(anim)
-//                findViewById<Switch>(R.id.switch1).isChecked = false
-//                locationSourceSwitchClicked()
-            }
-            else if (it == "disconnected") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                findViewById<Switch>(R.id.switch1).isEnabled = false
-                val textView = findViewById<TextView>(R.id.locationSourceOn)
-                textView.clearAnimation()
-                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
-//                findViewById<Switch>(R.id.switch1).isChecked = false
-//                locationSourceSwitchClicked()
-            }
-        }
-
-        locationSubject.subscribe {
-            if (rsmStatus.value && it.accuracy > 2) {
-                rsmStatus.onNext(false)
-            }
-            else if (!dataLoggingVar && it.accuracy <= 2) {
-                rsmStatus.onNext(true)
-            }
-        }
-
-        rsmStatus.subscribe {
-            findViewById<CheckBox>(R.id.checkBox3).isChecked = it
-        }
 
         // TODO: Do not re-save values to saved preferences on initial load
         currentAzureInfoSubject.subscribe {
@@ -249,20 +151,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        toolbarActiveSubject.subscribe {
-            if (it) {
-                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.VISIBLE
-                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.VISIBLE
-                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.VISIBLE
-                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 90
-            }
-            else {
-                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.GONE
-                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.GONE
-                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.GONE
-                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
-            }
-        }
+//        toolbarActiveSubject.subscribe {
+//            if (it) {
+//                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.VISIBLE
+//                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.VISIBLE
+//                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.VISIBLE
+//                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 90
+//            }
+//            else {
+//                findViewById<LinearLayout>(R.id.toolbar_stuffs).visibility = View.GONE
+//                findViewById<LinearLayout>(R.id.gps_ll).visibility = View.GONE
+//                findViewById<LinearLayout>(R.id.checkbox_ll).visibility = View.GONE
+//                // findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
+//            }
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

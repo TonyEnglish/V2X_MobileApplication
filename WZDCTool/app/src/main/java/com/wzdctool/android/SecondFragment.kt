@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -25,6 +27,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.SecondFragmentUIObj
 import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
@@ -47,7 +51,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     private lateinit var localUIObj: SecondFragmentUIObj
     private lateinit var mMap: GoogleMap
     private lateinit var mMapView: MapView
-    private lateinit var locationSubscription: Subscription
+
+    private val subscriptions: MutableList<Subscription> = mutableListOf()
 
     val buttons = listOf(
         0,
@@ -100,8 +105,6 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        DataClassesRepository.toolbarActiveSubject.onNext(true)
-
         mMapView = view.findViewById(R.id.mapView)
         mMapView.onCreate(savedInstanceState)
         mMapView.getMapAsync(this)
@@ -152,6 +155,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         for (i in 1..viewModel.localUIObj.num_lanes)
             requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
+        requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
     }
 
     fun markRefPtUI() {
@@ -168,6 +173,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             if (i != viewModel.localUIObj.data_lane)
                 requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
+        requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -198,9 +205,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 //            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
-            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
-            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
-            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
+////            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
+////            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
@@ -230,32 +237,39 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
         viewModel.initMap(mMap, mMapView)
 
-        if (viewModel.automaticDetection.value!!) {
-            locationSubscription = locationSubject.subscribe{
-                println("called")
-                viewModel.updateMapLocation(it, mMap)
-                viewModel.checkLocation(it)
-            }
-        }
-        else {
-            locationSubscription = locationSubject.subscribe{
-                println("called")
-                viewModel.updateMapLocation(it, mMap)
-            }
-        }
-
+        addUpdateMapSubscription()
 
 //        val currLocation = LatLng(locationSubject.value.latitude, locationSubject.value.longitude)
 //        val center = CameraUpdateFactory.newLatLngZoom(currLocation, viewModel.zoom.toFloat())
 //        mMap.animateCamera(center, 10, null);
     }
 
-    private fun onEnd() {
-        locationSubscription.unsubscribe()
+    private fun removeSubscriptions() {
+        for (subscription in subscriptions) {
+            subscription.unsubscribe()
+        }
+    }
+
+    private fun addSubscriptions() {
+        subscriptions.add(dataFileSubject.subscribe {
+            viewModel.uploadDataFile(it)
+        })
+
+        subscriptions.add(locationSubject.subscribe{
+            viewModel.checkLocation(it)
+        })
+    }
+
+    private fun addUpdateMapSubscription() {
+        subscriptions.add(locationSubject.subscribe{
+            println("called")
+            viewModel.updateMapLocation(it, mMap)
+        })
     }
 
     override fun onResume() {
         super.onResume()
+        addSubscriptions()
         try {
             mMapView.onResume()
         }
@@ -266,6 +280,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
+        removeSubscriptions()
         try {
             mMapView.onPause()
         }
@@ -276,6 +291,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroy() {
         super.onDestroy()
+        removeSubscriptions()
         try {
             mMapView.onDestroy()
         }
@@ -302,12 +318,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
         ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
 
-        dataFileSubject.subscribe {
-            viewModel.uploadDataFile(it)
-        }
-
         viewModel.navigationLiveData.observe(viewLifecycleOwner, {
-            onEnd()
             findNavController().navigate(it)
         })
 
@@ -345,7 +356,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
-        // }
+
+        // addSubscriptions()
     }
 
     private fun updateUI() {

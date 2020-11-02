@@ -99,6 +99,8 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun checkLocation(location: Location) {
+        if (!automaticDetection.value!!)
+            return
         val currCoord = mapLocationToCoord(location)
         if (dataLog.value!!) {
             if (!gotRP.value!!) {

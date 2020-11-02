@@ -46,9 +46,6 @@ class MainFragment : Fragment() {
             view.findViewById<Button>(R.id.createMapButton).isEnabled = true
         }
 
-        DataClassesRepository.toolbarActiveSubject.onNext(false)
-        // requireActivity().findViewById<ConstraintLayout>(R.id.toolbar_stuffs).layoutParams.height = 0
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
