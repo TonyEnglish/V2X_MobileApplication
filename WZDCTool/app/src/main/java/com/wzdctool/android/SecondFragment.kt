@@ -147,6 +147,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
@@ -161,6 +162,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     fun markRefPtUI() {
         if (viewModel.automaticDetection.value!!) {
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
             // TODO: stuffs
         }
         else {
@@ -198,6 +200,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     fun collectionModeUI() {
         if (viewModel.automaticDetection.value!!) {
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.VISIBLE
+            requireView().findViewById<TextView>(R.id.automaticStatus).text = "Waiting for Start Point"
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
@@ -205,6 +209,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 //            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
 ////            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
 ////            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
