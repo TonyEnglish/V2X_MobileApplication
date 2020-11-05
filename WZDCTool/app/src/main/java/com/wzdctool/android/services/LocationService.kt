@@ -23,10 +23,10 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import com.wzdctool.android.Constants
 import com.wzdctool.android.MainActivity
-import com.wzdctool.android.dataclasses.CSVObj
-import com.wzdctool.android.dataclasses.Marker
-import com.wzdctool.android.dataclasses.MarkerObj
+import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataFileRepository
 import java.lang.Math.*
@@ -52,27 +52,27 @@ class LocationService : Service() {
 //        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show()
 //    }
 
-    init {
-        DataClassesRepository.activeLocationSourceSubject.subscribe {
-            updateLocationSource(it)
-        }
-        DataClassesRepository.locationSourcesSubject.subscribe {
-            updateLocationSources(it)
-        }
-    }
-
-    private fun updateLocationSource(source: String) {
-        locationSource = source
-    }
-
-    private fun updateLocationSources(sources: List<String>) {
-        locationSources = sources as MutableList<String>
-    }
+//    init {
+//        DataClassesRepository.activeLocationSourceSubject.subscribe {
+//            updateLocationSource(it)
+//        }
+//        DataClassesRepository.locationSourcesSubject.subscribe {
+//            updateLocationSources(it)
+//        }
+//    }
+//
+//    private fun updateLocationSource(source: String) {
+//        locationSource = source
+//    }
+//
+//    private fun updateLocationSources(sources: List<String>) {
+//        locationSources = sources as MutableList<String>
+//    }
 
     var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            if (locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
+            if (activeLocationSourceSubject.value == gps_type.internal) {
                 for (location in locationResult.locations){
                     locationSubject.onNext(location)
                     Log.v("LocationService", "Lat: ${location.latitude}, " +
@@ -164,15 +164,19 @@ class LocationService : Service() {
             if (action != null) {
                 if (action == Constants.ACTION_START_LOCATION_SERVICE) {
                     startLocationService()
-                    val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_INTERNAL)
-                    DataClassesRepository.locationSourcesSubject.onNext(locationSources)
+                    val localLocationSources = locationSourcesSubject.value
+                    if (localLocationSources.internal == gps_status.disconnected) {
+                        localLocationSources.internal = gps_status.invalid
+                        locationSourcesSubject.onNext(localLocationSources)
+                    }
+//                    val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_INTERNAL)
+//                    DataClassesRepository.locationSourcesSubject.onNext(locationSources)
 //                    DataClassesRepository.locationSourceValidSubject.onNext(true)
                 }
                 else if (action == Constants.ACTION_STOP_LOCATION_SERVICE) {
-                    if (locationSource == Constants.LOCATION_SOURCE_INTERNAL) {
-                        val removed: Boolean = locationSources.remove(Constants.ACTION_STOP_LOCATION_SERVICE)
-                        DataClassesRepository.locationSourcesSubject.onNext(locationSources)
-                    }
+                    val localLocationSources = locationSourcesSubject.value
+                    localLocationSources.internal = gps_status.disconnected
+                    locationSourcesSubject.onNext(localLocationSources)
 //                        DataClassesRepository.locationSourceValidSubject.onNext(false)
                     stopLocationService()
                 }

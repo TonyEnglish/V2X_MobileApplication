@@ -74,17 +74,17 @@ class SecondFragmentViewModel : ViewModel() {
         markerSubject.onNext(marker)
         dataLog.value = true
         dataLoggingVar = true
-        hasSetDataLogFalseMarker = false
     }
 
     fun stopDataCollection() {
         // toastNotificationSubject.onNext("Stopping data collection")
         println("Data Logging Ended")
-        if (!hasSetDataLogFalseMarker) {
-            hasSetDataLogFalseMarker = true
-            val marker = MarkerObj("Data Log", "False")
-            markerSubject.onNext(marker)
-        }
+        val marker = MarkerObj("Data Log", "False")
+        markerSubject.onNext(marker)
+        dataLoggingVar = false
+        dataLog.value = false
+        gotRP.value = false
+        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 
     fun markRefPt() {
@@ -259,9 +259,6 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
-        dataLog.value = false
-        dataLoggingVar = false
-        gotRP.value = false
         navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
 
         dataFileName =

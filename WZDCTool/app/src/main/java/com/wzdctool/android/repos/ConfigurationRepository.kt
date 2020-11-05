@@ -137,12 +137,18 @@ object ConfigurationRepository {
         val container: CloudBlobContainer = blobClient.getContainerReference(Constants.AZURE_PUBLISHED_CONFIG_FILES_CONTAINER)
         // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
         val blob: CloudBlockBlob = container.getBlockBlobReference(configName)
-        val filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
+        var filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
         // Activity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
         println("File Path: $filePath")
         val source = File(filePath)
 
-        blob.download(FileOutputStream(source))
+        try {
+            blob.download(FileOutputStream(source))
+        }
+        catch (e: Exception) {
+            return null
+        }
+
         return filePath
     }
 }

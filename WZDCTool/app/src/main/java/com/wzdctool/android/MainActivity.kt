@@ -3,28 +3,27 @@ package com.wzdctool.android
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.IBinder
-import android.view.Menu
+import android.location.LocationManager
+import android.os.*
+import android.provider.Settings
 import android.view.MenuItem
-import android.view.View
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.widget.*
+import android.widget.EditText
+import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.dataclasses.azureInfoObj
+import com.wzdctool.android.dataclasses.gps_status
+import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.handlers.UsbHandler
-import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
+import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
@@ -32,15 +31,15 @@ import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
-import com.wzdctool.android.repos.DataClassesRepository.toolbarActiveSubject
-import com.wzdctool.android.repos.DataClassesRepository.usbGpsStatus
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
-import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
 import com.wzdctool.android.repos.azureInfoRepository.updateConnectionStringFromObj
 import com.wzdctool.android.services.LocationService
 import com.wzdctool.android.services.UsbService
 import com.wzdctool.android.services.UsbService.UsbBinder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import rx.Subscription
 
 
@@ -50,8 +49,10 @@ class MainActivity : AppCompatActivity() {
     private var display: TextView? = null
     private var editText: EditText? = null
     private var mHandler: UsbHandler? = null
+    private val locationCheckHandler: Handler = Handler(Looper.getMainLooper())
     private var isGPSConnected: Boolean = false
     private val subscriptions: MutableList<Subscription> = mutableListOf()
+    private lateinit var lm: LocationManager
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
             usbService = (arg1 as UsbBinder).service
@@ -63,32 +64,70 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val locationCheckRunnable: Runnable = object : Runnable {
+        override fun run() {
+            var updated = false
+            val localLocationSources = locationSourcesSubject.value
+
+            // Internal Location Source
+            var internal_gps_enabled = false;
+            try {
+                internal_gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            } catch (ex: Exception) {
+            }
+
+            if (!internal_gps_enabled && localLocationSources.internal == gps_status.valid) {
+                updated = true
+                localLocationSources.internal = gps_status.invalid
+            } else if (internal_gps_enabled && localLocationSources.internal != gps_status.valid) {
+                updated = true
+                localLocationSources.internal = gps_status.valid
+            }
+
+            // USB Location Source
+            // TODO: Verify USB source emitting valid data
+
+            // Other Location Sources
+            // TODO: Support other location sources
+
+            if (updated) {
+                locationSourcesSubject.onNext(localLocationSources)
+            }
+            locationCheckHandler.postDelayed(this, 5000)
+        }
+    }
+
     private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
                 UsbService.ACTION_USB_PERMISSION_GRANTED -> {
                     Toast.makeText(context, "USB Ready", Toast.LENGTH_SHORT).show()
-                    val locationSources = (locationSourcesSubject.value!! as MutableList<String>)
-                    val added: Boolean = locationSources.add(Constants.LOCATION_SOURCE_USB)
-                    if (added)
-                        locationSourcesSubject.onNext(locationSources)
-                    usbGpsStatus.onNext("invalid")
-                    isGPSConnected = true
+                    val localLocationSources = locationSourcesSubject.value
+                    localLocationSources.usb = gps_status.invalid
+                    locationSourcesSubject.onNext(localLocationSources)
                 }
-                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED -> Toast.makeText(context, "USB Permission not granted", Toast.LENGTH_SHORT).show()
-                UsbService.ACTION_NO_USB -> Toast.makeText(context, "No USB connected", Toast.LENGTH_SHORT).show()
+                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED -> Toast.makeText(
+                    context,
+                    "USB Permission not granted",
+                    Toast.LENGTH_SHORT
+                ).show()
+                UsbService.ACTION_NO_USB -> Toast.makeText(
+                    context,
+                    "No USB connected",
+                    Toast.LENGTH_SHORT
+                ).show()
                 UsbService.ACTION_USB_DISCONNECTED -> {
                     // if (activeLocationSourceSubject.value == Constants.LOCATION_SOURCE_USB)
-                    val locationSources = (locationSourcesSubject.value!! as MutableList<String>)
-                    val removed: Boolean = locationSources.remove(Constants.LOCATION_SOURCE_USB)
-                    if (removed)
-                        locationSourcesSubject.onNext(locationSources)
-                    usbGpsStatus.onNext("disconnected")
-                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                    mHandler?.usbDisconnected()
+                    val localLocationSources = locationSourcesSubject.value
+                    localLocationSources.usb = gps_status.disconnected
+                    locationSourcesSubject.onNext(localLocationSources)
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show()
                 }
-                UsbService.ACTION_USB_NOT_SUPPORTED -> Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show()
+                UsbService.ACTION_USB_NOT_SUPPORTED -> Toast.makeText(
+                    context,
+                    "USB device not supported",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -99,6 +138,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        lm = (this.getSystemService(Context.LOCATION_SERVICE) as LocationManager);
 
 //        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
 ////            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -135,25 +176,21 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        subscriptions.add(locationSourcesSubject.subscribe {
-            if (!it.contains(Constants.LOCATION_SOURCE_USB) && activeLocationSourceSubject.value!! == Constants.LOCATION_SOURCE_USB) {
-                if (it.contains(Constants.LOCATION_SOURCE_INTERNAL)) {
-                    activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-                }
+        subscriptions.add(locationSourcesSubject.subscribe{ locationSources ->
+            if (locationSources.internal == gps_status.valid && locationSources.usb != gps_status.valid) {
+                activeLocationSourceSubject.onNext(gps_type.internal)
+            }
+            else if (locationSources.usb == gps_status.valid) {
+                activeLocationSourceSubject.onNext(gps_type.usb)
+            }
+            else if (locationSources.internal != gps_status.valid && locationSources.usb != gps_status.valid) {
+                activeLocationSourceSubject.onNext(gps_type.none)
             }
         })
 
-        subscriptions.add(usbGpsStatus.subscribe {
-            if (it == "valid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
-            } else if (it == "invalid") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-            } else if (it == "disconnected") {
-                activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
-            }
-        })
 
         activeLocationSourceSubject.subscribe {
+//            toastNotificationSubject.onNext(it.toString())
 //            toastNotificationSubject.onNext(it)
         }
 
@@ -161,21 +198,47 @@ class MainActivity : AppCompatActivity() {
         currentAzureInfoSubject.subscribe {
             updateConnectionStringFromObj(it)
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
-            with (sharedPref.edit()) {
+            with(sharedPref.edit()) {
                 putString(getString(R.string.preference_account_name), it.account_name)
                 putString(getString(R.string.preference_account_key), it.account_key)
                 apply()
             }
-            println(sharedPref.getString(resources.getString(R.string.preference_account_name), null))
-            println(sharedPref.getString(resources.getString(R.string.preference_account_key), null))
+            println(
+                sharedPref.getString(
+                    resources.getString(R.string.preference_account_name),
+                    null
+                )
+            )
+            println(
+                sharedPref.getString(
+                    resources.getString(R.string.preference_account_key),
+                    null
+                )
+            )
         }
 
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
         if (sharedPref != null) {
-            println(sharedPref.getString(resources.getString(R.string.preference_account_name), null))
-            println(sharedPref.getString(resources.getString(R.string.preference_account_key), null))
-            val accountName = sharedPref.getString(resources.getString(R.string.preference_account_name), null)
-            val accountKey = sharedPref.getString(resources.getString(R.string.preference_account_key), null)
+            println(
+                sharedPref.getString(
+                    resources.getString(R.string.preference_account_name),
+                    null
+                )
+            )
+            println(
+                sharedPref.getString(
+                    resources.getString(R.string.preference_account_key),
+                    null
+                )
+            )
+            val accountName = sharedPref.getString(
+                resources.getString(R.string.preference_account_name),
+                null
+            )
+            val accountKey = sharedPref.getString(
+                resources.getString(R.string.preference_account_key),
+                null
+            )
 
             if (accountName != null && accountKey != null) {
                 currentAzureInfoSubject.onNext(azureInfoObj(accountName, accountKey))
@@ -201,36 +264,52 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onStart() {
         super.onStart()
+        setFilters() // Start listening notifications from UsbService
+        startService(UsbService::class.java, usbConnection, null) // Start UsbService(if it was not started before) and Bind it
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) -> {
                 // You can use the API that requires the permission.
                 // performAction(...)
             }
             else -> {
                 // You can directly ask for the permission.
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        premissionRequestCode)
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    premissionRequestCode
+                )
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        setFilters() // Start listening notifications from UsbService
-        startService(UsbService::class.java, usbConnection, null) // Start UsbService(if it was not started before) and Bind it
+        locationCheckHandler.post(locationCheckRunnable)
+        checkLocationEnabled()
+//        checkLocationEnabled()
+//        setFilters() // Start listening notifications from UsbService
+//        startService(UsbService::class.java, usbConnection, null) // Start UsbService(if it was not started before) and Bind it
     }
 
     override fun onPause() {
         super.onPause()
+        locationCheckHandler.removeCallbacks(locationCheckRunnable)
+//        unregisterReceiver(mUsbReceiver)
+//        unbindService(usbConnection)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         unregisterReceiver(mUsbReceiver)
         unbindService(usbConnection)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             premissionRequestCode -> {
@@ -263,7 +342,7 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings ->  {
+            R.id.action_settings -> {
                 println("SETTINGS")
                 return true
             }
@@ -271,13 +350,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun locationSourceSwitchClicked() {
-        if (findViewById<Switch>(R.id.switch1).isChecked) {
-            // if (locationSource == Constants.LOCATION_SOURCE_USB)
-            activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_USB)
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
+    private fun checkLocationEnabled() {
+        var gps_enabled = false;
+        var network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (ex: Exception) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (ex: Exception) {}
+
+        if(!gps_enabled && !network_enabled) {
+            // notify user
+            AlertDialog.Builder(this)
+                .setMessage("Location Disabled")
+                .setPositiveButton("Open Location Settings") { _: DialogInterface, _: Int ->
+                    this.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+                .setNegativeButton("Cancel") { _: DialogInterface, _: Int ->
+                    val localLocationSources = locationSourcesSubject.value
+                    localLocationSources.internal = gps_status.invalid
+                    locationSourcesSubject.onNext(localLocationSources)
+                }
+                .show();
         }
         else {
-            activeLocationSourceSubject.onNext(Constants.LOCATION_SOURCE_INTERNAL)
+            val localLocationSources = locationSourcesSubject.value
+            localLocationSources.internal = gps_status.valid
+            locationSourcesSubject.onNext(localLocationSources)
         }
     }
 
@@ -313,7 +419,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startService(service: Class<*>, serviceConnection: ServiceConnection, extras: Bundle?) {
+    private fun startService(
+        service: Class<*>,
+        serviceConnection: ServiceConnection,
+        extras: Bundle?
+    ) {
         if (!UsbService.SERVICE_CONNECTED) {
             val startService = Intent(this, service)
             if (extras != null && !extras.isEmpty) {

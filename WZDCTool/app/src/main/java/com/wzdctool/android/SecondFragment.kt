@@ -11,30 +11,28 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.SecondFragmentUIObj
+import com.wzdctool.android.dataclasses.gps_status
+import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
-import com.wzdctool.android.services.LocationService
 import rx.Subscription
-import kotlin.math.*
+import kotlin.math.min
 
 
 /**
@@ -114,7 +112,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 println("Workers Not Present")
                 viewModel.wpStat = false
                 view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_small))
-                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(R.color.colorAccent)
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
+                    R.color.colorAccent
+                )
                 val marker = MarkerObj("WP", "False")
                 markerSubject.onNext(marker)
             }
@@ -122,9 +122,20 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 println("Workers Present")
                 viewModel.wpStat = true
                 view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_noworker))
-                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(R.color.primary_active)
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
+                    R.color.primary_active
+                )
                 val marker = MarkerObj("WP", "True")
                 markerSubject.onNext(marker)
+            }
+        }
+
+        view.findViewById<SwitchCompat>(R.id.gpsSwitch).setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                activeLocationSourceSubject.onNext(gps_type.usb)
+            }
+            else {
+                activeLocationSourceSubject.onNext(gps_type.internal)
             }
         }
     }
@@ -145,6 +156,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     fun stopDataCollectionUI() {
         if (viewModel.automaticDetection.value!!) {
             // TODO: stuffs
+
         }
         else {
             requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
@@ -187,12 +199,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 if (!laneStatLocal[lane]) {
                     statusMsg.text = resources.getString(R.string.status_open)
                     statusMsg.setTextColor(resources.getColor(R.color.status_open))
-                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(R.color.colorAccent)
+                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(
+                        R.color.colorAccent
+                    )
                 }
                 else {
                     statusMsg.text = resources.getString(R.string.status_closed)
                     statusMsg.setTextColor(resources.getColor(R.color.status_closed))
-                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(R.color.primary_active)
+                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(
+                        R.color.primary_active
+                    )
                 }
             }
         }
@@ -260,13 +276,67 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             viewModel.uploadDataFile(it)
         })
 
-        subscriptions.add(locationSubject.subscribe{
+        subscriptions.add(locationSubject.subscribe {
             viewModel.checkLocation(it)
+        })
+
+        subscriptions.add(locationSourcesSubject.subscribe {
+            // Internal GPS
+            if (it.internal == gps_status.valid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
+            } else if (it.internal == gps_status.invalid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
+            } else if (it.internal == gps_status.disconnected) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
+            }
+
+            // USB GPS
+            if (it.usb == gps_status.valid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
+            } else if (it.usb == gps_status.invalid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
+
+                val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+                anim.duration = 900 //You can manage the blinking time with this parameter
+                anim.startOffset = 20
+                anim.repeatMode = Animation.REVERSE
+                anim.repeatCount = Animation.INFINITE
+                textView.startAnimation(anim)
+            } else if (it.usb == gps_status.disconnected) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
+            }
+
+            val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
+            gps_switch.isEnabled = it.internal == gps_status.valid && it.usb == gps_status.valid
+        })
+
+        subscriptions.add(activeLocationSourceSubject.subscribe {
+            val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
+            if (it == gps_type.internal) {
+                gps_switch.isChecked = false
+            } else if (it == gps_type.usb) { // if (usbLocationValid.value)
+                gps_switch.isChecked = true
+            } else {
+                requireView().findViewById<Button>(R.id.button_first).isEnabled = false
+            }
+        })
+
+        subscriptions.add(DataClassesRepository.rsmStatus.subscribe {
+            requireView().findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         })
     }
 
     private fun addUpdateMapSubscription() {
-        subscriptions.add(locationSubject.subscribe{
+        subscriptions.add(locationSubject.subscribe {
             println("called")
             viewModel.updateMapLocation(it, mMap)
         })
@@ -297,6 +367,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         removeSubscriptions()
+        val marker = MarkerObj("Cancel", "")
+        markerSubject.onNext(marker)
         try {
             mMapView.onDestroy()
         }
@@ -404,7 +476,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
                 laneLayout.visibility = View.INVISIBLE
 
-                val laneLine = requireView().findViewById<ImageView>(laneLines[i-1])
+                val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
                 laneLine.visibility = View.INVISIBLE
 
 //                val button = requireView().findViewById<ToggleButton>(buttons[i])

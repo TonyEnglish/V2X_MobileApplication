@@ -72,7 +72,12 @@ object DataFileRepository {
                 isFirstTime = false
                 markerSubject.subscribe {
 //                    toastNotificationSubject.onNext("${it.marker}: ${it.value}")
-                    if (loggingData) {
+                    if (it.marker == "Cancel") {
+                        loggingData = false
+                        end_when_ready = false
+                        File(dataPath).delete()
+                    }
+                    else if (loggingData) {
                         markerQueue.add(it.marker)
                         markerValueQueue.add(it.value)
                     }
