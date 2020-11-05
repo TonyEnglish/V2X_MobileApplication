@@ -23,7 +23,7 @@ object DataFileRepository {
     var markerSubject = PublishSubject.create<MarkerObj>()
     var dataFileSubject = PublishSubject.create<String>()
 
-    private lateinit var dataPath: String
+    private var dataPath: String = ""
     private lateinit var osw: OutputStreamWriter
     private lateinit var prevLocation: Location
     lateinit var dataFileName: String
@@ -75,7 +75,8 @@ object DataFileRepository {
                     if (it.marker == "Cancel") {
                         loggingData = false
                         end_when_ready = false
-                        File(dataPath).delete()
+                        if (dataPath != "")
+                            File(dataPath).delete()
                     }
                     else if (loggingData) {
                         markerQueue.add(it.marker)
@@ -404,6 +405,7 @@ object DataFileRepository {
 
     fun uploadPathDataFile(filePath: String, fileName: String): String {
         try {
+            println("started")
             // Retrieve storage account from connection-string.
             if (azureInfoRepository.currentConnectionStringSubject.value == null) {
                 return ""
@@ -420,6 +422,7 @@ object DataFileRepository {
             // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
             val blob: CloudBlockBlob = container.getBlockBlobReference(fileName)
             val source = File(filePath)
+            println("About to upload")
             blob.upload(FileInputStream(source), source.length())
             return "Success!"
 

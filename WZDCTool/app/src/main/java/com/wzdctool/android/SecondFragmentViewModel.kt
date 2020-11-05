@@ -84,7 +84,6 @@ class SecondFragmentViewModel : ViewModel() {
         dataLoggingVar = false
         dataLog.value = false
         gotRP.value = false
-        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 
     fun markRefPt() {
@@ -259,8 +258,7 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
-        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
-
+        println("UploadDataFile")
         dataFileName =
             "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
         val uploadFileName =
@@ -279,5 +277,6 @@ class SecondFragmentViewModel : ViewModel() {
             println(output)
             notificationSubject.onNext("Path data file uploaded")
         }
+        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 }
