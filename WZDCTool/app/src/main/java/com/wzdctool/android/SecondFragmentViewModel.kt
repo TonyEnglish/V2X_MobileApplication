@@ -98,6 +98,7 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun checkLocation(location: Location) {
+        println("Checking Location")
         if (!automaticDetection.value!!)
             return
         val currCoord = mapLocationToCoord(location)
@@ -165,7 +166,9 @@ class SecondFragmentViewModel : ViewModel() {
         zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
     }
 
-    fun updateMapLocation(location: Location, mMap: GoogleMap) {
+    fun updateMapLocation(location: Location, mMap: GoogleMap?) {
+        if (mMap == null)
+            return
         val currLocation = LatLng(location.latitude, location.longitude)
         val center = CameraUpdateFactory.newLatLngZoom(currLocation, zoom.toFloat())
         mMap.animateCamera(center, 10, null);

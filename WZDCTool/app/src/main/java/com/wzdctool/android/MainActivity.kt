@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.*
 import android.provider.Settings
+import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Switch
@@ -190,11 +191,18 @@ class MainActivity : AppCompatActivity() {
 
 
         activeLocationSourceSubject.subscribe {
-//            toastNotificationSubject.onNext(it.toString())
+            toastNotificationSubject.onNext(it.toString())
 //            toastNotificationSubject.onNext(it)
         }
 
+        locationSubject.subscribe {
+            Log.v("LocationService", "Lat: ${it.latitude}, " +
+                    "Lon: ${it.longitude}, " + "elevation: ${it.altitude}, " +
+                    "accuracy: ${it.accuracy}")
+        }
+
         // TODO: Do not re-save values to saved preferences on initial load
+        currentAzureInfoSubject.onNext(azureInfoObj("neaeraiotstorage", "gSFq2szM88ag0BV/J7QqzoXdak1aIGsUgyWagsR/96mlVnQhdOTnns6D7z8nOgRUdQy3FdbMxEmufrCqmE6mdw=="))
         currentAzureInfoSubject.subscribe {
             updateConnectionStringFromObj(it)
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
@@ -286,7 +294,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        locationCheckHandler.post(locationCheckRunnable)
+//        locationCheckHandler.post(locationCheckRunnable)
         checkLocationEnabled()
 //        checkLocationEnabled()
 //        setFilters() // Start listening notifications from UsbService
@@ -295,7 +303,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        locationCheckHandler.removeCallbacks(locationCheckRunnable)
+//        locationCheckHandler.removeCallbacks(locationCheckRunnable)
 //        unregisterReceiver(mUsbReceiver)
 //        unbindService(usbConnection)
     }

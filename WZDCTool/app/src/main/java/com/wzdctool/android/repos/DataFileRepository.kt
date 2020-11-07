@@ -8,6 +8,7 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
 import com.wzdctool.android.dataclasses.CSVObj
+import com.wzdctool.android.dataclasses.Marker
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
@@ -33,6 +34,8 @@ object DataFileRepository {
 
     private var total_lanes: Int = 8
 
+    private var prevCsvObj: CSVObj? = null
+
     private var lane_stat = MutableList<Boolean>(8+1) {false}
     private var wp_stat = false
     private var got_rp = false
@@ -53,9 +56,7 @@ object DataFileRepository {
 
 
     // var marker: String = ""
-    var markerQueue: Queue<String> = LinkedList<String>()
-    // var markerValue: String = ""
-    var markerValueQueue: Queue<String> = LinkedList<String>()
+    var markerQueue: Queue<MarkerObj> = LinkedList<MarkerObj>()
 
 //    fun createDataFile() {
 //        dataPath = "${Constants.DATA_FILE_DIRECTORY}/dataFile-${Calendar.getInstance().timeInMillis}.csv"
@@ -79,14 +80,11 @@ object DataFileRepository {
                             File(dataPath).delete()
                     }
                     else if (loggingData) {
-                        markerQueue.add(it.marker)
-                        markerValueQueue.add(it.value)
+                        markerQueue.add(it)
                     }
                     else if (it.marker == "Data Log" && it.value == "True") {
                         markerQueue.clear()
-                        markerQueue.add(it.marker)
-                        markerValueQueue.clear()
-                        markerValueQueue.add(it.value)
+                        markerQueue.add(it)
                         createDataFile()
                         // toastNotificationSubject.onNext("Logging Data")
                         loggingData = true
@@ -95,23 +93,52 @@ object DataFileRepository {
                 }
 
                 locationSubject.subscribe {
-                    if (loggingData) {
-                        val csvObj = createCSVObj(it)
-                        writeToDataFile(csvObj)
-                    }
-                    prevLocation = it
+                    handleLocation(it)
                 }
             }
         }
     }
 
+    private fun handleLocation(location: Location) {
+        println("Data File Repo")
+        println("loggingData: $loggingData")
+        val csvObj = createCSVObj(location)
+        validateDataLine(csvObj, line_num)
+        if (loggingData) {
+            if (csvObj == prevCsvObj)
+                return
+            if (csvObj.marker == "Data Log" && csvObj.marker_value == "False") {
+                val requiredMarkers = getRequiredMarkers(csvObj)
+                if (requiredMarkers.isEmpty()) {
+                    writeToDataFile(csvObj)
+                    loggingData = false
+                    saveDataFile()
+                }
+                else {
+                    markerQueue.clear()
+                    for (marker in requiredMarkers) {
+                        markerQueue.add(marker)
+                    }
+                    markerQueue.add(MarkerObj("Data Log", "False"))
+                    val updatedCsvObj = createCSVObj(location)
+                    validateDataLine(updatedCsvObj, line_num)
+                    writeToDataFile(updatedCsvObj)
+                }
+            }
+            else {
+                writeToDataFile(csvObj)
+            }
+            prevCsvObj = csvObj
+            line_num++
+        }
+    }
+
     private fun createCSVObj(location: Location): CSVObj {
-        val marker: String = if (markerQueue.size >= 1) markerQueue.remove() else ""
-        val markerValue: String = if (markerValueQueue.size >= 1) markerValueQueue.remove() else ""
+        val marker: MarkerObj = if (markerQueue.size >= 1) markerQueue.remove() else MarkerObj("", "")
         val csvObj = CSVObj(
             Date(location.time), location.extras.getInt("satellites"), location.accuracy,
             location.latitude, location.longitude, location.altitude, location.speed,
-            location.bearing, marker, markerValue, false
+            location.bearing, marker.marker, marker.value, false
         )
         return csvObj
     }
@@ -144,7 +171,7 @@ object DataFileRepository {
             laneList.add(i.toString())
         }
         lane_stat = MutableList<Boolean>(total_lanes+1) {false}
-        var wp_stat = false
+        wp_stat = false
         got_rp = false
         line_num = 0
         // messages.clear()
@@ -154,72 +181,8 @@ object DataFileRepository {
         val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
         println(formattedMessage)
 
-//        validateDataLine(formattedMessage, line_num)
-//        val messages =
-//        if (messages.isNotEmpty()) {
-//            // Line invalid
-//            for (msg in messages) {
-//                toastNotificationSubject.onNext("Invalid data line: $msg")
-//            }
-//        }
-
-        println(loggingData)
-        // Remove duplicates
-        if (loggingData) { //formattedMessage != previousLine &&
-            // Ignores duplicate lines
-            if (message.marker == "Data Log" && message.marker_value == "False") {
-                // Verify that app state is valid (lane closures and worker presence
-                val lastMessages = "" //validateLastDataLine(formattedMessage)
-                if (lastMessages.isNotEmpty() && false) {
-                    end_when_ready = true
-                    // App state invalid, do not end data collection
-                    // Print messages and remove 'Data Log False' from message
-                    for (msg in lastMessages) {
-                        toastNotificationSubject.onNext("Cannot end data collection because: $msg")
-                    }
-
-                    // Recreate message without marker and marker_value
-                    val updatedMessage = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},,"
-                    if (updatedMessage != previousLine) {
-                        osw.appendLine(updatedMessage)
-                        previousLine = updatedMessage
-                    }
-                }
-                else {
-                    // App state valid, write line to file and end data collection/upload data file
-                    osw.appendLine(formattedMessage)
-                    previousLine = formattedMessage
-                    loggingData = false
-                    end_when_ready = false
-                    saveDataFile()
-                }
-            }
-            else if (end_when_ready && false) {
-                println("Attmepting to end")
-                val lastMessages = validateLastDataLine(formattedMessage)
-                if (lastMessages.isEmpty()) {
-                    // App state valid, ensure last message written to file has Data Log False
-                    if (message.marker != "") {
-                        println(message)
-                        // Add Data Log False, write line to file and end data collection/upload data file
-                        val updatedMessage = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},Data Log,False"
-                        osw.appendLine(updatedMessage)
-                        loggingData = false
-                        end_when_ready = false
-                        saveDataFile()
-                    }
-                    else {
-                        osw.appendLine(formattedMessage)
-                        previousLine = formattedMessage
-                    }
-                }
-            }
-            else {
-                // Nothing special, just write line to data file
-                osw.appendLine(formattedMessage)
-                previousLine = formattedMessage
-            }
-        }
+        osw.appendLine(formattedMessage)
+        previousLine = formattedMessage
     }
 
     private fun saveDataFile() {
@@ -236,24 +199,23 @@ object DataFileRepository {
         dataFileSubject.onNext(dataFileDownloadsLocation)
     }
 
-    private fun validateDataLine(line: String, lineNum: Int): List<String> {
-        val fields = line.split(",")
+    private fun validateDataLine(csvObj: CSVObj, lineNum: Int): List<String> {
         var valid = true
         val messages: MutableList<String> = mutableListOf()
 
-        val time    = fields[0]
-        val sats    = fields[1].toInt()
-        val hdop    = fields[2].toDouble()
-        val lat     = fields[3].toDouble()
-        val lon     = fields[4].toDouble()
-        val elev    = fields[5].toDouble()
-        val speed   = fields[6].toDouble()
-        val heading = fields[7].toDouble()
-        val marker  = fields[8]
-        val value   = fields[9]
+        val time    = csvObj.time
+        val sats    = csvObj.num_sats
+        val hdop    = csvObj.hdop
+        val lat     = csvObj.latitude
+        val lon     = csvObj.longitude
+        val elev    = csvObj.altitude
+        val speed   = csvObj.speed
+        val heading = csvObj.heading
+        val marker  = csvObj.marker
+        val value   = csvObj.marker_value
 
         // Simple verification
-        if (! ("""([0-9]){4}\/(0[1-9]|1[0-2])\/([0-9]){2}-(0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9]):([0-9]){2}""").toRegex().matches(time)) {
+        if (! ("""([0-9]){4}\/(0[1-9]|1[0-2])\/([0-9]){2}-(0[0-9]|1[0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9]):([0-9]){2}""").toRegex().matches(formatter.format(time))) {
             messages.add("Line $lineNum: GPS date time gormat invalid: $time")
         }
         if (sats !in 0..12) {
@@ -331,25 +293,25 @@ object DataFileRepository {
         return messages
     }
 
-    private fun validateLastDataLine(line: String): List<String> {
+    private fun getRequiredMarkers(csvObj: CSVObj): List<MarkerObj> {
 //        val fields = line.split(",")
-        val messages: MutableList<String> = mutableListOf()
+        val markers: MutableList<MarkerObj> = mutableListOf()
 
         if (!got_rp) {
-            messages.add("Reference point must be marked")
+            markers.add(MarkerObj("RP", ""))
         }
 
         for (i in 1 until lane_stat.size) {
             if (lane_stat[i]) {
-                messages.add("Lane $i still closed")
+                markers.add(MarkerObj("LO", i.toString()))
             }
         }
 
         if (wp_stat) {
-            messages.add("Workers still present")
+            markers.add(MarkerObj("WP", "False"))
         }
 
-        return messages
+        return markers
     }
 
 //    private fun validateDataFile() {
