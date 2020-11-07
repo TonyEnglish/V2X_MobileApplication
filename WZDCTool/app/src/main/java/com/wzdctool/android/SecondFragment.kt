@@ -29,6 +29,7 @@ import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import rx.Subscription
@@ -47,7 +48,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     private lateinit var viewModel: SecondFragmentViewModel
     private lateinit var uiObjObserver: Observer<SecondFragmentUIObj>
     private lateinit var localUIObj: SecondFragmentUIObj
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private lateinit var mMapView: MapView
 
     private val subscriptions: MutableList<Subscription> = mutableListOf()
@@ -150,7 +151,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
-            requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
+            requireView().findViewById<ImageButton>(buttons[i]).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
@@ -169,7 +170,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
-                requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
+                requireView().findViewById<ImageButton>(buttons[i]).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
@@ -179,20 +180,24 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
         for (lane in 1..viewModel.localUIObj.num_lanes) {
             val statusMsg = requireView().findViewById<ImageButton>(buttons[lane])
-            //if (statusMsg.text != resources.getString(R.string.status_driven)) {
+            if (lane != viewModel.localUIObj.data_lane) { //Check if driven lane
                 if (!laneStatLocal[lane]) {
                     //change open image
-                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(
+                    val button = requireView().findViewById<ImageButton>(buttons[lane])
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_nolines))
+                    button.backgroundTintList = resources.getColorStateList(
                         R.color.colorAccent
                     )
                 }
                 else {
                     //change close image
-                    requireView().findViewById<Button>(buttons[lane]).backgroundTintList = resources.getColorStateList(
+                    val button = requireView().findViewById<ImageButton>(buttons[lane])
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_closed))
+                    button.backgroundTintList = resources.getColorStateList(
                         R.color.primary_active
                     )
                 }
-            //}
+            }
         }
     }
 
@@ -237,10 +242,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        mMap.isMyLocationEnabled = true
-        viewModel.initMap(mMap, mMapView)
-
-        addUpdateMapSubscription()
+        mMap!!.isMyLocationEnabled = true
+        viewModel.initMap(mMap!!, mMapView)
 
 //        val currLocation = LatLng(locationSubject.value.latitude, locationSubject.value.longitude)
 //        val center = CameraUpdateFactory.newLatLngZoom(currLocation, viewModel.zoom.toFloat())
@@ -315,11 +318,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         subscriptions.add(DataClassesRepository.rsmStatus.subscribe {
             requireView().findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         })
-    }
 
-    private fun addUpdateMapSubscription() {
         subscriptions.add(locationSubject.subscribe {
-            println("called")
+            println("updating map")
             viewModel.updateMapLocation(it, mMap)
         })
     }
@@ -337,6 +338,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
+        toastNotificationSubject.onNext("paused")
         removeSubscriptions()
         try {
             mMapView.onPause()
@@ -349,6 +351,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         removeSubscriptions()
+//        toastNotificationSubject.onNext("destroy")
         val marker = MarkerObj("Cancel", "")
         markerSubject.onNext(marker)
         try {
@@ -429,7 +432,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         //lane3_ll
         //laneLine3_4
 
-        requireView().findViewById<Button>(R.id.lane1btn).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.lane1btn).setOnClickListener {
             viewModel.laneClicked(1)
         }
 
@@ -448,6 +451,17 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         //drivenStatusText.setTextColor(resources.getColor(R.color.status_driven))
         //requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
 
+        val layout_params = requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams
+        layout_params.width = ((requireView().parent as View).width * 0.9 * numLanes/8).toInt()
+        println(layout_params.width)
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
+
+
+        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_road_driven_2))
+
+
+
+
 //        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
         if (numLanes <= 1 ) {
             // TODO: Throw exception
@@ -456,7 +470,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         else if (numLanes > 1) {
             for (i in (min(numLanes, 8)+1)..8) {
                 val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
-                laneLayout.visibility = View.INVISIBLE
+                laneLayout.visibility = View.GONE
 
                 //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
                 //laneLine.visibility = View.INVISIBLE
@@ -469,7 +483,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 //                textView.visibility = View.INVISIBLE
             }
             for (i in 2..min(numLanes, 8)) {
-                val button = requireView().findViewById<ToggleButton>(buttons[i])
+                val button = requireView().findViewById<ImageButton>(buttons[i])
                 button.setOnClickListener {
                     viewModel.laneClicked(i)
                 }

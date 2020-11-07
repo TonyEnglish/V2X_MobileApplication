@@ -75,9 +75,9 @@ class LocationService : Service() {
             if (activeLocationSourceSubject.value == gps_type.internal) {
                 for (location in locationResult.locations){
                     locationSubject.onNext(location)
-                    Log.v("LocationService", "Lat: ${location.latitude}, " +
-                            "Lon: ${location.longitude}, " + "elevation: ${location.altitude}, " +
-                            "accuracy: ${location.accuracy}")
+//                    Log.v("LocationService", "Lat: ${location.latitude}, " +
+//                            "Lon: ${location.longitude}, " + "elevation: ${location.altitude}, " +
+//                            "accuracy: ${location.accuracy}")
 
                     // println(csvObj.toString())
                     //val time: Date, val num_sats: Int, val hdop: Double, val latitude: Double,
