@@ -96,7 +96,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             if (viewModel.wpStat) {
                 println("Workers Not Present")
                 viewModel.wpStat = false
-                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_small))
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_bw))
                 view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
                     R.color.colorAccent
                 )
@@ -106,7 +106,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             else {
                 println("Workers Present")
                 viewModel.wpStat = true
-                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_noworker))
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_small))
                 view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
                     R.color.primary_active
                 )

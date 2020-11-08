@@ -306,7 +306,7 @@
                 android:layout_weight="0.33"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/colorAccent"
-                android:src="@drawable/ic_construction_worker_small"
+                android:src="@drawable/ic_construction_worker_bw"
                 android:enabled="false"
                 android:visibility="gone"
                 android:textColor="@color/button_text" />
