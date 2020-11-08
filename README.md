@@ -20,7 +20,8 @@ This repository contains the following components:
 
 ## Prerequisites
 Supported device running Android 8.0 to 11 (SDK 26 - 30)
-Internet access
+
+Internet access (Loading configuration files and uploading path data)
 
 ## Usage
 This application is located on the Googel play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
@@ -35,9 +36,9 @@ There are currently no test cases for this proof of concept tool.
 
 ### Execution
 
-Configuration  |  Data Collection          |  Upload path Data
+Main Page | Configuration | Data Collection
 :-------------------------:|:-------------------------:|:-------------------------:
-![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Main_Page.jpg)
+![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Main_Page.jpg)  | ![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)
 
 #### Setup: Configure Azure Connection Info
 Contact [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) to request connection to the cloud. 
