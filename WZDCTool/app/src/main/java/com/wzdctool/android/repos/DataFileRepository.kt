@@ -68,39 +68,34 @@ object DataFileRepository {
     }
 
     fun initializeObservers() {
-        synchronized(this) {
-            if (isFirstTime) {
-                isFirstTime = false
-                markerSubject.subscribe {
+        markerSubject.subscribe {
 //                    toastNotificationSubject.onNext("${it.marker}: ${it.value}")
-                    if (it.marker == "Cancel") {
-                        loggingData = false
-                        end_when_ready = false
-                        if (dataPath != "")
-                            File(dataPath).delete()
-                    }
-                    else if (loggingData) {
-                        markerQueue.add(it)
-                    }
-                    else if (it.marker == "Data Log" && it.value == "True") {
-                        markerQueue.clear()
-                        markerQueue.add(it)
-                        createDataFile()
-                        // toastNotificationSubject.onNext("Logging Data")
-                        loggingData = true
-                        // val csvObj = createCSVObj(prevLocation)
-                    }
-                }
-
-                locationSubject.subscribe {
-                    handleLocation(it)
-                }
+            if (it.marker == "Cancel") {
+                loggingData = false
+                end_when_ready = false
+                if (dataPath != "")
+                    File(dataPath).delete()
             }
+            else if (loggingData) {
+                markerQueue.add(it)
+            }
+            else if (it.marker == "Data Log" && it.value == "True") {
+                markerQueue.clear()
+                markerQueue.add(it)
+                createDataFile()
+                // toastNotificationSubject.onNext("Logging Data")
+                loggingData = true
+                // val csvObj = createCSVObj(prevLocation)
+            }
+        }
+
+        locationSubject.subscribe {
+            handleLocation(it)
         }
     }
 
     private fun handleLocation(location: Location) {
-//        println("Data File Repo")
+        println("Data File Repo")
 //        println("loggingData: $loggingData")
         val csvObj = createCSVObj(location)
         validateDataLine(csvObj, line_num)
