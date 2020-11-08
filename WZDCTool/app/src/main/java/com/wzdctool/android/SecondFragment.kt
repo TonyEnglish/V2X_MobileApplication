@@ -338,7 +338,6 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
-        toastNotificationSubject.onNext("paused")
         removeSubscriptions()
         try {
             mMapView.onPause()
@@ -351,7 +350,6 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         removeSubscriptions()
-//        toastNotificationSubject.onNext("destroy")
         val marker = MarkerObj("Cancel", "")
         markerSubject.onNext(marker)
         try {

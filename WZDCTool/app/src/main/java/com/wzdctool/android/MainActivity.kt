@@ -190,10 +190,10 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        activeLocationSourceSubject.subscribe {
-            toastNotificationSubject.onNext(it.toString())
-//            toastNotificationSubject.onNext(it)
-        }
+//        activeLocationSourceSubject.subscribe {
+//            toastNotificationSubject.onNext(it.toString())
+////            toastNotificationSubject.onNext(it)
+//        }
 
         locationSubject.subscribe {
             Log.v("LocationService", "Lat: ${it.latitude}, " +
