@@ -24,7 +24,7 @@ Supported device running Android 8.0 to 11 (SDK 26 - 30)
 Internet access (Loading configuration files and uploading path data)
 
 ## Usage
-This application is located on the Googel play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
+This application is located on the Google play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
 
 ### Building
 
