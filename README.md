@@ -15,7 +15,7 @@ This repository contains the following components:
   
 ### Related Projects
 
-- [V2X Manual Data Collection](https://github.com/TonyEnglish/V2X-manual-data-collection)
+- [Work Zone Data Collection Tool](https://github.com/TonyEnglish/V2X-manual-data-collection)
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
