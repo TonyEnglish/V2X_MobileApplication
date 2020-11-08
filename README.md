@@ -19,7 +19,8 @@ This repository contains the following components:
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
-Android 8.0 to 11 (SDK 26 - 30)
+Supported device running Android 8.0 to 11 (SDK 26 - 30)
+Internet access
 
 ## Usage
 This application is located on the Googel play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
@@ -42,12 +43,42 @@ Configuration  |  Data Collection          |  Upload path Data
 Contact [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) to request connection to the cloud. 
 
 #### Step 1: Configuration
-The first step in mapping a work zone is importing the configuration file already created for the work zone. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator. Once a configuration file is selected, the next button brings the user to the data collection component
+At the top of the screen, there are 3 elements. The highest is a textbox labeled Active Config. This displays the work zone id of the active configuration file. The next element is a slider showing Internal GPS and USb GPS. Each GPS type ahs the following stats
 
-If you have a supported USB GPS, connect it now and wait until the 'USB GPS' text at the top right is green before moving forward to data collection
+Internal GPS:
+- Green: GPS connection is valid and can be used for data collection
+- Yellow: Location permissions are enabled but location is currently disabled. GPS type cannot currently be used for data collection
+- Red: Location permissions are disabled. GPS type cannot currently be used for data collection
+
+USB (External) GPS:
+- Green: GPS connection is valid and can be used for data collection
+- Yellow: Device detected but has not established a valid GPS fix. . GPS type cannot currently be used for data collection
+- Red: No supported USB devices are detected. GPS type cannot currently be used for data collection
+
+The final element at the top of the screen features 2 checkboxes. These display whether those message types will be generated in the current configuration. RSM messages may only be generated when the GPS accuracy is less than 2 meters. 
+
+The Manual Detection vs Automatic Detection slider changes the start/ending location detection mode. 
+1. In automatic detection mode (default), data collection will automatically commence when a set starting location is reached (from configuration file). Data collection will commence as normal, until the set ending location is reached, at which point data collection will end and the data file will be uploaded. 
+2. In manual detection mode, the user manually starts and ends data collection. When the user is approaching a work zone, the user presses the play button. When the work zone begins, the user presses the marker button. Then, data collection commences as normal. Once the user exits the work zone, they will press the stop button.
+
+The final step is to select a configuration file. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
+
+Note: The user may only start data collection if a valid GPS device is selected and a configuration file is selected. 
 
 #### Step 2: Data Collection
-The next step is to physically map the work zone. This involves driving through the work zone while marking features in the mobile application. These features include lane closures/openings and the presence of workers. In automatic detection mode, the application will begin and end data collection based on the locations set in the configuration file. In manual detection mode, the user must start and end data collection, and the application will save these locations to allow the application to run automatically the next time this work zone is mapped.
+Data collection functions slightly differently in manual and automatic detection modes. The application behaviorn is described below
+1. In automatic detection mode (default), data collection will automatically commence when a set starting location is reached (from configuration file). Data collection will commence as normal, until the set ending location is reached, at which point data collection will end and the data file will be uploaded. 
+2. In manual detection mode, the user manually starts and ends data collection. When the user is approaching a work zone, the user presses the play button. When the work zone begins, the user presses the marker button. Then, data collection commences as normal. Once the user exits the work zone, they will press the stop button.
+
+The user is (usually) required to drive in a specific lane, except in cases where the user does not intend to generate RSM messages. This lane is set in the configuration file and shown in the data collection screen by a car icon.
+
+Once data collection has begun, the user can mark lane closures and the presence of workers. 
+Lane closures are marked at the beginning of the taper. For a closing lane, mark the lane closed when the lane starts to taper to closed. For an opening lane, mark the lane open when the lane starts to taper to open. To mark a lane closure in the application, simply click the corresponding lane button. A cone will appear, signifying that the lane is closed. To open that lane, simply press the lane again. The lane with a yellow/orange car displays the lane that the user is driving in and cannot be closed. Images are shown below
+To mark workers present, press the worker button at the bottom. The background will change color and the worker will be colored in, signifying that workers are present. To mark workers no longer present, simply press the worker button again. Images are shown below
+
+Nothing  |  Lane Closed  |  Workers Present
+:-------------------------:|:-------------------------:|:-------------------------:
+![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection_Blank_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Lane_Closed_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Workers_Present_cropped.jpg)
 
 #### Step 3: Upload Path Data
 The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
