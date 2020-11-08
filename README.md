@@ -19,18 +19,10 @@ This repository contains the following components:
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
-
-*Required - Detail what actions users need to take before they can stand up the project, including instructions for different environments users might have. This might include instructions and examples for installing additional software.*
-
-Example:
-
-Requires:
-- Java 8 (or higher)
-- Maven 3.5.4
-- Docker
+Android 8.0 to 11 (SDK 26 - 30)
 
 ## Usage
-*Required - Provide users with detailed instrucitons for how to use your software. The specifics of this section will vary between projects, but should adhere to the following minimum outline:*
+This application is located on the Googel play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
 
 ### Building
 
@@ -42,13 +34,17 @@ There are currently no test cases for this proof of concept tool.
 
 ### Execution
 
-Import Configuration File  |  Data Collection          |  Upload path Data
+Configuration  |  Data Collection          |  Upload path Data
 :-------------------------:|:-------------------------:|:-------------------------:
-![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Path_Data_Uploaded.jpg)
+![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Main_Page.jpg)
 
+#### Setup: Configure Azure Connection Info
+Contact [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) to request connection to the cloud. 
 
-#### Step 1: Import Configuration File
+#### Step 1: Configuration
 The first step in mapping a work zone is importing the configuration file already created for the work zone. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator. Once a configuration file is selected, the next button brings the user to the data collection component
+
+If you have a supported USB GPS, connect it now and wait until the 'USB GPS' text at the top right is green before moving forward to data collection
 
 #### Step 2: Data Collection
 The next step is to physically map the work zone. This involves driving through the work zone while marking features in the mobile application. These features include lane closures/openings and the presence of workers. In automatic detection mode, the application will begin and end data collection based on the locations set in the configuration file. In manual detection mode, the user must start and end data collection, and the application will save these locations to allow the application to run automatically the next time this work zone is mapped.
