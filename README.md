@@ -81,6 +81,8 @@ Nothing  |  Lane Closed  |  Workers Present
 :-------------------------:|:-------------------------:|:-------------------------:
 ![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection_Blank_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Lane_Closed_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Workers_Present_cropped.jpg)
 
+For more detailed user information, see the [WZDC Tool Mobile Application Setup + Documentation](https://github.com/TonyEnglish/V2X_MobileApplication/blob/master/Documentation/WZDC%20Tool%20Mobile%20Application%20Setup%20%2B%20Documentation.pdf)
+
 #### Step 3: Upload Path Data
 The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
 
@@ -90,11 +92,16 @@ This toolset was developed as a proof of concept and is not able to provide a fu
 
 This tool functions alongside a POC TMC website (https://neaeraconsulting.com/V2x_Home). Instructions for utilizing this website are located here: [POC Toolset User Guide](https://github.com/TonyEnglish/V2X-manual-data-collection/blob/master/POC%20Toolset%20User%20Guide.pdf)
 
-Documentation for this project is located here: [Documentation](https://github.com/TonyEnglish/V2X-manual-data-collection/tree/master/Documentation). This documentation includes:
+Documentation for this project is located here: [Documentation](https://github.com/TonyEnglish/V2X_MobileApplication/tree/master/Documentation). This documentation includes:
 
 - V2X POC Interface Control Document
 - V2X POC System Engineering Report
 - V2X POC Test Case Results Report
+- WZDC Tool Documentation Updates
+  - Describes message generation process
+- WZDC Tool Mobile Application Setup + Documentation
+  - Describes how to use application in detail
+  - Describes how to set up development environment
 
 ## Version History and Retention
 
