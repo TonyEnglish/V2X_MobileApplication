@@ -2,33 +2,38 @@ package com.wzdctool.android
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Guideline
+import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.SecondFragmentUIObj
+import com.wzdctool.android.dataclasses.gps_status
+import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.repos.DataClassesRepository
+import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
-import com.wzdctool.android.services.LocationService
-import kotlin.math.*
+import rx.Subscription
+import kotlin.math.min
 
 
 /**
@@ -43,8 +48,10 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     private lateinit var viewModel: SecondFragmentViewModel
     private lateinit var uiObjObserver: Observer<SecondFragmentUIObj>
     private lateinit var localUIObj: SecondFragmentUIObj
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private lateinit var mMapView: MapView
+
+    private val subscriptions: MutableList<Subscription> = mutableListOf()
 
     val buttons = listOf(
         0,
@@ -57,25 +64,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         R.id.lane7btn,
         R.id.lane8btn
     )
-    val statusList = listOf(
+    val laneLayouts = listOf(
         0,
-        R.id.lane1status,
-        R.id.lane2status,
-        R.id.lane3status,
-        R.id.lane4status
-    )
-    val textViewList = listOf(
-        0,
-        R.id.lane1textView,
-        R.id.lane2textView,
-        R.id.lane3textView,
-        R.id.lane4textView
-    )
-    val laneLines = listOf(
-        0,
-        R.id.laneLine1_2,
-        R.id.laneLine2_3,
-        R.id.laneLine3_4,
+        R.id.lane1_ll,
+        R.id.lane2_ll,
+        R.id.lane3_ll,
+        R.id.lane4_ll,
+        R.id.lane5_ll,
+        R.id.lane6_ll,
+        R.id.lane7_ll,
+        R.id.lane8_ll
     )
 
     override fun onCreateView(
@@ -86,6 +84,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         return inflater.inflate(R.layout.fragment_second, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -93,18 +92,35 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         mMapView.onCreate(savedInstanceState)
         mMapView.getMapAsync(this)
 
-        view.findViewById<Button>(R.id.wp).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.wp).setOnClickListener {
             if (viewModel.wpStat) {
                 println("Workers Not Present")
                 viewModel.wpStat = false
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_bw))
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
+                    R.color.colorAccent
+                )
                 val marker = MarkerObj("WP", "False")
                 markerSubject.onNext(marker)
             }
             else {
                 println("Workers Present")
                 viewModel.wpStat = true
+                view.findViewById<ImageButton>(R.id.wp).setImageDrawable(resources.getDrawable(R.drawable.ic_construction_worker_small))
+                view.findViewById<ImageButton>(R.id.wp).backgroundTintList = resources.getColorStateList(
+                    R.color.primary_active
+                )
                 val marker = MarkerObj("WP", "True")
                 markerSubject.onNext(marker)
+            }
+        }
+
+        view.findViewById<SwitchCompat>(R.id.gpsSwitch).setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                activeLocationSourceSubject.onNext(gps_type.usb)
+            }
+            else {
+                activeLocationSourceSubject.onNext(gps_type.internal)
             }
         }
     }
@@ -114,98 +130,204 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<Button>(R.id.startBtn).isEnabled = false
-            requireView().findViewById<Button>(R.id.ref).isEnabled = true
+//            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.VISIBLE
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = true
         }
     }
 
     fun stopDataCollectionUI() {
         if (viewModel.automaticDetection.value!!) {
             // TODO: stuffs
+
         }
         else {
-            requireView().findViewById<Button>(R.id.endBtn).isEnabled = false
-            requireView().findViewById<Button>(R.id.wp).isEnabled = false
-            requireView().findViewById<Button>(R.id.startBtn).isEnabled = true
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
-            requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = false
+            requireView().findViewById<ImageButton>(buttons[i]).isEnabled = false
+        requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
+        requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
     }
 
     fun markRefPtUI() {
         if (viewModel.automaticDetection.value!!) {
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
             // TODO: stuffs
         }
         else {
-            requireView().findViewById<Button>(R.id.ref).isEnabled = false
-            requireView().findViewById<Button>(R.id.endBtn).isEnabled = true
-            requireView().findViewById<Button>(R.id.wp).isEnabled = true
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.endBtn).isEnabled = true
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.VISIBLE
         }
         for (i in 1..viewModel.localUIObj.num_lanes)
             if (i != viewModel.localUIObj.data_lane)
-                requireView().findViewById<ToggleButton>(buttons[i]).isEnabled = true
+                requireView().findViewById<ImageButton>(buttons[i]).isEnabled = true
+        requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
+        requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun laneClickedUI(laneStatLocal: List<Boolean>) {
         for (lane in 1..viewModel.localUIObj.num_lanes) {
-            val statusMsg = requireView().findViewById<TextView>(statusList[lane])
-            if (!laneStatLocal[lane]) {
-                statusMsg.text = resources.getString(R.string.status_open)
-                statusMsg.setTextColor(resources.getColor(R.color.status_open))
-            }
-            else {
-                statusMsg.text = resources.getString(R.string.status_closed)
-                statusMsg.setTextColor(resources.getColor(R.color.status_closed))
+            val statusMsg = requireView().findViewById<ImageButton>(buttons[lane])
+            if (lane != viewModel.localUIObj.data_lane) { //Check if driven lane
+                if (!laneStatLocal[lane]) {
+                    //change open image
+                    val button = requireView().findViewById<ImageButton>(buttons[lane])
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_nolines))
+                    button.backgroundTintList = resources.getColorStateList(
+                        R.color.colorAccent
+                    )
+                }
+                else {
+                    //change close image
+                    val button = requireView().findViewById<ImageButton>(buttons[lane])
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_closed))
+                    button.backgroundTintList = resources.getColorStateList(
+                        R.color.primary_active
+                    )
+                }
             }
         }
     }
 
     fun collectionModeUI() {
         if (viewModel.automaticDetection.value!!) {
-            requireView().findViewById<Button>(R.id.startBtn).visibility = View.INVISIBLE
-            requireView().findViewById<Button>(R.id.endBtn).visibility = View.INVISIBLE
-            requireView().findViewById<Button>(R.id.ref).visibility = View.INVISIBLE
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.VISIBLE
+            requireView().findViewById<TextView>(R.id.automaticStatus).text = "Waiting for Start Point"
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_auto).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_auto).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_auto).toInt() + 10
+//            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
-            requireView().findViewById<Button>(R.id.startBtn).visibility = View.VISIBLE
-            requireView().findViewById<Button>(R.id.endBtn).visibility = View.VISIBLE
-            requireView().findViewById<Button>(R.id.ref).visibility = View.VISIBLE
+            requireView().findViewById<TextView>(R.id.automaticStatus).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.VISIBLE
+////            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
+////            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
+//            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
 
-            requireView().findViewById<Guideline>(R.id.wp_guideline).setGuidelineEnd(resources.getDimension(R.dimen.wp_guideline_height_manual).toInt())
-            requireView().findViewById<Guideline>(R.id.lane_guideline).setGuidelineEnd(resources.getDimension(R.dimen.lane_guideline_height_manual).toInt())
-            requireView().findViewById<FrameLayout>(R.id.button_background).layoutParams.height = resources.getDimension(R.dimen.lane_guideline_height_manual).toInt() + 10
+            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mMap.isMyLocationEnabled = true
-        viewModel.initMap(mMap, mMapView)
-
-        if (viewModel.automaticDetection.value!!) {
-            locationSubject.subscribe{
-                viewModel.updateMapLocation(it, mMap)
-                viewModel.checkLocation(it)
-            }
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
         }
-        else {
-            locationSubject.subscribe{
-                viewModel.updateMapLocation(it, mMap)
-            }
-        }
+        mMap!!.isMyLocationEnabled = true
+        viewModel.initMap(mMap!!, mMapView)
 
 //        val currLocation = LatLng(locationSubject.value.latitude, locationSubject.value.longitude)
 //        val center = CameraUpdateFactory.newLatLngZoom(currLocation, viewModel.zoom.toFloat())
 //        mMap.animateCamera(center, 10, null);
     }
 
+    private fun removeSubscriptions() {
+        for (subscription in subscriptions) {
+            subscription.unsubscribe()
+        }
+    }
+
+    private fun addSubscriptions() {
+        subscriptions.add(dataFileSubject.subscribe {
+            viewModel.uploadDataFile(it)
+        })
+
+        subscriptions.add(locationSubject.subscribe {
+            viewModel.checkLocation(it)
+        })
+
+        subscriptions.add(locationSourcesSubject.subscribe {
+            // Internal GPS
+            if (it.internal == gps_status.valid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
+            } else if (it.internal == gps_status.invalid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
+            } else if (it.internal == gps_status.disconnected) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOff)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
+            }
+
+            // USB GPS
+            if (it.usb == gps_status.valid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_valid))
+            } else if (it.usb == gps_status.invalid) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.setTextColor(resources.getColor(R.color.usb_status_invalid))
+
+                val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+                anim.duration = 900 //You can manage the blinking time with this parameter
+                anim.startOffset = 20
+                anim.repeatMode = Animation.REVERSE
+                anim.repeatCount = Animation.INFINITE
+                textView.startAnimation(anim)
+            } else if (it.usb == gps_status.disconnected) {
+                val textView = requireView().findViewById<TextView>(R.id.locationSourceOn)
+                textView.clearAnimation()
+                textView.setTextColor(resources.getColor(R.color.usb_status_disconnected))
+            }
+
+            val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
+            gps_switch.isEnabled = it.internal == gps_status.valid && it.usb == gps_status.valid
+        })
+
+        subscriptions.add(activeLocationSourceSubject.subscribe {
+            val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
+            if (it == gps_type.internal) {
+                gps_switch.isChecked = false
+            } else if (it == gps_type.usb) { // if (usbLocationValid.value)
+                gps_switch.isChecked = true
+            } else {
+                requireView().findViewById<Button>(R.id.button_first).isEnabled = false
+            }
+        })
+
+        subscriptions.add(DataClassesRepository.rsmStatus.subscribe {
+            requireView().findViewById<CheckBox>(R.id.checkBox3).isChecked = it
+        })
+
+        subscriptions.add(locationSubject.subscribe {
+            println("updating map")
+            viewModel.updateMapLocation(it, mMap)
+        })
+    }
+
     override fun onResume() {
         super.onResume()
+        addSubscriptions()
         try {
             mMapView.onResume()
         }
@@ -216,6 +338,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onPause() {
         super.onPause()
+        removeSubscriptions()
         try {
             mMapView.onPause()
         }
@@ -226,6 +349,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroy() {
         super.onDestroy()
+        removeSubscriptions()
+        val marker = MarkerObj("Cancel", "")
+        markerSubject.onNext(marker)
         try {
             mMapView.onDestroy()
         }
@@ -244,6 +370,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
@@ -251,11 +378,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
         ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
 
-        dataFileSubject.subscribe {
-            viewModel.uploadDataFile(it)
-        }
-
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, {   findNavController().navigate(it)    })
+        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
+            findNavController().navigate(it)
+        })
 
         viewModel.dataLog.observe(viewLifecycleOwner, {
             if (it)
@@ -280,18 +405,19 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         })
 
         // if (!viewModel.automaticDetection) {
-        requireView().findViewById<Button>(R.id.startBtn).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.startBtn).setOnClickListener {
             viewModel.startDataCollection()
         }
 
-        requireView().findViewById<Button>(R.id.endBtn).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.endBtn).setOnClickListener {
             viewModel.stopDataCollection()
         }
 
-        requireView().findViewById<Button>(R.id.ref).setOnClickListener {
+        requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
-        // }
+
+        // addSubscriptions()
     }
 
     private fun updateUI() {
@@ -299,37 +425,63 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun ititializeLaneBtns(numLanes: Int, dataLane: Int) {
-        requireView().findViewById<Button>(R.id.lane1btn).setOnClickListener {
+        println("Data Lane: $dataLane")
+
+        //lane3_ll
+        //laneLine3_4
+
+        requireView().findViewById<ImageButton>(R.id.lane1btn).setOnClickListener {
             viewModel.laneClicked(1)
         }
 
-        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
-        carImageViewparams.endToEnd = buttons[dataLane]
-        carImageViewparams.startToStart = buttons[dataLane]
+//        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
+//        carImageViewparams.endToEnd = buttons[dataLane]
+//        carImageViewparams.startToStart = buttons[dataLane]
 
-        val textViewParams = requireView().findViewById<TextView>(statusList[dataLane])
-        textViewParams.visibility = View.GONE
+        //val drivenStatusText = requireView().findViewById<TextView>(statusList[dataLane])
+        //drivenStatusText.setText(drivenStatusText.text)
+        // println(drivenStatusText.text)
 
-        requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
+        // val adapter = AdapterView<TextView>(this)
 
-        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
+        //drivenStatusText.text = resources.getString(R.string.status_driven)
+        //println(drivenStatusText.text)
+        //drivenStatusText.setTextColor(resources.getColor(R.color.status_driven))
+        //requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
+
+        val layout_params = requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams
+        layout_params.width = ((requireView().parent as View).width * 0.9 * numLanes/8).toInt()
+        println(layout_params.width)
+        requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
+
+
+        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_road_driven_2))
+
+
+
+
+//        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
         if (numLanes <= 1 ) {
             // TODO: Throw exception
             return
         }
         else if (numLanes > 1) {
-            for (i in (min(numLanes, 4)+1)..4) {
-                val button = requireView().findViewById<ToggleButton>(buttons[i])
-                button.visibility = View.INVISIBLE
-                val status = requireView().findViewById<TextView>(statusList[i])
-                status.visibility = View.INVISIBLE
-                val textView = requireView().findViewById<TextView>(textViewList[i])
-                textView.visibility = View.INVISIBLE
-                val laneLine = requireView().findViewById<ImageView>(laneLines[i-1])
-                laneLine.visibility = View.INVISIBLE
+            for (i in (min(numLanes, 8)+1)..8) {
+                val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
+                laneLayout.visibility = View.GONE
+
+                //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
+                //laneLine.visibility = View.INVISIBLE
+
+//                val button = requireView().findViewById<ToggleButton>(buttons[i])
+//                button.visibility = View.INVISIBLE
+//                val status = requireView().findViewById<TextView>(statusList[i])
+//                status.visibility = View.INVISIBLE
+//                val textView = requireView().findViewById<TextView>(textViewList[i])
+//                textView.visibility = View.INVISIBLE
             }
-            for (i in 2..min(numLanes, 4)) {
-                val button = requireView().findViewById<ToggleButton>(buttons[i])
+            for (i in 2..min(numLanes, 8)) {
+                val button = requireView().findViewById<ImageButton>(buttons[i])
                 button.setOnClickListener {
                     viewModel.laneClicked(i)
                 }

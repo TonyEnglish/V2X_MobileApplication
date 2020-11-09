@@ -8,8 +8,9 @@ import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
-import com.wzdctool.android.SecureKeys
 import com.wzdctool.android.dataclasses.ConfigurationObj
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
+import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
 import java.io.File
 import java.io.FileOutputStream
 
@@ -18,8 +19,6 @@ object ConfigurationRepository {
     val localConfigListSubject = MutableLiveData<List<String>>()
     val activeConfigSubject = MutableLiveData<ConfigurationObj>()
     val activeWZIDSubject = MutableLiveData<String>()
-
-    private val storageContainer = "publishedconfigfiles"
 
 
 //    val configList: Observable<List<String>>
@@ -99,14 +98,17 @@ object ConfigurationRepository {
     fun getConfigFileList(): List<String> {
 
         // Retrieve storage account from connection-string.
+        if (currentConnectionStringSubject.value == null) {
+            return listOf()
+        }
         val storageAccount: CloudStorageAccount =
-            CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
+            CloudStorageAccount.parse(currentConnectionStringSubject.value)
 
         // Create the blob client.
         val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
 
         // Retrieve reference to a previously created container.
-        val container: CloudBlobContainer = blobClient.getContainerReference(storageContainer)
+        val container: CloudBlobContainer = blobClient.getContainerReference(Constants.AZURE_PUBLISHED_CONFIG_FILES_CONTAINER)
         val configNameList: MutableList<String> = mutableListOf<String>()
 
         val configList = container.listBlobs()
@@ -123,22 +125,31 @@ object ConfigurationRepository {
 
     private fun downloadConfigFile(configName: String, fileDir: String): String? {
         // Retrieve storage account from connection-string.
+        if (currentConnectionStringSubject.value == null) {
+            return null
+        }
         val storageAccount: CloudStorageAccount =
-            CloudStorageAccount.parse(SecureKeys.AZURE_CONNECTION_STRING)
+            CloudStorageAccount.parse( currentConnectionStringSubject.value ) // SecureKeys.AZURE_CONNECTION_STRING)
 
         // Create the blob client.
         val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()
 
         // Retrieve reference to a previously created container.
-        val container: CloudBlobContainer = blobClient.getContainerReference(storageContainer)
+        val container: CloudBlobContainer = blobClient.getContainerReference(Constants.AZURE_PUBLISHED_CONFIG_FILES_CONTAINER)
         // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
         val blob: CloudBlockBlob = container.getBlockBlobReference(configName)
-        val filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
+        var filePath = "${Constants.CONFIG_DIRECTORY}/$configName"
         // Activity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
         println("File Path: $filePath")
         val source = File(filePath)
 
-        blob.download(FileOutputStream(source))
+        try {
+            blob.download(FileOutputStream(source))
+        }
+        catch (e: Exception) {
+            return null
+        }
+
         return filePath
     }
 }

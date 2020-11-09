@@ -15,8 +15,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,6 +32,8 @@ class SecondFragmentViewModel : ViewModel() {
 
     private var prevDistance = 0.0
     var automaticDetection = MutableLiveData<Boolean>()
+
+    var hasSetDataLogFalseMarker = false
 
     // var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
@@ -68,15 +73,17 @@ class SecondFragmentViewModel : ViewModel() {
         val marker = MarkerObj("Data Log", "True")
         markerSubject.onNext(marker)
         dataLog.value = true
+        dataLoggingVar = true
     }
 
     fun stopDataCollection() {
+        // toastNotificationSubject.onNext("Stopping data collection")
         println("Data Logging Ended")
         val marker = MarkerObj("Data Log", "False")
         markerSubject.onNext(marker)
+        dataLoggingVar = false
         dataLog.value = false
         gotRP.value = false
-        navigationLiveData.value = R.id.action_SecondFragment_to_FirstFragment
     }
 
     fun markRefPt() {
@@ -91,20 +98,28 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun checkLocation(location: Location) {
+        println("Checking Location")
+        if (!automaticDetection.value!!)
+            return
         val currCoord = mapLocationToCoord(location)
         if (dataLog.value!!) {
             if (!gotRP.value!!) {
                 val distance = distDeg(localUIObj.start_coord, currCoord)
-                if (prevDistance < distance) {
+                if (prevDistance != 0.0 && prevDistance < distance) {
+                    toastNotificationSubject.onNext("Starting Data Collection")
                     markRefPt()
+//                    prevDistance = 0.0
                 }
-                prevDistance = distance
+                else {
+                    prevDistance = distance
+                }
             }
             else {
                 val distance = distDeg(localUIObj.end_coord, currCoord)
-                if (distance <= 50) {
+                if (distance < 50) { //prevDistance != 0.0 && prevDistance < distance &&
                     stopDataCollection()
                 }
+                // prevDistance = distance
             }
         }
         else if (!dataLog.value!!) {
@@ -151,7 +166,9 @@ class SecondFragmentViewModel : ViewModel() {
         zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
     }
 
-    fun updateMapLocation(location: Location, mMap: GoogleMap) {
+    fun updateMapLocation(location: Location, mMap: GoogleMap?) {
+        if (mMap == null)
+            return
         val currLocation = LatLng(location.latitude, location.longitude)
         val center = CameraUpdateFactory.newLatLngZoom(currLocation, zoom.toFloat())
         mMap.animateCamera(center, 10, null);
@@ -159,7 +176,7 @@ class SecondFragmentViewModel : ViewModel() {
 
     fun calcZoomLevel(north: Double, south: Double, east: Double, west: Double, pixelWidth: Int, pixelHeight: Int): Int {
         val GLOBE_WIDTH = 256
-        val ZOOM_MAX = 21
+        val ZOOM_MAX = 21 - 7
         var angle = east - west
         if (angle < 0) {
             angle += 360
@@ -244,15 +261,25 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
+        println("UploadDataFile")
+        dataFileName =
+            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
+        val uploadFileName =
+            if (automaticDetection.value!!) {
+                dataFileName
+            }
+            else {
+                dataFileName.replace(".csv", "--update-image.csv")
+            }
+
         viewModelScope.launch(Dispatchers.IO) {
-            DataFileRepository.dataFileName =
-                "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
             val output = DataFileRepository.uploadPathDataFile(
                 fileName,
-                DataFileRepository.dataFileName
+                uploadFileName
             )
             println(output)
             notificationSubject.onNext("Path data file uploaded")
         }
+        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 }

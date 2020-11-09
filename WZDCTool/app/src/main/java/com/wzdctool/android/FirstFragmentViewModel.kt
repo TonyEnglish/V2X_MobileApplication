@@ -1,5 +1,6 @@
 package com.wzdctool.android
 
+import android.os.Looper
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.lifecycle.Observer
@@ -26,7 +27,10 @@ class FirstFragmentViewModel : ViewModel() {
 
     fun activateConfig(configName: String, filePath: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            ConfigurationRepository.activateConfig(configName, filePath)
+            val success: Boolean = ConfigurationRepository.activateConfig(configName, filePath)
+//            if (!success) {
+//                DataClassesRepository.notificationSubject.onNext("Config Download Failed")
+//            }
         }
     }
 
