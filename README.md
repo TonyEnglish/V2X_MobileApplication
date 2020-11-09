@@ -81,7 +81,7 @@ Nothing  |  Lane Closed  |  Workers Present
 :-------------------------:|:-------------------------:|:-------------------------:
 ![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection_Blank_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Lane_Closed_cropped.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Workers_Present_cropped.jpg)
 
-For more detailed user information, see the [WZDC Tool Mobile Application Setup + Documentation](https://github.com/TonyEnglish/V2X_MobileApplication/tree/master/Documentation/WZDC%Tool%Mobile%Application%Setup%+%Documentation.pdf)
+For more detailed user information, see the [WZDC Tool Mobile Application Setup + Documentation](https://github.com/TonyEnglish/V2X_MobileApplication/blob/master/Documentation/WZDC%20Tool%20Mobile%20Application%20Setup%20%2B%20Documentation.pdf)
 
 #### Step 3: Upload Path Data
 The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
