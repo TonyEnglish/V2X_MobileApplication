@@ -102,24 +102,34 @@ class LocationService : Service() {
             Intent(this, MainActivity::class.java).let { notificationIntent ->
                 PendingIntent.getActivity(this, 0, notificationIntent, 0)
             }
+        val notification: Notification
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notification = Notification.Builder(this, CHANNEL_ID)
+                .setContentTitle("Using Location")
+                .setContentText("logging location")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setTicker("text")
+                .build()
 
-        //Notification.
-        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Using Location")
-            .setContentText("logging location")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
-            .setTicker("text")
-            .build()
-
-//        if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
-//            val notificationChannel: NotificationChannel = NotificationChannel(
-//                CHANNEL_ID,
-//                "Location Service", NotificationManager.IMPORTANCE_DEFAULT
-//            )
-//            notificationChannel.description = "This channel is used by location service"
-//            notificationManager.createNotificationChannel(notificationChannel)
-//        }
+            if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
+                val notificationChannel: NotificationChannel = NotificationChannel(
+                    CHANNEL_ID,
+                    "Location Service", NotificationManager.IMPORTANCE_DEFAULT
+                )
+                notificationChannel.description = "This channel is used by location service"
+                notificationManager.createNotificationChannel(notificationChannel)
+            }
+        }
+        else {
+            notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Using Location")
+                .setContentText("logging location")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setTicker("text")
+                .build()
+        }
 
         val locationRequest: LocationRequest = LocationRequest()
             .setInterval(1000)
