@@ -23,6 +23,7 @@ import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.*
 
 class SecondFragmentViewModel : ViewModel() {
@@ -261,25 +262,25 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
-        println("UploadDataFile")
-        dataFileName =
-            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
-        val uploadFileName =
-            if (automaticDetection.value!!) {
-                dataFileName
-            }
-            else {
-                dataFileName.replace(".csv", "--update-image.csv")
-            }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val output = DataFileRepository.uploadPathDataFile(
-                fileName,
-                uploadFileName
-            )
-            println(output)
-            notificationSubject.onNext("Path data file uploaded")
-        }
+//        println("UploadDataFile")
+//        dataFileName =
+//            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
+//        val uploadFileName =
+//            if (automaticDetection.value!!) {
+//                dataFileName
+//            }
+//            else {
+//                dataFileName.replace(".csv", "--update-image.csv")
+//            }
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val output = DataFileRepository.uploadPathDataFile(
+//                fileName,
+//                uploadFileName
+//            )
+//            println(output)
+//            notificationSubject.onNext("Path data file uploaded")
+//        }
         navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 }

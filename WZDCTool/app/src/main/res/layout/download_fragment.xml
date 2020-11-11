@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DownloadFragment">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:background="@color/colorPrimary"
+        android:text="Select Configuration Files To Download"
+        android:layout_alignParentTop="true"/>
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"
+        android:layout_below="@+id/textView"/>
+
+    <TextView
+        android:id="@+id/sizeText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/colorPrimary"
+        android:buttonTint="@color/colorAccent"
+        android:text="Estimated Storage Size: 0KB"
+        android:layout_below="@+id/line"/>
+
+    <LinearLayout
+        android:id="@+id/button_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sizeText"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="DeSelect All"
+            android:drawableLeft="@drawable/ic_baseline_close_24"
+            android:layout_weight=".5"
+            android:backgroundTint="@color/colorPrimary"/>
+
+        <Button
+            android:id="@+id/fillButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Select All"
+            android:drawableLeft="@drawable/ic_baseline_close_24"
+            android:layout_weight=".5"
+            android:backgroundTint="@color/colorPrimary"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:entries="@array/config_files_download"
+        android:layout_below="@+id/button_ll"
+        android:layout_above="@+id/button">
+    </ListView>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Sync"
+        android:drawableLeft="@drawable/ic_baseline_arrow_downward_24"
+        android:enabled="false"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

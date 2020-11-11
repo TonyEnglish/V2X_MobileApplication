@@ -21,13 +21,13 @@ class FirstFragmentViewModel : ViewModel() {
 
     fun updateConfigList() {
         viewModelScope.launch(Dispatchers.IO) {
-            ConfigurationRepository.updateConfigList()
+            ConfigurationRepository.updateLocalConfigList()
         }
     }
 
-    fun activateConfig(configName: String, filePath: String) {
+    fun activateConfig(configName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success: Boolean = ConfigurationRepository.activateConfig(configName, filePath)
+            val success: Boolean = ConfigurationRepository.activateConfig(configName)
 //            if (!success) {
 //                DataClassesRepository.notificationSubject.onNext("Config Download Failed")
 //            }

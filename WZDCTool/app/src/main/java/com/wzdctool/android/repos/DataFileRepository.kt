@@ -2,6 +2,7 @@ package com.wzdctool.android.repos
 
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.microsoft.azure.storage.CloudStorageAccount
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
@@ -11,9 +12,14 @@ import com.wzdctool.android.dataclasses.CSVObj
 import com.wzdctool.android.dataclasses.Marker
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
+import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
+import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import rx.Subscription
 import rx.subjects.PublishSubject
 import java.io.*
 import java.text.SimpleDateFormat
@@ -44,6 +50,8 @@ object DataFileRepository {
 
     private var previousLine = ""
 
+    private val subscriptions: MutableList<Subscription> = mutableListOf()
+
     // private val messages: MutableList<String> = mutableListOf()
 
     private val laneList: MutableList<String> = mutableListOf()
@@ -68,7 +76,7 @@ object DataFileRepository {
     }
 
     fun initializeObservers() {
-        markerSubject.subscribe {
+        subscriptions.add(markerSubject.subscribe {
 //                    toastNotificationSubject.onNext("${it.marker}: ${it.value}")
             if (it.marker == "Cancel") {
                 loggingData = false
@@ -87,10 +95,17 @@ object DataFileRepository {
                 loggingData = true
                 // val csvObj = createCSVObj(prevLocation)
             }
-        }
+        })
 
-        locationSubject.subscribe {
+        subscriptions.add(locationSubject.subscribe {
             handleLocation(it)
+        })
+    }
+
+    fun removeObservers() {
+        println("Removing Observers")
+        for (subscription in subscriptions) {
+            subscription.unsubscribe()
         }
     }
 
@@ -140,7 +155,7 @@ object DataFileRepository {
 
 
     private fun createDataFile() {
-        dataPath = "${Constants.DATA_FILE_DIRECTORY}/dataFile-${Calendar.getInstance().timeInMillis}.csv"
+        dataPath = "${Constants.DATA_FILE_DIRECTORY}/path-data--${activeWZIDSubject.value!!}.csv"
         val fOut: FileOutputStream = FileOutputStream(dataPath)
 
         val csvHeaders = listOf<String>(
@@ -184,7 +199,7 @@ object DataFileRepository {
         osw.flush()
         osw.close()
         println("File Size: ${File(dataPath).length()}")
-        val dataFileDownloadsLocation: String = "${Constants.DOWNLOAD_LOCTION}/${dataPath.split(
+        val dataFileDownloadsLocation: String = "${Constants.PENDING_UPLOAD_DIRECTORY}/${dataPath.split(
             "/"
         ).last()}"
         println("Download location: $dataFileDownloadsLocation")
@@ -192,6 +207,50 @@ object DataFileRepository {
         File(dataPath).delete()
 
         dataFileSubject.onNext(dataFileDownloadsLocation)
+    }
+
+    fun uploadAllDataFiles() {
+        val directory: File = File(Constants.PENDING_UPLOAD_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            var i = 0
+            for (file in files) {
+                println("Name: ${file.name}")
+                println("Path: ${file.path}")
+                i++
+                uploadPathDataFile(
+                    file.path,
+                    file.name
+                )
+            }
+            if (i != 0) {
+                notificationSubject.onNext("$i Path data file(s) uploaded")
+            }
+        }
+    }
+
+    fun getDataFilesList(): List<String> {
+        val fileList = mutableListOf<String>()
+        val directory: File = File(Constants.PENDING_UPLOAD_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                fileList.add(file.name)
+            }
+        }
+        return fileList
+    }
+
+    fun uploadDataFiles(fileList: List<String>) {
+        var i = 0
+        for (file in fileList) {
+            uploadPathDataFile(
+                "${Constants.PENDING_UPLOAD_DIRECTORY}/$file",
+                file
+            )
+            i++
+        }
+        notificationSubject.onNext("$i Path data file(s) uploaded")
     }
 
     private fun validateDataLine(csvObj: CSVObj, lineNum: Int): List<String> {
@@ -360,12 +419,12 @@ object DataFileRepository {
         }
     }
 
-    fun uploadPathDataFile(filePath: String, fileName: String): String {
+    fun uploadPathDataFile(filePath: String, fileName: String): Boolean {
         try {
             println("started")
             // Retrieve storage account from connection-string.
             if (azureInfoRepository.currentConnectionStringSubject.value == null) {
-                return ""
+                return false
             }
             val storageAccount: CloudStorageAccount =
                 CloudStorageAccount.parse(azureInfoRepository.currentConnectionStringSubject.value)
@@ -379,14 +438,17 @@ object DataFileRepository {
             // Create or overwrite the blob (with the name "example.jpeg") with contents from a local file.
             val blob: CloudBlockBlob = container.getBlockBlobReference(fileName)
             val source = File(filePath)
-            println("About to upload")
+            println("About to upload $filePath")
             blob.upload(FileInputStream(source), source.length())
-            return "Success!"
+
+            println("Deleted: ${source.delete()}")
+
+            return true
 
         } catch (e: Exception) {
             // Output the stack trace.
             e.printStackTrace()
-            return "FAILED${e.stackTrace}"
+            return false
         }
     }
 

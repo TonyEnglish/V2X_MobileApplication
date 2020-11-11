@@ -1,5 +1,8 @@
 package com.wzdctool.android.repos
 
+import android.R.attr.path
+import android.system.ErrnoException
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.microsoft.azure.storage.CloudStorageAccount
@@ -9,13 +12,16 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
 import com.wzdctool.android.dataclasses.ConfigurationObj
-import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
+import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+
 
 object ConfigurationRepository {
     val configListSubject = MutableLiveData<List<String>>()
+    val cloudConfigListSubject = MutableLiveData<List<String>>()
     val localConfigListSubject = MutableLiveData<List<String>>()
     val activeConfigSubject = MutableLiveData<ConfigurationObj>()
     val activeWZIDSubject = MutableLiveData<String>()
@@ -40,59 +46,135 @@ object ConfigurationRepository {
         return "path-data--$wzId.csv"
     }
 
+    fun getConfigFileName(wzId: String): String {
+        return "config--$wzId.json"
+    }
+
+    private fun getConfigFileLocation(name: String): String {
+        return "${Constants.CONFIG_DIRECTORY}/$name"
+    }
+
     // fun refreshWorkZoneList(): Observable<LiveResource<List<String>>> = Observable.just
 
-    fun activateConfig(configName: String, filePath: String): Boolean {
+    fun activateConfig(configName: String): Boolean {
         // TODO: Catch exception and return false
         // if (configName !in configListSubject.value!!) return false
 
-        val filePath = downloadConfigFile(configName, filePath) ?: return false
-        val fileContents: String = File(filePath).readText(Charsets.UTF_8)
-        val config: ConfigurationObj = Gson().fromJson(
-            fileContents,
-            ConfigurationObj::class.java
-        )
-        activeConfigSubject.postValue(config)
-        activeWZIDSubject.postValue(configName.removePrefix("config--").removeSuffix(".json"))
-        return true
+        Log.v("Path", Constants.CONFIG_DIRECTORY)
+        val directory: File = File(Constants.CONFIG_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                Log.v("Files: ", file.path)
+            }
+        }
+        else {
+            Log.v("result", "null")
+        }
+
+        Log.v("activate config", getConfigFileLocation(configName))
+//        try {
+//        if (configName == "Loading Configuration File List") {
+//            return false
+//        }
+        try {
+            val fileContents: String = File(getConfigFileLocation(configName)).readText(Charsets.UTF_8)
+            val config: ConfigurationObj = Gson().fromJson(
+                fileContents,
+                ConfigurationObj::class.java
+            )
+            activeConfigSubject.postValue(config)
+            activeWZIDSubject.postValue(configName.removePrefix("config--").removeSuffix(".json"))
+            return true
+        }
+        catch (e: FileNotFoundException) {
+            return false
+        }
+//        }
+//        catch (e: Exception) {
+//            return false
+//        }
     }
 
     fun updateLocalConfigList(): Boolean {
-        val localConfigList = getLocalConfigFileList()
-        if (localConfigList != listOf<String>()) {
-            localConfigListSubject.postValue(localConfigList)
-            return true
-        }
-        return true
-    }
-
-    //    fun getConfigList(): List<String> {
-//        return getConfigFileList()
-//    }
-    fun updateConfigList(): Boolean {
-        val configListUpdated = getConfigFileList()
-        if (configListUpdated != listOf<String>()) {
-            configListSubject.postValue(configListUpdated)
+        val updatedConfigList = mutableListOf<String>()
+        val directory: File = File(Constants.CONFIG_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                updatedConfigList.add(file.name)
+            }
+            configListSubject.postValue(updatedConfigList)
             return true
         }
         return false
     }
 
-    private fun getLocalConfigFileList(): List<String> {
-        // TODO: Check permissions
-        val configList = mutableListOf<String>()
-        val fileList: Array<String>? = File(Constants.CONFIG_DIRECTORY).list()
-        if (fileList != null) {
-            for (file in fileList) {
-                val end = file.split('/')[file.split('/').size - 1].removePrefix(Constants.CONFIG_DIRECTORY + "/")
-                if (!end.contains("/") && end.contains(".json")) {
-                    configList.add(end.removePrefix("config-").removeSuffix(".json"))
+    fun getLocalConfigList(): List<String> {
+        val updatedConfigList = mutableListOf<String>()
+        val directory: File = File(Constants.CONFIG_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                updatedConfigList.add(file.name)
+            }
+        }
+        return updatedConfigList
+    }
+
+    fun getLocalConfigSizeKB(): Double {
+        var size: Double = 0.0
+        val directory: File = File(Constants.CONFIG_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                size += (file.length()/1024)
+            }
+        }
+        return size
+    }
+
+    private fun clearLocalConfigFiles(): Boolean {
+        val directory: File = File(Constants.CONFIG_DIRECTORY)
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                file.delete()
+            }
+            return true
+        }
+        return false
+    }
+
+    //    fun getConfigList(): List<String> {
+//        return getConfigFileList()
+//    }
+    fun downloadNewConfigFiles(configList: List<String>): Boolean {
+        if (isInternetAvailable()) {
+            clearLocalConfigFiles()
+            val updatedConfigList = mutableListOf<String>()
+            for (config in configList) {
+                if (downloadConfigFile(config, getConfigFileLocation(config)) != null) {
+                    updatedConfigList.add(config)
                 }
             }
-            return configList
+            configListSubject.postValue(updatedConfigList)
+            return true
         }
-        return listOf<String>()
+        else {
+            return false
+        }
+    }
 
+    fun updateCloudConfigList(): Boolean {
+        if (isInternetAvailable()) {
+            val configListUpdated = getConfigFileList()
+            if (configListUpdated != listOf<String>()) {
+                cloudConfigListSubject.postValue(configListUpdated)
+                return true
+            }
+        }
+        return false
     }
 
     fun getConfigFileList(): List<String> {
@@ -129,7 +211,7 @@ object ConfigurationRepository {
             return null
         }
         val storageAccount: CloudStorageAccount =
-            CloudStorageAccount.parse( currentConnectionStringSubject.value ) // SecureKeys.AZURE_CONNECTION_STRING)
+            CloudStorageAccount.parse(currentConnectionStringSubject.value) // SecureKeys.AZURE_CONNECTION_STRING)
 
         // Create the blob client.
         val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()

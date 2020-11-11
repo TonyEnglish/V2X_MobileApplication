@@ -19,13 +19,20 @@
             android:background="?attr/colorPrimary"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/activeConfigTextView"
+            <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Active Config: NONE"
-                android:singleLine="true"
-                android:textSize="20sp" />
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp">
+
+                <TextView
+                    android:id="@+id/activeConfigTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active Config: NONE"
+                    android:singleLine="true"
+                    android:textSize="20sp" />
+            </HorizontalScrollView>
 
             <LinearLayout
                 android:id="@+id/gps_ll"
@@ -118,7 +125,7 @@
             android:id="@+id/button_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="70dp"
             android:backgroundTint="@color/colorAccent"
             android:enabled="false"
             android:text="@string/next"
@@ -139,11 +146,44 @@
             android:layout_marginRight="5dp"
             android:layout_marginBottom="30dp"
             android:entries="@array/config_files"
+            tools:listitem="@layout/support_simple_spinner_dropdown_item"
+            android:backgroundTint="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline4"
-            tools:listitem="@layout/support_simple_spinner_dropdown_item"
-            android:backgroundTint="@color/colorAccent"/>
+            app:layout_constraintTop_toTopOf="@+id/guideline4"/>
+
+        <!--        <LinearLayout-->
+<!--            android:id="@+id/spinner_ll"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:orientation="horizontal"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/guideline4">-->
+
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/refreshButton"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:src="@drawable/ic_refresh_small"-->
+<!--                android:backgroundTint="@color/colorAccent"/>-->
+
+<!--            <Spinner-->
+<!--                android:id="@+id/spinner2"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:layout_marginLeft="5dp"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_marginRight="5dp"-->
+<!--                android:layout_marginBottom="30dp"-->
+<!--                android:entries="@array/config_files"-->
+<!--                tools:listitem="@layout/support_simple_spinner_dropdown_item"-->
+<!--                android:backgroundTint="@color/colorAccent"/>-->
+<!--        </LinearLayout>-->
+
+
 
 <!--        <Button-->
 <!--            android:id="@+id/import_config"-->
@@ -217,6 +257,5 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_begin="197dp" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

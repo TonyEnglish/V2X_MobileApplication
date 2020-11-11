@@ -7,32 +7,36 @@ import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.os.*
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.wzdctool.android.dataclasses.azureInfoObj
 import com.wzdctool.android.dataclasses.gps_status
 import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.handlers.UsbHandler
-import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
+import com.wzdctool.android.repos.DataClassesRepository.automaticUploadSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
+import com.wzdctool.android.repos.DataClassesRepository.internetStatusSubject
+import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository
+import com.wzdctool.android.repos.DataFileRepository.uploadAllDataFiles
 import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
 import com.wzdctool.android.repos.azureInfoRepository.updateConnectionStringFromObj
 import com.wzdctool.android.services.LocationService
@@ -94,6 +98,16 @@ class MainActivity : AppCompatActivity() {
             if (updated) {
                 locationSourcesSubject.onNext(localLocationSources)
             }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val internetStatus = isInternetAvailable()
+                runOnUiThread {
+                    if (internetStatusSubject.value != internetStatus) {
+                        internetStatusSubject.onNext(internetStatus)
+                    }
+                }
+            }
+
             locationCheckHandler.postDelayed(this, 5000)
         }
     }
@@ -147,22 +161,48 @@ class MainActivity : AppCompatActivity() {
 ////                    .setAction("Action", null).show()
 ////        }
 
-        notificationSubject.subscribe {
+
+//        var cm = (this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+//        var netInfo = cm.activeNetworkInfo
+//
+//        //should check null because in airplane mode it will be null
+//        var nc = cm.getNetworkCapabilities(cm.activeNetwork)
+//        var downSpeed = nc.linkDownstreamBandwidthKbps
+//        var upSpeed = nc.linkUpstreamBandwidthKbps
+
+        val connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var isWifiConn: Boolean = false
+        var isMobileConn: Boolean = false
+        connMgr.allNetworks.forEach { network ->
+            connMgr.getNetworkInfo(network).apply {
+                if (type == ConnectivityManager.TYPE_WIFI) {
+                    isWifiConn = isWifiConn or isConnected
+                }
+                if (type == ConnectivityManager.TYPE_MOBILE) {
+                    isMobileConn = isMobileConn or isConnected
+                }
+            }
+        }
+        Log.d("NetworkStatusExample", "Wifi connected: $isWifiConn")
+        Log.d("NetworkStatusExample", "Mobile connected: $isMobileConn")
+
+
+        subscriptions.add(notificationSubject.subscribe {
             val mySnackbar = Snackbar.make(
                 findViewById(R.id.toolbar),
                 it,
                 5000
             )
             mySnackbar.show()
-        }
+        })
 
-        toastNotificationSubject.subscribe {
+        subscriptions.add(toastNotificationSubject.subscribe {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-        }
+        })
 
-        Constants.CONFIG_DIRECTORY = filesDir.toString()
+        Constants.CONFIG_DIRECTORY = getExternalFilesDir("Configuration_Files").toString() //"${filesDir}/config"
         Constants.DATA_FILE_DIRECTORY = filesDir.toString()
-        Constants.DOWNLOAD_LOCTION = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString()
+        Constants.PENDING_UPLOAD_DIRECTORY = getExternalFilesDir("Pending_Uploads").toString()
 
         startLocationService()
         DataFileRepository.initializeObservers()
@@ -177,14 +217,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        subscriptions.add(locationSourcesSubject.subscribe{ locationSources ->
+        subscriptions.add(locationSourcesSubject.subscribe { locationSources ->
             if (locationSources.internal == gps_status.valid && locationSources.usb != gps_status.valid) {
                 activeLocationSourceSubject.onNext(gps_type.internal)
-            }
-            else if (locationSources.usb == gps_status.valid) {
+            } else if (locationSources.usb == gps_status.valid) {
                 activeLocationSourceSubject.onNext(gps_type.usb)
-            }
-            else if (locationSources.internal != gps_status.valid && locationSources.usb != gps_status.valid) {
+            } else if (locationSources.internal != gps_status.valid && locationSources.usb != gps_status.valid) {
                 activeLocationSourceSubject.onNext(gps_type.none)
             }
         })
@@ -195,15 +233,16 @@ class MainActivity : AppCompatActivity() {
 ////            toastNotificationSubject.onNext(it)
 //        }
 
-        locationSubject.subscribe {
-            Log.v("LocationService", "Lat: ${it.latitude}, " +
-                    "Lon: ${it.longitude}, " + "elevation: ${it.altitude}, " +
-                    "accuracy: ${it.accuracy}")
-        }
+        subscriptions.add(locationSubject.subscribe {
+            Log.v(
+                "LocationService", "Lat: ${it.latitude}, " +
+                        "Lon: ${it.longitude}, " + "elevation: ${it.altitude}, " +
+                        "accuracy: ${it.accuracy}"
+            )
+        })
 
         // TODO: Do not re-save values to saved preferences on initial load
-        currentAzureInfoSubject.onNext(azureInfoObj("neaeraiotstorage", "gSFq2szM88ag0BV/J7QqzoXdak1aIGsUgyWagsR/96mlVnQhdOTnns6D7z8nOgRUdQy3FdbMxEmufrCqmE6mdw=="))
-        currentAzureInfoSubject.subscribe {
+        subscriptions.add(currentAzureInfoSubject.subscribe {
             updateConnectionStringFromObj(it)
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
@@ -211,34 +250,19 @@ class MainActivity : AppCompatActivity() {
                 putString(getString(R.string.preference_account_key), it.account_key)
                 apply()
             }
-            println(
-                sharedPref.getString(
-                    resources.getString(R.string.preference_account_name),
-                    null
-                )
-            )
-            println(
-                sharedPref.getString(
-                    resources.getString(R.string.preference_account_key),
-                    null
-                )
-            )
-        }
+        })
+
+        subscriptions.add(automaticUploadSubject.subscribe {
+            println("Saving Upload Status: $it")
+            val sharedPref = getPreferences(Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putBoolean(getString(R.string.preference_upload), it)
+                apply()
+            }
+        })
 
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
         if (sharedPref != null) {
-            println(
-                sharedPref.getString(
-                    resources.getString(R.string.preference_account_name),
-                    null
-                )
-            )
-            println(
-                sharedPref.getString(
-                    resources.getString(R.string.preference_account_key),
-                    null
-                )
-            )
             val accountName = sharedPref.getString(
                 resources.getString(R.string.preference_account_name),
                 null
@@ -251,6 +275,13 @@ class MainActivity : AppCompatActivity() {
             if (accountName != null && accountKey != null) {
                 currentAzureInfoSubject.onNext(azureInfoObj(accountName, accountKey))
             }
+
+            val automaticUpload = sharedPref.getBoolean(
+                resources.getString(R.string.preference_upload),
+                false
+            )
+            println("Upload Status: $automaticUpload")
+            automaticUploadSubject.onNext(automaticUpload)
         }
 
 //        toolbarActiveSubject.subscribe {
@@ -294,16 +325,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        locationCheckHandler.post(locationCheckRunnable)
+        locationCheckHandler.post(locationCheckRunnable)
         checkLocationEnabled()
-//        checkLocationEnabled()
 //        setFilters() // Start listening notifications from UsbService
 //        startService(UsbService::class.java, usbConnection, null) // Start UsbService(if it was not started before) and Bind it
     }
 
     override fun onPause() {
         super.onPause()
-//        locationCheckHandler.removeCallbacks(locationCheckRunnable)
+        locationCheckHandler.removeCallbacks(locationCheckRunnable)
 //        unregisterReceiver(mUsbReceiver)
 //        unbindService(usbConnection)
     }
@@ -312,6 +342,10 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         unregisterReceiver(mUsbReceiver)
         unbindService(usbConnection)
+        DataFileRepository.removeObservers()
+        for (subscription in subscriptions) {
+            subscription.unsubscribe()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -409,7 +443,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLocationService() {
-        println("starting location service")
+        println("Starting location service Activity")
         if (!isLocationServiceRunning()) {
             val intent: Intent = Intent(applicationContext, LocationService::class.java)
             intent.action = Constants.ACTION_START_LOCATION_SERVICE

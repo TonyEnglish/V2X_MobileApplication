@@ -3,69 +3,93 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".SettingsFragment">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/background">
+        android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Azure Account Name"
-            android:textColor="@color/text"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"/>
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/editTextAccountName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text=""
-            android:textColor="@color/colorPrimary"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:autofillHints="storage" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Azure Account Name"
+                android:textColor="@color/text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Azure Account Key"
-            android:textColor="@color/text"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="30dp"/>
+            <EditText
+                android:id="@+id/editTextAccountName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text=""
+                android:textColor="@color/colorPrimary"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:autofillHints="storage" />
 
-        <EditText
-            android:id="@+id/editTextAccountKey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:text=""
-            android:autofillHints="storage key" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Azure Account Key"
+                android:textColor="@color/text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="30dp"/>
 
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="50dp"
-            android:backgroundTint="@color/colorAccent"
-            android:text="Save"
-            android:textColor="@color/text"
-            android:textSize="18sp" />
+            <EditText
+                android:id="@+id/editTextAccountKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:autofillHints="storage key" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="40dp"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Save Azure Settings"
+                android:textColor="@color/text"
+                android:textSize="18sp" />
+
+            <View
+                android:id="@+id/line"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="30dp"
+                android:background="#c0c0c0"
+                android:layout_below="@+id/textView"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/autoUploadSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:checked="false"
+                android:textSize="20sp"
+                android:text="Automatically Upload Data Files" />
+        </LinearLayout>
+
+    </ScrollView>
+
 
 </RelativeLayout>
