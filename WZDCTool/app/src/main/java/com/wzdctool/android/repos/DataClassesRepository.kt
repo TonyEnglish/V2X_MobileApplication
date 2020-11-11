@@ -16,6 +16,8 @@ object DataClassesRepository {
     // val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
     // val markerSubject = ObservableField<MarkerObj>()
 
+    val automaticDetectionSubject = BehaviorSubject.create<Boolean>()
+
     val internetStatusSubject = BehaviorSubject.create<Boolean>(false)
 
     val automaticUploadSubject = BehaviorSubject.create<Boolean>()

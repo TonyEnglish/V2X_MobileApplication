@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository.automaticDetectionSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
@@ -50,6 +51,7 @@ class SecondFragmentViewModel : ViewModel() {
     fun initializeUI(data_obj: DataCollectionObj) {
         localUIObj = mapDataToUIObj(data_obj)
         automaticDetection.value = localUIObj.automatic_detection
+        automaticDetectionSubject.onNext(localUIObj.automatic_detection)
     }
 
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {

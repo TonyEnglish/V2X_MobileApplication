@@ -43,8 +43,9 @@ class UploadFragment : Fragment() {
                 selectedItems.add(list.getItemAtPosition(i).toString())
             }
 
+            disableUI()
             viewModel.uploadDataFiles(selectedItems)
-            findNavController().navigate(R.id.action_uploadFragment_to_MainFragment)
+//            findNavController().navigate(R.id.action_uploadFragment_to_MainFragment)
         }
 
         view.findViewById<Button>(R.id.clearButton).setOnClickListener {
@@ -81,6 +82,16 @@ class UploadFragment : Fragment() {
         for (i in 0 until list.count) {
             list.setItemChecked(i, true)
         }
+
+        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
+            findNavController().navigate(it)
+        })
     }
 
+    private fun disableUI() {
+        requireView().findViewById<Button>(R.id.clearButton).isEnabled = false
+        requireView().findViewById<Button>(R.id.fillButton).isEnabled = false
+        requireView().findViewById<ListView>(R.id.list).isEnabled = false
+        requireView().findViewById<Button>(R.id.button).isEnabled = false
+    }
 }

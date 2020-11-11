@@ -156,6 +156,9 @@ object DataFileRepository {
 
     private fun createDataFile() {
         dataPath = "${Constants.DATA_FILE_DIRECTORY}/path-data--${activeWZIDSubject.value!!}.csv"
+        if (DataClassesRepository.automaticDetectionSubject.value == false) {
+            dataPath = "${Constants.DATA_FILE_DIRECTORY}/path-data--${activeWZIDSubject.value!!}--update-image.csv"
+        }
         val fOut: FileOutputStream = FileOutputStream(dataPath)
 
         val csvHeaders = listOf<String>(

@@ -43,9 +43,9 @@ class DownloadFragment : Fragment() {
                 println(list.getItemAtPosition(i).toString())
                 selectedItems.add(list.getItemAtPosition(i).toString())
             }
-
+            disableUI()
             viewModel.downloadConfigFiles(selectedItems)
-            findNavController().navigate(R.id.action_downloadFragment_to_MainFragment)
+//            findNavController().navigate(R.id.action_downloadFragment_to_MainFragment)
         }
 
         view.findViewById<Button>(R.id.clearButton).setOnClickListener {
@@ -76,6 +76,9 @@ class DownloadFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(DownloadFragmentViewModel::class.java)
         // TODO: Use the ViewModel
 
+        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
+            findNavController().navigate(it)
+        })
 
         val spinnerObserver = Observer<List<String>> {
             if (it.isNotEmpty())
@@ -111,6 +114,13 @@ class DownloadFragment : Fragment() {
         ConfigurationRepository.cloudConfigListSubject.observe(viewLifecycleOwner, spinnerObserver)
 
         viewModel.updateCloudConfigFiles()
+    }
+
+    private fun disableUI() {
+        requireView().findViewById<Button>(R.id.clearButton).isEnabled = false
+        requireView().findViewById<Button>(R.id.fillButton).isEnabled = false
+        requireView().findViewById<ListView>(R.id.list).isEnabled = false
+        requireView().findViewById<Button>(R.id.button).isEnabled = false
     }
 
     private fun updateSize() {
