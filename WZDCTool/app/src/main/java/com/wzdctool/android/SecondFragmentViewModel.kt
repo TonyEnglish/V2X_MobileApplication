@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository.automaticDetectionSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
@@ -23,6 +24,7 @@ import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.*
 
 class SecondFragmentViewModel : ViewModel() {
@@ -49,6 +51,7 @@ class SecondFragmentViewModel : ViewModel() {
     fun initializeUI(data_obj: DataCollectionObj) {
         localUIObj = mapDataToUIObj(data_obj)
         automaticDetection.value = localUIObj.automatic_detection
+        automaticDetectionSubject.onNext(localUIObj.automatic_detection)
     }
 
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
@@ -261,25 +264,25 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
-        println("UploadDataFile")
-        dataFileName =
-            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
-        val uploadFileName =
-            if (automaticDetection.value!!) {
-                dataFileName
-            }
-            else {
-                dataFileName.replace(".csv", "--update-image.csv")
-            }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val output = DataFileRepository.uploadPathDataFile(
-                fileName,
-                uploadFileName
-            )
-            println(output)
-            notificationSubject.onNext("Path data file uploaded")
-        }
+//        println("UploadDataFile")
+//        dataFileName =
+//            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
+//        val uploadFileName =
+//            if (automaticDetection.value!!) {
+//                dataFileName
+//            }
+//            else {
+//                dataFileName.replace(".csv", "--update-image.csv")
+//            }
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val output = DataFileRepository.uploadPathDataFile(
+//                fileName,
+//                uploadFileName
+//            )
+//            println(output)
+//            notificationSubject.onNext("Path data file uploaded")
+//        }
         navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 }

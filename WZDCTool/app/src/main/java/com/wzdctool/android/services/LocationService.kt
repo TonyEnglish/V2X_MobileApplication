@@ -48,6 +48,11 @@ class LocationService : Service() {
         return null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopLocationService()
+    }
+
 //    override fun onCreate() {
 //        Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show()
 //    }
@@ -88,9 +93,8 @@ class LocationService : Service() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+//    @RequiresApi(Build.VERSION_CODES.O)
     private fun startLocationService() {
-
         val notificationManager: NotificationManager =
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
 
@@ -98,23 +102,33 @@ class LocationService : Service() {
             Intent(this, MainActivity::class.java).let { notificationIntent ->
                 PendingIntent.getActivity(this, 0, notificationIntent, 0)
             }
+        val notification: Notification
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notification = Notification.Builder(this, CHANNEL_ID)
+                .setContentTitle("Using Location")
+                .setContentText("logging location")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setTicker("text")
+                .build()
 
-        //Notification.
-        val notification: Notification = Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("Using Location")
-            .setContentText("logging location")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
-            .setTicker("text")
-            .build()
-
-        if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
-            val notificationChannel: NotificationChannel = NotificationChannel(
-                CHANNEL_ID,
-                "Location Service", NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationChannel.description = "This channel is used by location service"
-            notificationManager.createNotificationChannel(notificationChannel)
+            if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
+                val notificationChannel: NotificationChannel = NotificationChannel(
+                    CHANNEL_ID,
+                    "Location Service", NotificationManager.IMPORTANCE_DEFAULT
+                )
+                notificationChannel.description = "This channel is used by location service"
+                notificationManager.createNotificationChannel(notificationChannel)
+            }
+        }
+        else {
+            notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Using Location")
+                .setContentText("logging location")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setTicker("text")
+                .build()
         }
 
         val locationRequest: LocationRequest = LocationRequest()
@@ -157,7 +171,7 @@ class LocationService : Service() {
         stopSelf()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+//    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
             val action = intent.action
@@ -174,11 +188,11 @@ class LocationService : Service() {
 //                    DataClassesRepository.locationSourceValidSubject.onNext(true)
                 }
                 else if (action == Constants.ACTION_STOP_LOCATION_SERVICE) {
+                    stopLocationService()
                     val localLocationSources = locationSourcesSubject.value
                     localLocationSources.internal = gps_status.disconnected
                     locationSourcesSubject.onNext(localLocationSources)
 //                        DataClassesRepository.locationSourceValidSubject.onNext(false)
-                    stopLocationService()
                 }
             }
         }
