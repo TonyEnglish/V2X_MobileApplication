@@ -1,10 +1,13 @@
 package com.wzdctool.android
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 
 class HelpFragment : Fragment() {
     override fun onCreateView(
@@ -16,6 +19,13 @@ class HelpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<Button>(R.id.more_button).setOnClickListener() {
+            val url = "https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/Documentation/WZDC%20Tool%20Documentation%20Updates.pdf"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

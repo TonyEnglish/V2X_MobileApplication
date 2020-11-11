@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Switch
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +45,10 @@ class MainFragment : Fragment() {
 
         view.findViewById<Button>(R.id.downloadConfigButton).setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_downloadFragment)
+        }
+
+        view.findViewById<ImageButton>(R.id.help_button).setOnClickListener() {
+            findNavController().navigate(R.id.helpFragment)
         }
 
         view.findViewById<Button>(R.id.settingsButton).setOnClickListener {
