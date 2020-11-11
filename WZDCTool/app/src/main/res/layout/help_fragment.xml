@@ -39,7 +39,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 android:lineSpacingExtra="0.3dp"
                 android:text="The settings page contains the Azure required information to allow a user access to the Map Work Zone
 data collection part of the application. To receive this information, please contact
@@ -48,10 +48,19 @@ click SAVE."
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp" />
 
+            <Button
+                android:id="@+id/access_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Request Access"
+                android:textColor="@color/button_text"
+                android:backgroundTint="@color/colorAccent"/>
+
             <TextView
                 android:id="@+id/import_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginEnd="10dp"
