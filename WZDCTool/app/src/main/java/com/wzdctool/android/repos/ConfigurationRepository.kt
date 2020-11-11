@@ -13,6 +13,7 @@ import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
+import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
 import java.io.File
 import java.io.FileNotFoundException
@@ -152,11 +153,16 @@ object ConfigurationRepository {
     fun downloadNewConfigFiles(configList: List<String>): Boolean {
         if (isInternetAvailable()) {
             clearLocalConfigFiles()
+            var i = 0
             val updatedConfigList = mutableListOf<String>()
             for (config in configList) {
                 if (downloadConfigFile(config, getConfigFileLocation(config)) != null) {
                     updatedConfigList.add(config)
+                    i++
                 }
+            }
+            if (i != 0) {
+                notificationSubject.onNext("$i configuration file(s) downloaded")
             }
             configListSubject.postValue(updatedConfigList)
             return true

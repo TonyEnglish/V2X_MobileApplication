@@ -12,7 +12,7 @@
         android:textSize="30sp"
         android:textColor="#FFFFFF"
         android:background="@color/colorPrimary"
-        android:text="Select Configuration Files To Download"
+        android:text="Select Configuration Files To Store Locally"
         android:layout_alignParentTop="true"/>
 
     <View
@@ -50,7 +50,7 @@
             android:text="DeSelect All"
             android:drawableLeft="@drawable/ic_baseline_close_24"
             android:layout_weight=".5"
-            android:backgroundTint="@color/colorPrimary"/>
+            android:backgroundTint="@color/colorAccent"/>
 
         <Button
             android:id="@+id/fillButton"
@@ -58,9 +58,9 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:text="Select All"
-            android:drawableLeft="@drawable/ic_baseline_close_24"
+            android:drawableLeft="@drawable/ic_plus"
             android:layout_weight=".5"
-            android:backgroundTint="@color/colorPrimary"/>
+            android:backgroundTint="@color/colorAccent"/>
 
     </LinearLayout>
 
@@ -79,7 +79,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:text="Sync"
-        android:drawableLeft="@drawable/ic_baseline_arrow_downward_24"
+        android:drawableLeft="@drawable/ic_refresh"
         android:enabled="false"
         android:backgroundTint="@color/colorAccent"
         android:layout_alignParentBottom="true"/>

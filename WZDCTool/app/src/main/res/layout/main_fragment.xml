@@ -30,10 +30,10 @@
         <Button
             android:id="@+id/downloadConfigButton"
             android:layout_width="300sp"
-            android:layout_height="wrap_content"
+            android:layout_height="66dp"
             android:layout_marginBottom="10sp"
             android:backgroundTint="@color/colorAccent"
-            android:drawableLeft="@drawable/ic_down_arrow"
+            android:drawableLeft="@drawable/ic_down_arrow_small"
             android:text="Download Configuration Files"
             android:enabled="false"
             android:textColor="@color/button_text"
@@ -42,7 +42,7 @@
         <Button
             android:id="@+id/createMapButton"
             android:layout_width="300sp"
-            android:layout_height="wrap_content"
+            android:layout_height="66dp"
             android:layout_marginBottom="10sp"
             android:backgroundTint="@color/colorAccent"
             android:drawableLeft="@drawable/ic_construction_worker"
@@ -54,7 +54,7 @@
         <Button
             android:id="@+id/settingsButton"
             android:layout_width="300sp"
-            android:layout_height="wrap_content"
+            android:layout_height="66dp"
             android:backgroundTint="@color/colorAccent"
             android:layout_marginBottom="10sp"
             android:drawableLeft="@drawable/ic_baseline_settings_24"
@@ -65,9 +65,9 @@
         <Button
             android:id="@+id/uploadbutton"
             android:layout_width="300sp"
-            android:layout_height="wrap_content"
+            android:layout_height="66dp"
             android:backgroundTint="@color/colorAccent"
-            android:drawableLeft="@drawable/ic_up_arrow"
+            android:drawableLeft="@drawable/ic_up_arrow_small"
             android:text="Upload Data Files"
             android:visibility="visible"
             android:enabled="false"

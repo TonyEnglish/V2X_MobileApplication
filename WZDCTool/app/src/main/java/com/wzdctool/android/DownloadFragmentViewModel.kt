@@ -20,7 +20,6 @@ class DownloadFragmentViewModel : ViewModel() {
     fun downloadConfigFiles(configList: List<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             ConfigurationRepository.downloadNewConfigFiles(configList)
-            notificationSubject.onNext("Configuration Files Downloaded")
         }
     }
 }
