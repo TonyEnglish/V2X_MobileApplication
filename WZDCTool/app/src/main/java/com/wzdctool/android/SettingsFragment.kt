@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.dataclasses.azureInfoObj
 import com.wzdctool.android.repos.DataClassesRepository
@@ -35,6 +36,10 @@ class SettingsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.saveButton).setOnClickListener {
             processAzureSettings()
+        }
+
+        view.findViewById<ImageButton>(R.id.help_button).setOnClickListener() {
+            findNavController().navigate(R.id.helpFragment)
         }
 
         if (currentAzureInfoSubject.value != null) {

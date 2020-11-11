@@ -36,6 +36,11 @@
             app:destination="@id/MainFragment"
             app:enterAnim="@anim/slide_in_bottom"
             app:exitAnim="@anim/slide_out_top" />
+        <action
+            android:id="@+id/action_SettingsFragment_to_helpFragment"
+            app:destination="@id/helpFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom" />
     </fragment>
     <fragment
         android:id="@+id/MainFragment"
@@ -52,5 +57,16 @@
             app:destination="@id/FirstFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.wzdctool.android.HelpFragment"
+        android:label="help_fragment"
+        tools:layout="@layout/help_fragment" >
+        <action
+            android:id="@+id/action_helpFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top" />
     </fragment>
 </navigation>

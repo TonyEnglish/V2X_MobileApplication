@@ -55,6 +55,10 @@ class FirstFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
+        view.findViewById<ImageButton>(R.id.help_button).setOnClickListener() {
+            findNavController().navigate(R.id.helpFragment)
+        }
+
         view.findViewById<Spinner>(R.id.spinner2).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
