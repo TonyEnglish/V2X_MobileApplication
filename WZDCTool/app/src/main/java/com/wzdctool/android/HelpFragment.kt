@@ -28,11 +28,10 @@ class HelpFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.access_button).setOnClickListener() {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.setType("plain/text");
-            intent.putExtra(Intent.EXTRA_EMAIL, "some@email.address");
-            intent.putExtra(Intent.EXTRA_SUBJECT, "subject");
-            intent.putExtra(Intent.EXTRA_TEXT, "mail body");
+            val intent = Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto","tony@neaeraconsulting.com", null))
+            intent.putExtra(Intent.EXTRA_SUBJECT, "WZDC Tool Access");
+            intent.putExtra(Intent.EXTRA_TEXT, "Requesting access to WZDC Tool azure storage information");
             startActivity(Intent.createChooser(intent, ""));
         }
     }
