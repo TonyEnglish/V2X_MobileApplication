@@ -115,7 +115,7 @@ click SAVE."
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="25dp"
                 android:lineSpacingExtra="0.3dp"
-                android:text="Configuration files are located in the dropdown list on this page. These are the published configuration
+                android:text="Configuration files are located in the dropdown list on the Configuration Page. The dropdown lists published configuration
 files that were created on the Work."
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp" />
