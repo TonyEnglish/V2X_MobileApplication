@@ -41,8 +41,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_arrow_right_24"
-                    app:tint="@color/colorPrimary" />
+                    android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+                    app:tint="@color/colorPrimary"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginTop="1dp"/>
 
                 <TextView
                     android:id="@+id/settings_header"
@@ -91,8 +96,13 @@ click SAVE."
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_arrow_right_24"
-                    app:tint="@color/colorPrimary" />
+                    android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+                    app:tint="@color/colorPrimary"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginTop="1dp"/>
 
                 <TextView
                     android:id="@+id/import_header"
@@ -130,8 +140,13 @@ files that were created on the Work."
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_arrow_right_24"
-                    app:tint="@color/colorPrimary" />
+                    android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+                    app:tint="@color/colorPrimary"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginTop="1dp"/>
 
                 <TextView
                     android:id="@+id/gps_header"
@@ -215,8 +230,13 @@ files that were created on the Work."
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_arrow_right_24"
-                    app:tint="@color/colorPrimary" />
+                    android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+                    app:tint="@color/colorPrimary"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginTop="1dp"/>
 
                 <TextView
                     android:id="@+id/more_header"
