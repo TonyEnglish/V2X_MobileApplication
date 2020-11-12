@@ -41,6 +41,7 @@ object DataClassesRepository {
 
     val notificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     val toastNotificationSubject: PublishSubject<String> = PublishSubject.create<String>()
+    val longToastNotificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     // val dataLoggingSubject = PublishSubject.createDefault<Boolean>() // MutableLiveData<Boolean>(false)
 
     // val gotRPSubject = BehaviorSubject.create<Boolean>(false)

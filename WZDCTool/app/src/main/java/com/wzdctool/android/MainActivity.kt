@@ -32,6 +32,7 @@ import com.wzdctool.android.repos.DataClassesRepository.internetStatusSubject
 import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.longToastNotificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity() {
     private var mHandler: UsbHandler? = null
     private val locationCheckHandler: Handler = Handler(Looper.getMainLooper())
     private var isGPSConnected: Boolean = false
+    private var prevTime: Long? = null
+    private var currTime: Long? = null
     private val subscriptions: MutableList<Subscription> = mutableListOf()
     private lateinit var lm: LocationManager
     private val usbConnection: ServiceConnection = object : ServiceConnection {
@@ -75,25 +78,50 @@ class MainActivity : AppCompatActivity() {
             val localLocationSources = locationSourcesSubject.value
 
             // Internal Location Source
-            var internal_gps_enabled = false;
-            try {
-                internal_gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            } catch (ex: Exception) {
-            }
-
-            if (!internal_gps_enabled && localLocationSources.internal == gps_status.valid) {
-                updated = true
-                localLocationSources.internal = gps_status.invalid
-            } else if (internal_gps_enabled && localLocationSources.internal != gps_status.valid) {
-                updated = true
-                localLocationSources.internal = gps_status.valid
-            }
+//            var internal_gps_enabled = false;
+//            try {
+//                internal_gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//            } catch (ex: Exception) {
+//
+//            }
+//
+//            if (!internal_gps_enabled && localLocationSources.internal == gps_status.valid) {
+//                updated = true
+//                localLocationSources.internal = gps_status.invalid
+//                toastNotificationSubject.onNext("Internal GPS invalid, location disabled")
+//            } else if (internal_gps_enabled && localLocationSources.internal != gps_status.valid) {
+//                updated = true
+//                localLocationSources.internal = gps_status.valid
+//                toastNotificationSubject.onNext("Internal GPS valid")
+//                // TODO: Potential infinite loop of disabling then re-enabling internal GPS when combined with prevTime vs currTime check
+//            }
 
             // USB Location Source
             // TODO: Verify USB source emitting valid data
 
             // Other Location Sources
             // TODO: Support other location sources
+
+            // Check if location updated since last check
+            if (prevTime != null && currTime != null) {
+                if (prevTime == currTime) {
+                    // Invalidate current location source
+                    val activeSource = activeLocationSourceSubject.value
+                    if (activeSource != gps_type.none) {
+                        if (activeSource == gps_type.internal) { // && localLocationSources.internal == gps_status.valid
+                            updated = true
+                            localLocationSources.internal = gps_status.invalid
+                        }
+                        else if (activeSource == gps_type.usb) { // && localLocationSources.usb == gps_status.valid
+                            updated = true
+                            localLocationSources.usb = gps_status.invalid
+                        }
+                        else {
+                            TODO("Unknown Location Source")
+                        }
+                    }
+                }
+            }
 
             if (updated) {
                 locationSourcesSubject.onNext(localLocationSources)
@@ -108,7 +136,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            locationCheckHandler.postDelayed(this, 5000)
+            prevTime = currTime
+
+            locationCheckHandler.postDelayed(this, 3000)
         }
     }
 
@@ -200,6 +230,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
+        subscriptions.add(longToastNotificationSubject.subscribe {
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        })
+
         Constants.CONFIG_DIRECTORY = getExternalFilesDir("Configuration_Files").toString() //"${filesDir}/config"
         Constants.DATA_FILE_DIRECTORY = filesDir.toString()
         Constants.PENDING_UPLOAD_DIRECTORY = getExternalFilesDir("Pending_Uploads").toString()
@@ -210,6 +244,7 @@ class MainActivity : AppCompatActivity() {
         mHandler = UsbHandler()
 
         subscriptions.add(locationSubject.subscribe {
+            currTime = it?.time
             if (rsmStatus.value && it.accuracy > 2) {
                 rsmStatus.onNext(false)
             } else if (!dataLoggingVar && it.accuracy <= 2) {

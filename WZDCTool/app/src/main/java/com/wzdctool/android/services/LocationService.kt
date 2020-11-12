@@ -77,6 +77,12 @@ class LocationService : Service() {
     var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
+            val localLocationSources = locationSourcesSubject.value
+            if (localLocationSources.internal != gps_status.valid) {
+                localLocationSources.internal = gps_status.valid
+                locationSourcesSubject.onNext(localLocationSources)
+                DataClassesRepository.toastNotificationSubject.onNext("Internal GPS Valid")
+            }
             if (activeLocationSourceSubject.value == gps_type.internal) {
                 for (location in locationResult.locations){
                     locationSubject.onNext(location)

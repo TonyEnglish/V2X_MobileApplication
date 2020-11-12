@@ -98,7 +98,9 @@ object DataFileRepository {
         })
 
         subscriptions.add(locationSubject.subscribe {
-            handleLocation(it)
+            if (it != null) {
+                handleLocation(it)
+            }
         })
     }
 

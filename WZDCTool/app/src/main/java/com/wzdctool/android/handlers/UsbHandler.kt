@@ -56,7 +56,7 @@ class UsbHandler : Handler() {
                 if (key == "RMC") {
                     newLocation = parseRMC(data, prevLocation)
                     if (newLocation != null) {
-                        if (isFirstTime && newLocation.bearing == 0f) {
+                        if (newLocation.bearing == 0f) {
                             isValid = false
 //                            DataClassesRepository.notificationSubject.onNext("RMC Invalid")
                         }
@@ -69,7 +69,7 @@ class UsbHandler : Handler() {
                 else if (key == "GGA") {
                     newLocation = parseGGA(data, prevLocation)
                     if (newLocation != null) {
-                        if (isFirstTime && newLocation.altitude == 0.0) {
+                        if (newLocation.altitude == 0.0) {
                             isValid = false
 //                            DataClassesRepository.notificationSubject.onNext("GGA Invalid")
                         }
@@ -86,26 +86,11 @@ class UsbHandler : Handler() {
                         locationSourcesSubject.onNext(localLocationSources)
                         toastNotificationSubject.onNext("USB GPS Valid")
                     }
-//                    if (isFirstTime) {
-//                        isFirstTime = false
-//                        usbGpsStatus.onNext("valid")
-////                        notificationSubject.onNext("${DataFileRepository.formatter.format(newLocation.time)},${newLocation.accuracy},${newLocation.latitude},${newLocation.longitude},${newLocation.altitude},${newLocation.speed},${newLocation.bearing}")
-////                        compareToLastCoord(newLocation.time)
-//                    }
                     if (activeLocationSourceSubject.value == gps_type.usb) {
                         DataClassesRepository.locationSubject.onNext(newLocation)
                     }
-                     prevLocation = newLocation
+                    prevLocation = newLocation
                 }
-//                else if (usbGpsStatus_local == "valid"){
-//                    DataClassesRepository.usbGpsStatus.onNext("invalid")
-//                }
-//                else {
-//                    notificationSubject.onNext("Invalid Position")
-//                }
-//                else if (!isValid) {
-//                    DataClassesRepository.locationSourceValidSubject.onNext(false)
-//                }
             }
         }
         catch (e:Exception) {
