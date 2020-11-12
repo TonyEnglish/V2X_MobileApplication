@@ -123,6 +123,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 activeLocationSourceSubject.onNext(gps_type.internal)
             }
         }
+
+        view.findViewById<Button>(R.id.centerButton).setOnClickListener {
+            viewModel.updatingMap.value = true
+            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+        }
     }
 
     fun startDataCollectionUI() {
@@ -416,6 +421,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
+
+        viewModel.updatingMap.observe(viewLifecycleOwner, {
+            if (it) {
+                requireView().findViewById<Button>(R.id.centerButton).visibility = View.GONE
+            }
+            else {
+                requireView().findViewById<Button>(R.id.centerButton).visibility = View.VISIBLE
+            }
+        })
+        viewModel.updatingMap.value = true
 
         // addSubscriptions()
     }
