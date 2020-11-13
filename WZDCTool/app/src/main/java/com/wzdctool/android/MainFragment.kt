@@ -30,6 +30,8 @@ class MainFragment : Fragment() {
 
     private val subscriptions: MutableList<Subscription> = mutableListOf()
 
+    private var hasConnectionString = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,6 +69,7 @@ class MainFragment : Fragment() {
 
 
         if (currentConnectionStringSubject.value != null) {
+            hasConnectionString = true
             view.findViewById<Button>(R.id.createMapButton).isEnabled = true
         }
 
@@ -84,9 +87,9 @@ class MainFragment : Fragment() {
 
     private fun addSubscriptions() {
         subscriptions.add(internetStatusSubject.subscribe {
-            requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled = it
+            requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled = (it && hasConnectionString)
 
-            requireView().findViewById<Button>(R.id.uploadbutton).isEnabled = (it && DataFileRepository.getDataFilesList().isNotEmpty())
+            requireView().findViewById<Button>(R.id.uploadbutton).isEnabled = (it && DataFileRepository.getDataFilesList().isNotEmpty() && hasConnectionString)
         })
     }
 

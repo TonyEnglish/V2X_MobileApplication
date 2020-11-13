@@ -21,7 +21,7 @@ class HelpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.more_button).setOnClickListener() {
-            val url = "https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/Documentation/WZDC%20Tool%20Documentation%20Updates.pdf"
+            val url = "https://github.com/TonyEnglish/Work_Zone_Data_Collection_Toolset/blob/master/Documentation/WZDC%20Tool%20Documentation%20Updates.pdf/"
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(url)
             startActivity(intent)

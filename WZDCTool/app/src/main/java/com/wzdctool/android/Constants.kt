@@ -17,4 +17,5 @@ object Constants {
     var DATA_FILE_DIRECTORY: String = ""
     var PENDING_UPLOAD_DIRECTORY: String = ""
     var DOWNLOAD_LOCATION: String = ""
+    var RECENT_WZ_MAPS: String = ""
 }

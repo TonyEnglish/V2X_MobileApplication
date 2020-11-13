@@ -111,9 +111,8 @@ class LocationService : Service() {
         val notification: Notification
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notification = Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle("Using Location")
-                .setContentText("logging location")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Processing Location")
+                .setSmallIcon(R.drawable.ic_baseline_pin_drop_24)
                 .setContentIntent(pendingIntent)
                 .setTicker("text")
                 .build()
@@ -129,9 +128,8 @@ class LocationService : Service() {
         }
         else {
             notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Using Location")
-                .setContentText("logging location")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Processing Location")
+                .setSmallIcon(R.drawable.ic_baseline_pin_drop_24)
                 .setContentIntent(pendingIntent)
                 .setTicker("text")
                 .build()

@@ -77,31 +77,6 @@ class MainActivity : AppCompatActivity() {
             var updated = false
             val localLocationSources = locationSourcesSubject.value
 
-            // Internal Location Source
-//            var internal_gps_enabled = false;
-//            try {
-//                internal_gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//            } catch (ex: Exception) {
-//
-//            }
-//
-//            if (!internal_gps_enabled && localLocationSources.internal == gps_status.valid) {
-//                updated = true
-//                localLocationSources.internal = gps_status.invalid
-//                toastNotificationSubject.onNext("Internal GPS invalid, location disabled")
-//            } else if (internal_gps_enabled && localLocationSources.internal != gps_status.valid) {
-//                updated = true
-//                localLocationSources.internal = gps_status.valid
-//                toastNotificationSubject.onNext("Internal GPS valid")
-//                // TODO: Potential infinite loop of disabling then re-enabling internal GPS when combined with prevTime vs currTime check
-//            }
-
-            // USB Location Source
-            // TODO: Verify USB source emitting valid data
-
-            // Other Location Sources
-            // TODO: Support other location sources
-
             // Check if location updated since last check
             if (prevTime != null && currTime != null) {
                 if (prevTime == currTime) {
@@ -138,7 +113,7 @@ class MainActivity : AppCompatActivity() {
 
             prevTime = currTime
 
-            locationCheckHandler.postDelayed(this, 3000)
+            locationCheckHandler.postDelayed(this, 4000)
         }
     }
 
@@ -237,6 +212,7 @@ class MainActivity : AppCompatActivity() {
         Constants.CONFIG_DIRECTORY = getExternalFilesDir("Configuration_Files").toString() //"${filesDir}/config"
         Constants.DATA_FILE_DIRECTORY = filesDir.toString()
         Constants.PENDING_UPLOAD_DIRECTORY = getExternalFilesDir("Pending_Uploads").toString()
+        Constants.RECENT_WZ_MAPS = getExternalFilesDir("WZ_MAPS").toString()
 
         startLocationService()
         DataFileRepository.initializeObservers()
