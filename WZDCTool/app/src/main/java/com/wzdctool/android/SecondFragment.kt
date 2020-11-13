@@ -29,6 +29,7 @@ import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
@@ -122,6 +123,11 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             else {
                 activeLocationSourceSubject.onNext(gps_type.internal)
             }
+        }
+
+        view.findViewById<Button>(R.id.centerButton).setOnClickListener {
+            viewModel.updatingMap.value = true
+            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
         }
     }
 
@@ -311,7 +317,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             } else if (it == gps_type.usb) { // if (usbLocationValid.value)
                 gps_switch.isChecked = true
             } else {
-                requireView().findViewById<Button>(R.id.button_first).isEnabled = false
+                toastNotificationSubject.onNext("No valid GPS sources found. Exiting data collection")
+                viewModel.navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
             }
         })
 
@@ -416,6 +423,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
+
+        viewModel.updatingMap.observe(viewLifecycleOwner, {
+            if (it) {
+                requireView().findViewById<Button>(R.id.centerButton).visibility = View.GONE
+            }
+            else {
+                requireView().findViewById<Button>(R.id.centerButton).visibility = View.VISIBLE
+            }
+        })
+        viewModel.updatingMap.value = true
 
         // addSubscriptions()
     }

@@ -36,6 +36,11 @@
             app:destination="@id/MainFragment"
             app:enterAnim="@anim/slide_in_bottom"
             app:exitAnim="@anim/slide_out_top" />
+        <action
+            android:id="@+id/action_SettingsFragment_to_helpFragment"
+            app:destination="@id/helpFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_bottom" />
     </fragment>
     <fragment
         android:id="@+id/MainFragment"
@@ -52,5 +57,40 @@
             app:destination="@id/FirstFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_MainFragment_to_downloadFragment"
+            app:destination="@id/downloadFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_uploadFragment"
+            app:destination="@id/uploadFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/downloadFragment"
+        android:name="com.wzdctool.android.DownloadFragment"
+        android:label="download_fragment"
+        tools:layout="@layout/download_fragment" >
+        <action
+            android:id="@+id/action_downloadFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/uploadFragment"
+        android:name="com.wzdctool.android.UploadFragment"
+        android:label="upload_fragment"
+        tools:layout="@layout/upload_fragment" >
+        <action
+            android:id="@+id/action_uploadFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.wzdctool.android.HelpFragment"
+        android:label="help_fragment"
+        tools:layout="@layout/help_fragment" >
+        <action
+            android:id="@+id/action_helpFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top" />
     </fragment>
 </navigation>

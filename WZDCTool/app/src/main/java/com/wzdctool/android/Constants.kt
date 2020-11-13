@@ -15,8 +15,7 @@ object Constants {
     // TODO: Do not hardcode path
     var CONFIG_DIRECTORY: String = "" //Android/data/com.wzdctool.android
     var DATA_FILE_DIRECTORY: String = ""
-    var DOWNLOAD_LOCTION: String = ""
-
-    var LOCATION_SOURCE_INTERNAL: String = "internal"
-    var LOCATION_SOURCE_USB: String = "usb"
+    var PENDING_UPLOAD_DIRECTORY: String = ""
+    var DOWNLOAD_LOCATION: String = ""
+    var RECENT_WZ_MAPS: String = ""
 }

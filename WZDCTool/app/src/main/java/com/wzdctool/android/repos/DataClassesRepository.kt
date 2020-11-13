@@ -1,13 +1,13 @@
 package com.wzdctool.android.repos
 
 import android.location.Location
-import androidx.lifecycle.MutableLiveData
-import com.wzdctool.android.Constants
-import com.wzdctool.android.dataclasses.*
-import rx.Observable
+import android.net.ConnectivityManager
+import com.wzdctool.android.dataclasses.DataCollectionObj
+import com.wzdctool.android.dataclasses.gps_type
+import com.wzdctool.android.dataclasses.locationSources
 import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
-import rx.subjects.Subject
+import java.net.InetAddress
 
 
 object DataClassesRepository {
@@ -16,13 +16,20 @@ object DataClassesRepository {
     // val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
     // val markerSubject = ObservableField<MarkerObj>()
 
+    val automaticDetectionSubject = BehaviorSubject.create<Boolean>()
+
+    val internetStatusSubject = BehaviorSubject.create<Boolean>(false)
+
+    val automaticUploadSubject = BehaviorSubject.create<Boolean>()
 
     ////// LOCATION
     val locationSubject: PublishSubject<Location> = PublishSubject.create<Location>()
 
     val activeLocationSourceSubject: BehaviorSubject<gps_type> = BehaviorSubject.create<gps_type>()
 
-    val locationSourcesSubject: BehaviorSubject<locationSources> = BehaviorSubject.create<locationSources>(locationSources())
+    val locationSourcesSubject: BehaviorSubject<locationSources> = BehaviorSubject.create<locationSources>(
+        locationSources()
+    )
 
     val rsmStatus: BehaviorSubject<Boolean> = BehaviorSubject.create<Boolean>(true)
 
@@ -34,7 +41,19 @@ object DataClassesRepository {
 
     val notificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     val toastNotificationSubject: PublishSubject<String> = PublishSubject.create<String>()
+    val longToastNotificationSubject: PublishSubject<String> = PublishSubject.create<String>()
     // val dataLoggingSubject = PublishSubject.createDefault<Boolean>() // MutableLiveData<Boolean>(false)
 
     // val gotRPSubject = BehaviorSubject.create<Boolean>(false)
+
+    fun isInternetAvailable(): Boolean {
+        return try {
+            val ipAddr: InetAddress = InetAddress.getByName("google.com")
+            //You can replace it with your name
+            !ipAddr.equals("")
+        } catch (e: java.lang.Exception) {
+            println(e.printStackTrace())
+            false
+        }
+    }
 }

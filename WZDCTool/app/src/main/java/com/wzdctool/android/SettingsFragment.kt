@@ -8,20 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.dataclasses.azureInfoObj
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.azureInfoRepository
 import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
+import rx.Subscription
 
 class SettingsFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = SettingsFragment()
-    }
-
     private lateinit var viewModel: SettingsViewModel
+
+    private val subscriptions: MutableList<Subscription> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,11 +38,20 @@ class SettingsFragment : Fragment() {
             processAzureSettings()
         }
 
+        view.findViewById<ImageButton>(R.id.help_button).setOnClickListener() {
+            findNavController().navigate(R.id.helpFragment)
+        }
+
         if (currentAzureInfoSubject.value != null) {
             requireView().findViewById<EditText>(R.id.editTextAccountName).setText(currentAzureInfoSubject.value.account_name)
             requireView().findViewById<EditText>(R.id.editTextAccountKey).setText(currentAzureInfoSubject.value.account_key)
         }
 
+        val autoUploadSwitch = requireView().findViewById<SwitchCompat>(R.id.autoUploadSwitch)
+        autoUploadSwitch.isChecked = DataClassesRepository.automaticUploadSubject.value
+        autoUploadSwitch.setOnCheckedChangeListener { _, isChecked ->
+            DataClassesRepository.automaticUploadSubject.onNext(isChecked)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

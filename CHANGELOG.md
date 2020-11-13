@@ -1,3 +1,8 @@
+11/13/2020
+- Enabling offline operation
+  - Config files can be downloaded and saved for later use
+  - Generated data files can be uploaded after data collection
+
 11/8/2020
 - Updated lane display to utilize small icons
 - updated readme

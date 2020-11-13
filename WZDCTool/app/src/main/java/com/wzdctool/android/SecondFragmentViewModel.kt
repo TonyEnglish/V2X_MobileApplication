@@ -1,29 +1,23 @@
 package com.wzdctool.android
 
 import android.location.Location
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
-import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository.automaticDetectionSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
-import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
-import com.wzdctool.android.repos.DataFileRepository
-import com.wzdctool.android.repos.DataFileRepository.dataFileName
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.math.*
+
 
 class SecondFragmentViewModel : ViewModel() {
     // Required parameters
@@ -32,6 +26,7 @@ class SecondFragmentViewModel : ViewModel() {
 
     private var prevDistance = 0.0
     var automaticDetection = MutableLiveData<Boolean>()
+    var updatingMap = MutableLiveData<Boolean>()
 
     var hasSetDataLogFalseMarker = false
 
@@ -43,12 +38,15 @@ class SecondFragmentViewModel : ViewModel() {
     var gotRP = MutableLiveData<Boolean>(false)
     var navigationLiveData = MutableLiveData<Int>()
     var notificationText = MutableLiveData<String>()
-    var laneStat = MutableLiveData<MutableList<Boolean>>(MutableList<Boolean>(8+1) {false})
+    var laneStat = MutableLiveData<MutableList<Boolean>>(MutableList<Boolean>(8 + 1) { false })
+
+    var prevLocation: Location? = null
 
 
     fun initializeUI(data_obj: DataCollectionObj) {
         localUIObj = mapDataToUIObj(data_obj)
         automaticDetection.value = localUIObj.automatic_detection
+        automaticDetectionSubject.onNext(localUIObj.automatic_detection)
     }
 
     private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
@@ -164,17 +162,36 @@ class SecondFragmentViewModel : ViewModel() {
         val pixelHeight = mMapView.height
 
         zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
+
+        mMap.setOnCameraMoveStartedListener {
+            if (it == 1) {
+                // User moved map
+                updatingMap.value = false
+            }
+            // else if (it == 3) //Code moved map
+        }
     }
 
-    fun updateMapLocation(location: Location, mMap: GoogleMap?) {
-        if (mMap == null)
+    fun updateMapLocation(location: Location?, mMap: GoogleMap?) {
+        if (mMap == null || location == null)
             return
         val currLocation = LatLng(location.latitude, location.longitude)
         val center = CameraUpdateFactory.newLatLngZoom(currLocation, zoom.toFloat())
-        mMap.animateCamera(center, 10, null);
+        if (updatingMap.value == true) {
+            mMap.animateCamera(center, 10, null)
+
+        }
+        prevLocation = location
     }
 
-    fun calcZoomLevel(north: Double, south: Double, east: Double, west: Double, pixelWidth: Int, pixelHeight: Int): Int {
+    fun calcZoomLevel(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        pixelWidth: Int,
+        pixelHeight: Int
+    ): Int {
         val GLOBE_WIDTH = 256
         val ZOOM_MAX = 21 - 7
         var angle = east - west
@@ -261,25 +278,25 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun uploadDataFile(fileName: String) {
-        println("UploadDataFile")
-        dataFileName =
-            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
-        val uploadFileName =
-            if (automaticDetection.value!!) {
-                dataFileName
-            }
-            else {
-                dataFileName.replace(".csv", "--update-image.csv")
-            }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val output = DataFileRepository.uploadPathDataFile(
-                fileName,
-                uploadFileName
-            )
-            println(output)
-            notificationSubject.onNext("Path data file uploaded")
-        }
+//        println("UploadDataFile")
+//        dataFileName =
+//            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
+//        val uploadFileName =
+//            if (automaticDetection.value!!) {
+//                dataFileName
+//            }
+//            else {
+//                dataFileName.replace(".csv", "--update-image.csv")
+//            }
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val output = DataFileRepository.uploadPathDataFile(
+//                fileName,
+//                uploadFileName
+//            )
+//            println(output)
+//            notificationSubject.onNext("Path data file uploaded")
+//        }
         navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
     }
 }

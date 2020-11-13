@@ -56,7 +56,7 @@ class UsbHandler : Handler() {
                 if (key == "RMC") {
                     newLocation = parseRMC(data, prevLocation)
                     if (newLocation != null) {
-                        if (isFirstTime && newLocation.bearing == 0f) {
+                        if (newLocation.bearing == 0f) {
                             isValid = false
 //                            DataClassesRepository.notificationSubject.onNext("RMC Invalid")
                         }
@@ -69,7 +69,7 @@ class UsbHandler : Handler() {
                 else if (key == "GGA") {
                     newLocation = parseGGA(data, prevLocation)
                     if (newLocation != null) {
-                        if (isFirstTime && newLocation.altitude == 0.0) {
+                        if (newLocation.altitude == 0.0) {
                             isValid = false
 //                            DataClassesRepository.notificationSubject.onNext("GGA Invalid")
                         }
@@ -86,26 +86,11 @@ class UsbHandler : Handler() {
                         locationSourcesSubject.onNext(localLocationSources)
                         toastNotificationSubject.onNext("USB GPS Valid")
                     }
-//                    if (isFirstTime) {
-//                        isFirstTime = false
-//                        usbGpsStatus.onNext("valid")
-////                        notificationSubject.onNext("${DataFileRepository.formatter.format(newLocation.time)},${newLocation.accuracy},${newLocation.latitude},${newLocation.longitude},${newLocation.altitude},${newLocation.speed},${newLocation.bearing}")
-////                        compareToLastCoord(newLocation.time)
-//                    }
                     if (activeLocationSourceSubject.value == gps_type.usb) {
                         DataClassesRepository.locationSubject.onNext(newLocation)
                     }
-                     prevLocation = newLocation
+                    prevLocation = newLocation
                 }
-//                else if (usbGpsStatus_local == "valid"){
-//                    DataClassesRepository.usbGpsStatus.onNext("invalid")
-//                }
-//                else {
-//                    notificationSubject.onNext("Invalid Position")
-//                }
-//                else if (!isValid) {
-//                    DataClassesRepository.locationSourceValidSubject.onNext(false)
-//                }
             }
         }
         catch (e:Exception) {
@@ -156,7 +141,10 @@ class UsbHandler : Handler() {
 
         val s = NMEAData.split(',')
 
-        if (s[RMCSTAT] != "A") {
+        if (s.size < 9) {
+            return null
+        }
+        else if (s[RMCSTAT] != "A") {
             return null
         }
 
@@ -168,7 +156,7 @@ class UsbHandler : Handler() {
         //       Get Latitude and convert to decimal degrees
         //////
 
-        val lats = s[RMCLAT].toDouble()
+        val lats = s[RMCLAT].toDoubleOrNull() ?: return null
         var p1  = (lats / 100.0).toInt()
         var lat = (p1 + (lats - p1 * 100) / 60.0)
         if (s[RMCLATNS] == "S")
@@ -181,7 +169,7 @@ class UsbHandler : Handler() {
 //        //       Get longitude and convert to decimal degrees
 //        //////
 
-        val lng = s[RMCLON].toDouble()
+        val lng = s[RMCLON].toDoubleOrNull() ?: return null
         p1  = (lng / 100.0).toInt()
         var lon = (p1+(lng-p1*100)/60.0)
         if (s[RMCLONEW] == "W") {
@@ -193,21 +181,14 @@ class UsbHandler : Handler() {
 //        //       Get speed and heading...
 //        //////
 
-        val GPSSpeed = s[RMCKNOTS].toFloat()       // Speed in Knots
+        val GPSSpeed = s[RMCKNOTS].toFloatOrNull() ?: return null      // Speed in Knots
 
-        var GPSHeading: Float? = null
-
-        if (s[RMCANGLE] != "") {
-            GPSHeading = s[RMCANGLE].toFloat()
-        }
-
-        var newLocation = prevLocation
-        if (newLocation == null) {
-            newLocation = Location("")
-        }
+        val GPSHeading = s[RMCANGLE].toFloatOrNull()
 
 
-        newLocation!!.latitude = GPSLat
+        val newLocation = prevLocation ?: Location("")
+
+        newLocation.latitude = GPSLat
         newLocation.longitude = GPSLon
         newLocation.speed = GPSSpeed
         if (GPSHeading != null) {
@@ -240,19 +221,18 @@ class UsbHandler : Handler() {
 
         val s = NMEAData.split(',')
 
-        if (s[GSAStat].toInt() <= 1) {
+        if (s.size < 16) {
+            return null
+        }
+        else if (s[GSAStat].toIntOrNull() ?: 0 <= 1) {
             return null
         }
 
-        val GPSHdop = s[GSAHDOP].toFloat()       // Accuracy in meters
+        val GPSHdop = s[GSAHDOP].toFloatOrNull() ?: return null      // Accuracy in meters
 
-        var newLocation = prevLocation
-        if (newLocation == null) {
-            newLocation = Location("")
-        }
+        val newLocation = prevLocation ?: Location("")
 
-
-        newLocation!!.accuracy = GPSHdop
+        newLocation.accuracy = GPSHdop
 
         return newLocation
     }
@@ -299,30 +279,27 @@ class UsbHandler : Handler() {
 
         val s = NMEAData.split(',')
 
-        if (s[GGAFIXQUAL].toDouble() <= 0.0) {
+        if (s.size < 10) {
+            return null
+        }
+        else if (s[GGAFIXQUAL].toDoubleOrNull() ?: -1.0 <= 0.0) {
             return null
         }
 
         //##
         //       Get # of satellites
         //##
-        val GPSSats = s[GGASATS].toInt()
+        val GPSSats = s[GGASATS].toIntOrNull() ?: return null
 
         //##
         //       Get altitude in meters
         //##
-        var GPSAlt: Double? = null
-        if (s[GGAALT] != "") {
-            GPSAlt = s[GGAALT].toDouble()
-        }
-//
-        var newLocation = prevLocation
-        if (newLocation == null) {
-            newLocation = Location("")
-        }
+        val GPSAlt = s[GGAALT].toDoubleOrNull()
+
+        val newLocation = prevLocation ?: Location("")
 
         if (GPSAlt != null) {
-            newLocation!!.altitude = GPSAlt
+            newLocation.altitude = GPSAlt
         }
         newLocation.extras = Bundle()
         newLocation.extras.putInt("satellites", GPSSats)

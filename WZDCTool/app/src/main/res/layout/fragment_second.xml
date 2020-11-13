@@ -12,6 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <Button
+        android:id="@+id/centerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Re-Center"
+        android:textSize="16sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toolbar_stuffs"/>
+
     <LinearLayout
         android:id="@+id/toolbar_stuffs"
         android:layout_width="match_parent"

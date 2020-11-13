@@ -17,8 +17,16 @@
 
     <string name="preference_account_name">preference_account_name</string>
     <string name="preference_account_key">preference_account_key</string>
+    <string name="preference_upload">preference_upload</string>
   
-    <string-array name="config_files"><item>Loading Configuration File List</item></string-array>
+    <string-array name="config_files">
+        <item>
+            No Downloaded Config Files
+        </item>
+    </string-array>
+
+    <string-array name="config_files_download">
+    </string-array>
 
     <string name="title_activity_home">HomeActivity</string>
     <string name="prompt_email">Email</string>
