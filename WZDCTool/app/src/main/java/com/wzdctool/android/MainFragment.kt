@@ -30,7 +30,7 @@ class MainFragment : Fragment() {
 
     private val subscriptions: MutableList<Subscription> = mutableListOf()
 
-    private var hasConnectionString = true
+    private var hasConnectionString = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
