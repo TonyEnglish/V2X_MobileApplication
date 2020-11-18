@@ -62,9 +62,9 @@ class MainFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.viewMapButton).setOnClickListener{
-            val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
-            val visualizationObj = DataFileRepository.getVisualizationObj(testFileName)
-            DataClassesRepository.visualizationObj = visualizationObj
+//            val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+//            val visualizationObj = DataFileRepository.getVisualizationObj(testFileName)
+//            DataClassesRepository.visualizationObj = visualizationObj
             findNavController().navigate(R.id.action_MainFragment_to_editingSelectionFragment)
         }
 
