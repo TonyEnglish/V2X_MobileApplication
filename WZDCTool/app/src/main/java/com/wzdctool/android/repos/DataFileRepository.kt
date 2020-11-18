@@ -3,18 +3,19 @@ package com.wzdctool.android.repos
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.microsoft.azure.storage.CloudStorageAccount
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
-import com.wzdctool.android.dataclasses.CSVObj
-import com.wzdctool.android.dataclasses.Marker
-import com.wzdctool.android.dataclasses.MarkerObj
+import com.wzdctool.android.R
+import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
 import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
+import com.wzdctool.android.repos.DataClassesRepository.longToastNotificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import kotlinx.coroutines.Dispatchers
@@ -71,8 +72,8 @@ object DataFileRepository {
 //        osw = createDataFile()
 //    }
 
-    fun getConfigName(wzId: String): String {
-        return "config--$wzId.json"
+    fun getDataFileName(wzId: String): String {
+        return "path-data--$wzId.csv"
     }
 
     fun initializeObservers() {
@@ -109,6 +110,94 @@ object DataFileRepository {
         for (subscription in subscriptions) {
             subscription.unsubscribe()
         }
+    }
+
+    fun getVisualizationObj(fileName: String): VisualizationObj {
+        val pathPoints = mutableListOf<LatLng>()
+        val markers = mutableListOf<CustomMarkerObj>()
+        val file = File(fileName)
+        val lines = file.readLines().drop(1) // Ignore first line
+
+        var startEndIDs = IDSet(UUID.randomUUID(), UUID.randomUUID())
+        var wpIDs = IDSet(UUID.randomUUID(), UUID.randomUUID())
+        val laneIDs = mutableListOf<IDSet>(IDSet(UUID.randomUUID(), UUID.randomUUID()),
+            IDSet(UUID.randomUUID(), UUID.randomUUID()), IDSet(UUID.randomUUID(), UUID.randomUUID()),
+            IDSet(UUID.randomUUID(), UUID.randomUUID()), IDSet(UUID.randomUUID(), UUID.randomUUID()),
+            IDSet(UUID.randomUUID(), UUID.randomUUID()), IDSet(UUID.randomUUID(), UUID.randomUUID()),
+            IDSet(UUID.randomUUID(), UUID.randomUUID()), IDSet(UUID.randomUUID(), UUID.randomUUID()))
+
+        for (line in lines) {
+            val csvObj = parseCSVLine(line)?: continue
+            val position = LatLng(csvObj.latitude, csvObj.longitude)
+            pathPoints.add(position)
+            if (csvObj.marker != "") {
+                var IDs: IDSet = IDSet(UUID.randomUUID(), UUID.randomUUID())
+                if (csvObj.marker == "LC" || csvObj.marker == "LO") {
+                    if (csvObj.marker == "LC") {
+                        laneIDs[csvObj.marker_value.toInt()] = IDSet(UUID.randomUUID(), UUID.randomUUID())
+                        IDs = laneIDs[csvObj.marker_value.toInt()]
+                    } else {
+                        IDs = reverseIDs(laneIDs[csvObj.marker_value.toInt()])
+                    }
+                }
+                else if (csvObj.marker == "WP") {
+                    if (csvObj.marker_value == "True") {
+                        wpIDs = IDSet(UUID.randomUUID(), UUID.randomUUID())
+                        IDs = wpIDs
+                    } else {
+                        IDs = reverseIDs(wpIDs)
+                    }
+                }
+                else if (csvObj.marker == "RP") {
+                    // Title correct
+                }
+                else if (csvObj.marker == "Data Log") {
+                    if (csvObj.marker_value == "True") {
+                        startEndIDs = IDSet(UUID.randomUUID(), UUID.randomUUID())
+                        IDs = startEndIDs
+                    } else {
+                        IDs = reverseIDs(startEndIDs)
+                    }
+                }
+                else {
+
+                }
+                markers.add(CustomMarkerObj(position, Title(csvObj.marker, csvObj.marker_value, IDs)))
+            }
+        }
+        return VisualizationObj(pathPoints, markers, fileName)
+    }
+
+    fun updateDataFileMarkers(fileName: String, markers: List<CSVMarkerObj>): Boolean {
+        val file = File(fileName)
+        val lines = file.readLines() // Ignore first line
+        val osw = OutputStreamWriter(FileOutputStream(fileName))
+        osw.write("")
+        for ((i, line) in lines.withIndex()) {
+            if (i == 0) {
+                osw.appendLine(line)
+            }
+            else {
+                val csvObj = parseCSVLine(line) ?: return false
+                csvObj.marker = ""
+                csvObj.marker_value = ""
+                for (marker in markers) {
+                    if (marker.row + 1 == i) {
+                        csvObj.marker = marker.marker
+                        csvObj.marker_value = marker.value
+                        println("Writing Marker: ${csvObj.marker}, ${csvObj.marker_value} to Line $i")
+                        println(getCSVLine(csvObj))
+                        break
+                    }
+                }
+                osw.appendLine(getCSVLine(csvObj))
+            }
+        }
+        osw.flush()
+        osw.close()
+        println("File Size: ${File(fileName).length()}")
+        notificationSubject.onNext("Data File updated")
+        return true
     }
 
     private fun handleLocation(location: Location) {
@@ -150,7 +239,35 @@ object DataFileRepository {
         val csvObj = CSVObj(
             Date(location.time), location.extras.getInt("satellites"), location.accuracy,
             location.latitude, location.longitude, location.altitude, location.speed,
-            location.bearing, marker.marker, marker.value, false
+            location.bearing, marker.marker, marker.value
+        )
+        return csvObj
+    }
+
+    private fun getCSVLine(csvObj: CSVObj): String {
+        return "${formatter.format(csvObj.time)},${csvObj.num_sats},${csvObj.hdop},${csvObj.latitude},${csvObj.longitude},${csvObj.altitude},${csvObj.speed},${csvObj.heading},${csvObj.marker},${csvObj.marker_value}"
+    }
+
+    private fun parseCSVLine(line: String): CSVObj? {
+        val fields = line.split(',')
+        if (fields.size < 9)
+            return null
+
+        val time = 0
+        val num_sats = 1
+        val hdop = 2
+        val latitude = 3
+        val longitde = 4
+        val altitude = 5
+        val speed = 6
+        val heading = 7
+        val marker = 8
+        val value = 9
+
+        val csvObj = CSVObj(
+            formatter.parse(fields[time])!!, fields[num_sats].toInt(), fields[hdop].toFloat(),
+            fields[latitude].toDouble(), fields[longitde].toDouble(), fields[altitude].toDouble(),
+            fields[speed].toFloat(), fields[heading].toFloat(), fields[marker], fields[value]
         )
         return csvObj
     }
@@ -181,7 +298,7 @@ object DataFileRepository {
         )
 
         // Initialize validation parameters
-        total_lanes = activeConfigSubject.value!!.LaneInfo.NumberOfLanes
+        total_lanes = 8 //activeConfigSubject.value!!.LaneInfo.NumberOfLanes
         for (i in 1..total_lanes) {
             laneList.add(i.toString())
         }
@@ -193,7 +310,7 @@ object DataFileRepository {
     }
 
     private fun writeToDataFile(message: CSVObj) {
-        val formattedMessage: String = "${formatter.format(message.time)},${message.num_sats},${message.hdop},${message.latitude},${message.longitude},${message.altitude},${message.speed},${message.heading},${message.marker},${message.marker_value}"
+        val formattedMessage: String = getCSVLine(message)
         println(formattedMessage)
 
         osw.appendLine(formattedMessage)

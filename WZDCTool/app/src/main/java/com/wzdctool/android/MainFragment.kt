@@ -30,7 +30,7 @@ class MainFragment : Fragment() {
 
     private val subscriptions: MutableList<Subscription> = mutableListOf()
 
-    private var hasConnectionString = true
+    private var hasConnectionString = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +59,13 @@ class MainFragment : Fragment() {
 
         view.findViewById<Button>(R.id.createMapButton).setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_FirstFragment)
+        }
+
+        view.findViewById<Button>(R.id.viewMapButton).setOnClickListener{
+            val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+            val visualizationObj = DataFileRepository.getVisualizationObj(testFileName)
+            DataClassesRepository.visualizationObj = visualizationObj
+            findNavController().navigate(R.id.action_MainFragment_to_editingSelectionFragment)
         }
 
         val uploadButton = view.findViewById<Button>(R.id.uploadbutton)
@@ -90,6 +97,8 @@ class MainFragment : Fragment() {
             requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled = (it && hasConnectionString)
 
             requireView().findViewById<Button>(R.id.uploadbutton).isEnabled = (it && DataFileRepository.getDataFilesList().isNotEmpty() && hasConnectionString)
+
+            requireView().findViewById<Button>(R.id.viewMapButton).isEnabled = DataFileRepository.getDataFilesList().isNotEmpty()
         })
     }
 
