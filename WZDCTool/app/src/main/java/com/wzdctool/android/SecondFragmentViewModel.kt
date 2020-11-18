@@ -12,9 +12,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
+import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.automaticDetectionSubject
 import com.wzdctool.android.repos.DataClassesRepository.dataLoggingVar
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
+import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlin.math.*
 
@@ -297,6 +299,10 @@ class SecondFragmentViewModel : ViewModel() {
 //            println(output)
 //            notificationSubject.onNext("Path data file uploaded")
 //        }
-        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
+//        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
+//        val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+        val visualizationObj = DataFileRepository.getVisualizationObj(fileName)
+        DataClassesRepository.visualizationObj = visualizationObj
+        navigationLiveData.value = R.id.action_SecondFragment_to_editingFragment2
     }
 }

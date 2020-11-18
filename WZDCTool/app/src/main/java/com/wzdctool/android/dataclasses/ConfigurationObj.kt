@@ -14,6 +14,19 @@ data class ConfigurationObj(
     val ImageInfo: IMAGEINFO
 )
 
+data class ConfigurationObjNoImage(
+    val DateCreated: String,
+    val FeedInfoID: String,
+    val GeneralInfo: GENERALINFO,
+    val TypesOfWork: List<TYPEOFWORK>,
+    val LaneInfo: LANEINFO,
+    val SpeedLimits: SPEEDLIMITS,
+    val CauseCodes: CAUSE,
+    val Schedule: SCHEDULE,
+    val Location: LOCATION,
+    val metadata: METADATA
+)
+
 data class GENERALINFO(
     val Description: String,
     val RoadName: String,

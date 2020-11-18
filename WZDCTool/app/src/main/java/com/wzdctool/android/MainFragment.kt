@@ -61,6 +61,13 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_MainFragment_to_FirstFragment)
         }
 
+        view.findViewById<Button>(R.id.viewMapButton).setOnClickListener{
+            val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+            val visualizationObj = DataFileRepository.getVisualizationObj(testFileName)
+            DataClassesRepository.visualizationObj = visualizationObj
+            findNavController().navigate(R.id.action_MainFragment_to_editingSelectionFragment)
+        }
+
         val uploadButton = view.findViewById<Button>(R.id.uploadbutton)
         uploadButton.setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_uploadFragment)
@@ -90,6 +97,8 @@ class MainFragment : Fragment() {
             requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled = (it && hasConnectionString)
 
             requireView().findViewById<Button>(R.id.uploadbutton).isEnabled = (it && DataFileRepository.getDataFilesList().isNotEmpty() && hasConnectionString)
+
+            requireView().findViewById<Button>(R.id.viewMapButton).isEnabled = DataFileRepository.getDataFilesList().isNotEmpty()
         })
     }
 

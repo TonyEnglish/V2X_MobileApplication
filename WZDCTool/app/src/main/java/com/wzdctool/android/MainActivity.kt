@@ -433,11 +433,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show();
         }
-        else {
-            val localLocationSources = locationSourcesSubject.value
-            localLocationSources.internal = gps_status.valid
-            locationSourcesSubject.onNext(localLocationSources)
-        }
+//        else {
+//            val localLocationSources = locationSourcesSubject.value
+//            localLocationSources.internal = gps_status.valid
+//            locationSourcesSubject.onNext(localLocationSources)
+//        }
     }
 
     private fun isLocationServiceRunning(): Boolean {
