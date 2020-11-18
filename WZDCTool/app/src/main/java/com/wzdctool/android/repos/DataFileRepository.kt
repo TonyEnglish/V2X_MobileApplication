@@ -236,8 +236,15 @@ object DataFileRepository {
 
     private fun createCSVObj(location: Location): CSVObj {
         val marker: MarkerObj = if (markerQueue.size >= 1) markerQueue.remove() else MarkerObj("", "")
+        var numSats = 0
+        try {
+            numSats = location.extras.getInt("satellites")
+        }
+        catch (e: Exception) {
+            numSats = 0
+        }
         val csvObj = CSVObj(
-            Date(location.time), location.extras.getInt("satellites"), location.accuracy,
+            Date(location.time), numSats, location.accuracy,
             location.latitude, location.longitude, location.altitude, location.speed,
             location.bearing, marker.marker, marker.value
         )
