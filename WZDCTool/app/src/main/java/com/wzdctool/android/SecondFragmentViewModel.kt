@@ -31,6 +31,7 @@ class SecondFragmentViewModel : ViewModel() {
     var updatingMap = MutableLiveData<Boolean>()
 
     var hasSetDataLogFalseMarker = false
+    var isViewDisabled = false
 
     // var laneStat = MutableList<Boolean>(8+1) {false}
     var wpStat = false
@@ -79,6 +80,7 @@ class SecondFragmentViewModel : ViewModel() {
     fun stopDataCollection() {
         // toastNotificationSubject.onNext("Stopping data collection")
         println("Data Logging Ended")
+        isViewDisabled = true
         val marker = MarkerObj("Data Log", "False")
         markerSubject.onNext(marker)
         dataLoggingVar = false

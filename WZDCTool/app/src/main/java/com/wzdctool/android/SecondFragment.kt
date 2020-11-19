@@ -161,6 +161,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
+
+        if (viewModel.isViewDisabled) {
+            requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<TextView>(R.id.overlay).visibility = View.VISIBLE
+            requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
+            requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
+            requireView().findViewById<Button>(R.id.centerButton).isEnabled = false
+            mMap?.uiSettings?.setAllGesturesEnabled(false)
+        }
     }
 
     fun markRefPtUI() {

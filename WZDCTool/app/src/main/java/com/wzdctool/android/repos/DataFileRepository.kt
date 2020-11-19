@@ -202,10 +202,9 @@ object DataFileRepository {
 
     private fun handleLocation(location: Location) {
         println("Data File Repo")
-//        println("loggingData: $loggingData")
-        val csvObj = createCSVObj(location)
-        validateDataLine(csvObj, line_num)
         if (loggingData) {
+            val csvObj = createCSVObj(location)
+            validateDataLine(csvObj, line_num)
             if (csvObj == prevCsvObj)
                 return
             if (csvObj.marker == "Data Log" && csvObj.marker_value == "False") {
@@ -236,8 +235,15 @@ object DataFileRepository {
 
     private fun createCSVObj(location: Location): CSVObj {
         val marker: MarkerObj = if (markerQueue.size >= 1) markerQueue.remove() else MarkerObj("", "")
+        var numSats = 0
+        try {
+            numSats = location.extras.getInt("satellites")
+        }
+        catch (e: Exception) {
+            numSats = 0
+        }
         val csvObj = CSVObj(
-            Date(location.time), location.extras.getInt("satellites"), location.accuracy,
+            Date(location.time), numSats, location.accuracy,
             location.latitude, location.longitude, location.altitude, location.speed,
             location.bearing, marker.marker, marker.value
         )

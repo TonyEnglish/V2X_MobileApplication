@@ -13,7 +13,7 @@
         android:gravity="center"
         android:textColor="#FFFFFF"
         android:background="@color/colorPrimary"
-        android:text="Select Data File To Visualize/Edit"
+        android:text="Select WZ Map To Visualize"
         android:layout_alignParentTop="true"/>
 
     <!--    <View-->
