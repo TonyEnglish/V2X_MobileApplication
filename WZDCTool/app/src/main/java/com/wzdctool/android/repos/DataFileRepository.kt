@@ -202,10 +202,9 @@ object DataFileRepository {
 
     private fun handleLocation(location: Location) {
         println("Data File Repo")
-//        println("loggingData: $loggingData")
-        val csvObj = createCSVObj(location)
-        validateDataLine(csvObj, line_num)
         if (loggingData) {
+            val csvObj = createCSVObj(location)
+            validateDataLine(csvObj, line_num)
             if (csvObj == prevCsvObj)
                 return
             if (csvObj.marker == "Data Log" && csvObj.marker_value == "False") {

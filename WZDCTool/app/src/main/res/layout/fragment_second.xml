@@ -19,6 +19,7 @@
         android:text="Re-Center"
         android:textSize="16sp"
         android:layout_alignParentEnd="true"
+        android:visibility="invisible"
         android:layout_below="@+id/toolbar_stuffs"/>
 
     <LinearLayout
@@ -135,7 +136,7 @@
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="visible"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <!-- Lane 1 -->
@@ -348,6 +349,18 @@
                 android:backgroundTint="@color/primary_active"
                 android:visibility="gone"
                 android:src="@drawable/ic_baseline_stop_24"
+                android:textColor="@color/button_text" />
+
+            <TextView
+                android:id="@+id/overlay"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                android:layout_weight="0.33"
+                android:gravity="center"
+                android:text="Finishing Data Collection"
+                android:textSize="20sp"
+                android:background="@color/colorAccent"
+                android:visibility="gone"
                 android:textColor="@color/button_text" />
 
         </LinearLayout>

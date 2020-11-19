@@ -13,7 +13,7 @@
         android:gravity="center"
         android:textColor="#FFFFFF"
         android:background="@color/colorPrimary"
-        android:text="Select Data File To Visualize/Edit"
+        android:text="Select WZ Map To Visualize"
         android:layout_alignParentTop="true"/>
 
     <!--    <View-->
@@ -49,6 +49,7 @@
         android:id="@+id/button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
         android:textSize="20sp"
         android:text="Visualize"
         android:drawableLeft="@drawable/ic_map"

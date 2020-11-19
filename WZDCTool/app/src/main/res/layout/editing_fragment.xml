@@ -10,12 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/savebutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Save Edits" />
+<!--    <Button-->
+<!--        android:id="@+id/savebutton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:text="Save Edits" />-->
 
     <Button
         android:id="@+id/continueButton"
@@ -23,6 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:text="Continue Without saving" />
+        android:text="Continue" />
 
 </RelativeLayout>
