@@ -49,6 +49,7 @@
         android:id="@+id/button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
         android:textSize="20sp"
         android:text="Visualize"
         android:drawableLeft="@drawable/ic_map"
