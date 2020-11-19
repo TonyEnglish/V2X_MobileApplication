@@ -318,6 +318,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 gps_switch.isChecked = true
             } else {
                 toastNotificationSubject.onNext("No valid GPS sources found. Exiting data collection")
+//                val marker = MarkerObj("Cancel", "")
+//                markerSubject.onNext(marker)
                 viewModel.navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
             }
         })
