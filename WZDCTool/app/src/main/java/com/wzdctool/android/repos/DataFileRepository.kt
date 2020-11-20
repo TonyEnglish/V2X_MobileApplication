@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.microsoft.azure.storage.CloudStorageAccount
+import com.microsoft.azure.storage.blob.CloudBlob
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
@@ -361,12 +362,21 @@ object DataFileRepository {
         val fileList = mutableListOf<String>()
         val directory: File = File(Constants.PENDING_UPLOAD_DIRECTORY)
         val files = directory.listFiles()
+        val fileObjList = mutableListOf<File>()
         if (files != null) {
             for (file in files) {
+                fileObjList.add(file)
                 fileList.add(file.name)
             }
         }
-        return fileList
+        val tempList = fileObjList.sortedWith(compareBy {
+            it.lastModified()  //.compareTo(Calendar.getInstance().time)
+        }).reversed()
+        val sortedFilesList = mutableListOf<String>()
+        tempList.forEach {
+            sortedFilesList.add(it.name)
+        }
+        return sortedFilesList //fileList.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it }))
     }
 
     fun uploadDataFiles(fileList: List<String>) {

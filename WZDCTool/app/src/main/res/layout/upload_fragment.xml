@@ -9,6 +9,7 @@
         android:id="@+id/textView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
         android:textSize="24sp"
         android:gravity="center"
         android:textColor="#FFFFFF"

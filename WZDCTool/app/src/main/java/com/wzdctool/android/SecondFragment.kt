@@ -165,7 +165,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         if (viewModel.isViewDisabled) {
             requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
-            requireView().findViewById<TextView>(R.id.overlay).visibility = View.VISIBLE
+            requireView().findViewById<LinearLayout>(R.id.overlay).visibility = View.VISIBLE
             requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
             requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
             requireView().findViewById<Button>(R.id.centerButton).isEnabled = false
