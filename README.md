@@ -19,7 +19,7 @@ This repository contains the following components:
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
-Supported device running Android 8.0 to 11 (SDK 26 - 30)
+Supported device running Android 5.0 to 11 (SDK 21 - 30)
 
 Internet access (Loading configuration files and uploading path data)
 
