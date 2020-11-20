@@ -292,7 +292,7 @@ class MainActivity : AppCompatActivity() {
                 false
             )
             println("Upload Status: $automaticUpload")
-            automaticUploadSubject.onNext(automaticUpload)
+            automaticUploadSubject.onNext(false) //automaticUpload
         }
 
 //        toolbarActiveSubject.subscribe {

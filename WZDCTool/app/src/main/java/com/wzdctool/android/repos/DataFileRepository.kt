@@ -300,6 +300,7 @@ object DataFileRepository {
             "Value"
         )
         osw = OutputStreamWriter(fOut)
+        osw.write("")
         osw.appendLine(
             csvHeaders.toString().replace("[", "").replace("]", "")
         )

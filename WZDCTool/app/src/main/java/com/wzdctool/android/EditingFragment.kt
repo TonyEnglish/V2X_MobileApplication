@@ -124,7 +124,10 @@ class EditingFragment : Fragment(), OnMapReadyCallback {
                 return linLayout
             }
 
-            fun processTitle(title: Title): String {
+            fun processTitle(title: Title?): String {
+                if (title == null) {
+                    return "Path Data Point"
+                }
                 if (title.type == "LC") {
                     return "Lane ${title.value} Closed"
                 }

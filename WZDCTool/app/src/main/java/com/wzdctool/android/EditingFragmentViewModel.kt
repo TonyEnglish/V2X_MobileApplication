@@ -154,7 +154,7 @@ class EditingFragmentViewModel : ViewModel() {
     private fun getCurrentMarkersList(): List<CSVMarkerObj> {
         val markerObjList = mutableListOf<CSVMarkerObj>()
         for (marker in markersList) {
-            val title = parseTitleString(marker.title)
+            val title = parseTitleString(marker.title) ?: continue
             val index = getClosestDataPointIndex(marker.position)
             println("${title.type}: ${title.value}, $index")
             markerObjList.add(CSVMarkerObj(index, title.type, title.value))
