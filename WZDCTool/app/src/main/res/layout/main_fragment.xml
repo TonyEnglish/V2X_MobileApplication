@@ -42,7 +42,6 @@
             android:id="@+id/downloadConfigButton"
             android:layout_width="300sp"
             android:layout_height="66dp"
-            android:layout_marginBottom="10sp"
             android:backgroundTint="@color/colorAccent"
             android:drawableLeft="@drawable/ic_down_arrow_small"
             android:text="Download Configuration Files"
