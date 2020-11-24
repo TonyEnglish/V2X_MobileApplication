@@ -3,6 +3,7 @@ package com.wzdctool.android.repos
 import android.location.Location
 import android.net.ConnectivityManager
 import com.wzdctool.android.dataclasses.DataCollectionObj
+import com.wzdctool.android.dataclasses.VisualizationObj
 import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.dataclasses.locationSources
 import rx.subjects.BehaviorSubject
@@ -13,6 +14,7 @@ import java.net.InetAddress
 object DataClassesRepository {
     val dataCollectionSubject: PublishSubject<DataCollectionObj> = PublishSubject.create<DataCollectionObj>()
     lateinit var dataCollectionObj: DataCollectionObj
+    lateinit var visualizationObj: VisualizationObj
     // val secondFragmentUISubject = MutableLiveData<SecondFragmentUIObj>()
     // val markerSubject = ObservableField<MarkerObj>()
 

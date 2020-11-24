@@ -1,3 +1,10 @@
+11/24/2020
+- Updated application icon
+- Improved GPS detection
+- Added visualization of mapped work zones
+- Updated documentation
+- Published most recent version to Google Play Store
+
 11/13/2020
 - Enabling offline operation
   - Config files can be downloaded and saved for later use

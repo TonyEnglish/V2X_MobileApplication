@@ -115,12 +115,21 @@ object ConfigurationRepository {
         val updatedConfigList = mutableListOf<String>()
         val directory: File = File(Constants.CONFIG_DIRECTORY)
         val files = directory.listFiles()
+//        val fileObjList = mutableListOf<File>()
         if (files != null) {
             for (file in files) {
                 updatedConfigList.add(file.name)
+//                fileObjList.add(file)
             }
         }
-        return updatedConfigList
+//        val tempList = fileObjList.sortedWith(compareBy {
+//            it.lastModified()  //.compareTo(Calendar.getInstance().time)
+//        }).reversed()
+//        val sortedFilesList = mutableListOf<String>()
+//        tempList.forEach {
+//            sortedFilesList.add(it.name)
+//        }
+        return updatedConfigList.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it }))
     }
 
     fun getLocalConfigSizeKB(): Double {

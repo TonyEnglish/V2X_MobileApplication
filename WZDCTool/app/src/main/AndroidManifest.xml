@@ -15,9 +15,9 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher_wzdx"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_wzdx_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
