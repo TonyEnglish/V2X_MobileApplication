@@ -36,14 +36,19 @@ There are currently no test cases for this proof of concept tool.
 
 ### Execution
 
-Main Page | Configuration | Data Collection
-:-------------------------:|:-------------------------:|:-------------------------:
-![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Main_Page.jpg)  | ![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)
+Main Page | Configuration | Data Collection | Visualization
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Main_Page.jpg)  | ![Import Configuration File UI](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Import_Configuration_File.jpg)  |  ![Collect Path Data](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Data_Collection.jpg)  |  ![Visualization](https://github.com/TonyEnglish/V2X_MobileApplication/blob/dev/Images/Visualizer.jpg)
 
 #### Setup: Configure Azure Connection Info
+This application cannot function without an Azure cloud connection. 
 Contact [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) to request connection to the cloud. 
 
-#### Step 1: Configuration
+#### Step 1: Download Configuration Files
+Mapping a work zone requires that the corresponding configuration file is downloaded. This file contains basic information such as the number of lanes and the driven lane during data collection. 
+Configuration files must be downloaded before the start of data collection. This is done through the Download Config Files page. Simply select the config files that you would like to download and press sync. All local config files will be deleted when new config files will be downloaded. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
+
+#### Step 2: Map Work Zone: Configuration
 At the top of the screen, there are 3 elements. The highest is a textbox labeled Active Config. This displays the work zone id of the active configuration file. The next element is a slider showing Internal GPS and USb GPS. Each GPS type ahs the following stats
 
 Internal GPS:
@@ -62,11 +67,11 @@ The Manual Detection vs Automatic Detection slider changes the start/ending loca
 1. In automatic detection mode (default), data collection will automatically commence when a set starting location is reached (from configuration file). Data collection will commence as normal, until the set ending location is reached, at which point data collection will end and the data file will be uploaded. 
 2. In manual detection mode, the user manually starts and ends data collection. When the user is approaching a work zone, the user presses the play button. When the work zone begins, the user presses the marker button. Then, data collection commences as normal. Once the user exits the work zone, they will press the stop button.
 
-The final step is to select a configuration file. This file contains basic information, such as the number of lanes and the speed limits in the work zone. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
+The final step is to select a configuration file. This file contains basic information, such as the number of lanes and the speed limits in the work zone.
 
 Note: The user may only start data collection if a valid GPS device is selected and a configuration file is selected. 
 
-#### Step 2: Data Collection
+#### Step 3: Map Work Zone: Data Collection
 Data collection functions slightly differently in manual and automatic detection modes. The application behaviorn is described below
 1. In automatic detection mode (default), data collection will automatically commence when a set starting location is reached (from configuration file). Data collection will commence as normal, until the set ending location is reached, at which point data collection will end and the data file will be uploaded. 
 2. In manual detection mode, the user manually starts and ends data collection. When the user is approaching a work zone, the user presses the play button. When the work zone begins, the user presses the marker button. Then, data collection commences as normal. Once the user exits the work zone, they will press the stop button.
@@ -83,8 +88,14 @@ Nothing  |  Lane Closed  |  Workers Present
 
 For more detailed user information, see the [WZDC Tool Mobile Application Setup + Documentation](https://github.com/TonyEnglish/V2X_MobileApplication/blob/master/Documentation/WZDC%20Tool%20Mobile%20Application%20Setup%20%2B%20Documentation.pdf)
 
-#### Step 3: Upload Path Data
-The final step is to upload the generated path data file. The application will execute this step automatically at the end of data collection, and a notification (shown above) will be shown. If the path data file fails to upload, you can upload it manually to https://neaeraconsulting.com/V2X_Upload (Generated data files can be found at Android/data/com.wzdctool.android/files/Download)
+#### Step 4: Visualize Mapped Work Zone
+Immediately after a work zone is mapped, a visualization will be generated. Visualizations may also be loaded from the main page, by pressing the View Work Zone button. This button will only be enabled if work zone maps are present on the device (have not been uploaded). This will load a list of locally mapped work zones, from which a user can select one and press Visualize. 
+This visualization shows the recorded path data (small purple dots), Lane closure start/end markers (orange and blue markers showing the affected lane number), and start/end markers for the presence of workers (orange and blue markers with a W). The White R marker shows the start of the work zone. 
+
+#### Step 5: Upload Path Data
+After mapping a work zone, a data file will be saved to the device. A new data file is created for each distinct mapped work zone. These must be manually uploaded. This is done from the main page, by pressing the Upload Data Files button. This button will only be enabled if work zone maps are present on the device. 
+All of the data files will be pre-selected. Simply press a list item to toggle its selection. There are Select All and Deselect All buttons at the top. To upload all selected data files, simply press the Upload button at the bottom of the screen. Uploaded data files will be removed from the device and can no longer be visualized locally. 
+The next step is to move to the verification page of the associated website, https://neaeraconsulting.com/V2X_Verification. This page allows advanced visualization of work zones, as well as editing and publishing.
 
 ## Additional Notes
 
