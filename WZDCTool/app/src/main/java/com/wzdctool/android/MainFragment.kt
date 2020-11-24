@@ -1,24 +1,23 @@
 package com.wzdctool.android
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.Spinner
-import android.widget.Switch
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.internetStatusSubject
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
-import kotlinx.coroutines.launch
 import rx.Subscription
+
 
 class MainFragment : Fragment() {
 
@@ -61,6 +60,13 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_MainFragment_to_FirstFragment)
         }
 
+        view.findViewById<Button>(R.id.viewMapButton).setOnClickListener{
+//            val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+//            val visualizationObj = DataFileRepository.getVisualizationObj(testFileName)
+//            DataClassesRepository.visualizationObj = visualizationObj
+            findNavController().navigate(R.id.action_MainFragment_to_editingSelectionFragment)
+        }
+
         val uploadButton = view.findViewById<Button>(R.id.uploadbutton)
         uploadButton.setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_uploadFragment)
@@ -87,9 +93,24 @@ class MainFragment : Fragment() {
 
     private fun addSubscriptions() {
         subscriptions.add(internetStatusSubject.subscribe {
-            requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled = (it && hasConnectionString)
+            requireView().findViewById<Button>(R.id.downloadConfigButton).isEnabled =
+                (it && hasConnectionString)
 
-            requireView().findViewById<Button>(R.id.uploadbutton).isEnabled = (it && DataFileRepository.getDataFilesList().isNotEmpty() && hasConnectionString)
+            val enabled = (it && DataFileRepository.getDataFilesList().isNotEmpty() && hasConnectionString)
+            val uploadButton = requireView().findViewById<Button>(R.id.uploadbutton)
+            uploadButton.isEnabled = enabled
+            if (enabled) {
+                val animation: Animation =
+                    AlphaAnimation(1f, .3f) // Change alpha from fully visible to invisible
+                animation.duration = 800
+                animation.interpolator = LinearInterpolator() // do not alter animation rate
+                animation.repeatCount = Animation.INFINITE // Repeat animation infinitely
+                animation.repeatMode = Animation.REVERSE // Reverse animation at the end so the button will fade back in
+                uploadButton.startAnimation(animation)
+            }
+
+            requireView().findViewById<Button>(R.id.viewMapButton).isEnabled =
+                DataFileRepository.getDataFilesList().isNotEmpty()
         })
     }
 

@@ -87,6 +87,7 @@
                 android:layout_height="4dp"
                 android:layout_marginTop="30dp"
                 android:background="#c0c0c0"
+                android:visibility="gone"
                 android:layout_below="@+id/textView"/>
 
             <androidx.appcompat.widget.SwitchCompat
@@ -97,6 +98,7 @@
                 android:layout_marginTop="10dp"
                 android:checked="false"
                 android:textSize="20sp"
+                android:visibility="gone"
                 android:text="Automatically Upload Data Files" />
         </LinearLayout>
 

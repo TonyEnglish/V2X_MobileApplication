@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_SecondFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_editingFragment2"
+            app:destination="@id/editingFragment" />
     </fragment>
     <fragment
         android:id="@+id/SettingsFragment"
@@ -63,6 +66,9 @@
         <action
             android:id="@+id/action_MainFragment_to_uploadFragment"
             app:destination="@id/uploadFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_editingSelectionFragment"
+            app:destination="@id/editingSelectionFragment" />
     </fragment>
     <fragment
         android:id="@+id/downloadFragment"
@@ -92,5 +98,23 @@
             app:destination="@id/SettingsFragment"
             app:enterAnim="@anim/slide_in_bottom"
             app:exitAnim="@anim/slide_out_top" />
+    </fragment>
+    <fragment
+        android:id="@+id/editingFragment"
+        android:name="com.wzdctool.android.EditingFragment"
+        android:label="editing_fragment"
+        tools:layout="@layout/editing_fragment" >
+        <action
+            android:id="@+id/action_editingFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editingSelectionFragment"
+        android:name="com.wzdctool.android.EditingSelectionFragment"
+        android:label="editing_selection_fragment"
+        tools:layout="@layout/editing_selection_fragment" >
+        <action
+            android:id="@+id/action_editingSelectionFragment_to_editingFragment"
+            app:destination="@id/editingFragment" />
     </fragment>
 </navigation>
