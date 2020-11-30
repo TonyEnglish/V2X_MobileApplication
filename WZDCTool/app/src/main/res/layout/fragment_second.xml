@@ -169,7 +169,7 @@
                 <!--            <FrameLayout-->
                 <!--                android:layout_width="0sp"-->
                 <!--                android:layout_height="match_parent"-->
-                <!--                android:layout_weight="0.015"-->
+                <!--                android:layout_weight="0.0085"-->
                 <!--                android:layout_marginStart="5dp"-->
                 <!--                android:background="#FFFF00">-->
                 <!--            </FrameLayout>-->
@@ -184,9 +184,18 @@
                 <!--            <FrameLayout-->
                 <!--                android:layout_width="0sp"-->
                 <!--                android:layout_height="match_parent"-->
-                <!--                android:layout_weight="0.015"-->
+                <!--                android:layout_weight="0.0085"-->
                 <!--                android:background="#FFFF00">-->
                 <!--            </FrameLayout>-->
+
+                <ImageView
+                    android:id="@+id/lane_line_0_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.01"
+                    android:src="@drawable/ic_yellow_lane_line">
+                </ImageView>
 
                 <!-- Lane 1 -->
                 <LinearLayout
@@ -207,14 +216,18 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_1_2"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+<!--                <FrameLayout>-->
+<!--                </FrameLayout>-->
 
                 <!-- Lane 2 -->
                 <LinearLayout
@@ -235,14 +248,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_2_3"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 3 -->
                 <LinearLayout
@@ -263,14 +277,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_3_4"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 4 -->
                 <LinearLayout
@@ -291,14 +306,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_4_5"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 5 -->
                 <LinearLayout
@@ -319,14 +335,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_5_6"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 6 -->
                 <LinearLayout
@@ -347,14 +364,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_6_7"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 7 -->
                 <LinearLayout
@@ -375,14 +393,15 @@
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/lane_line_7_8"
-                    android:layout_width="0sp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.01"
-                    android:layout_gravity="bottom"
-                    android:background="#FFFFFF">
-                </FrameLayout>
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
 
                 <!-- Lane 8 -->
                 <LinearLayout

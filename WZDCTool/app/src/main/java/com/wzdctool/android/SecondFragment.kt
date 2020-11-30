@@ -233,7 +233,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 else {
                     //change close image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_straight_arrow_closed))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.primary_active
                     )
@@ -508,7 +508,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         //requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
 
         val layout_params = requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams
-        layout_params.width = ((requireView().parent as View).width * 0.9 * numLanes/8).toInt()
+        layout_params.width = ((requireView().parent as View).width * 0.95 * numLanes/8).toInt()
         println(layout_params.width)
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
 
@@ -529,7 +529,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 laneLayout.visibility = View.GONE
 
 
-                requireView().findViewById<FrameLayout>(laneLines[i-1]).visibility = View.GONE
+                requireView().findViewById<ImageView>(laneLines[i-1]).visibility = View.GONE
 
                 //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
                 //laneLine.visibility = View.INVISIBLE
