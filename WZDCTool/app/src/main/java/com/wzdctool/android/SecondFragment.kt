@@ -15,6 +15,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -137,18 +138,25 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
 
         view.findViewById<Button>(R.id.centerButton).setOnClickListener {
-            viewModel.updatingMap.value = true
-            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            if (mMap != null) {
+                viewModel.setCurrentZoom(mMap)
+                viewModel.updatingMap.value = true
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
         }
 
         view.findViewById<ImageButton>(R.id.zoomInButton).setOnClickListener{
-            viewModel.zoomIn()
-            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            if (mMap != null) {
+                viewModel.zoomIn()
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
         }
 
         view.findViewById<ImageButton>(R.id.zoomOutButton).setOnClickListener{
-            viewModel.zoomOut()
-            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            if (mMap != null) {
+                viewModel.zoomOut()
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
         }
     }
 
@@ -188,12 +196,15 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         if (viewModel.isViewDisabled) {
             requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.zoomInButton).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.zoomOutButton).isEnabled = false
             requireView().findViewById<LinearLayout>(R.id.overlay).visibility = View.VISIBLE
             requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
             requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
             requireView().findViewById<Button>(R.id.centerButton).isEnabled = false
             mMap?.uiSettings?.setAllGesturesEnabled(false)
         }
+        requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
     }
 
     fun markRefPtUI() {
@@ -225,7 +236,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 if (!laneStatLocal[lane]) {
                     //change open image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_straight_arrow))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.colorAccent
                     )
@@ -233,7 +244,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 else {
                     //change close image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow_closed))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.primary_active
                     )
@@ -269,6 +280,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+//        mMap!!.uiSettings.isScrollGesturesEnabled = false
+//        mMap!!.uiSettings.setAllGesturesEnabled(false)
 
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -346,7 +359,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             }
 
             val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
-            gps_switch.isEnabled = it.internal == gps_status.valid && it.usb == gps_status.valid
+            gps_switch.isEnabled = (it.internal == gps_status.valid && it.usb == gps_status.valid && !viewModel.isViewDisabled)
         })
 
         subscriptions.add(activeLocationSourceSubject.subscribe {

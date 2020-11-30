@@ -176,6 +176,10 @@ class SecondFragmentViewModel : ViewModel() {
         }
     }
 
+    fun setCurrentZoom(mMap: GoogleMap?) {
+        zoom = mMap!!.cameraPosition.zoom.toInt()
+    }
+
     fun zoomIn() {
         zoom++
     }

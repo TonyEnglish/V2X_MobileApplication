@@ -212,8 +212,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -244,8 +244,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -273,8 +273,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -302,8 +302,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -331,8 +331,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -360,8 +360,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -389,8 +389,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
                 <ImageView
@@ -418,8 +418,8 @@
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
                         android:enabled="false"
-                        android:src="@drawable/ic_straight_arrow"
-                        tools:src="@drawable/ic_straight_arrow" />
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
                 </LinearLayout>
 
             </LinearLayout>
