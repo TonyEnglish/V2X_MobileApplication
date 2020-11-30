@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#2F6690</color>
     <color name="colorAccent">#81C3D7</color>
     <color name="colorAccentTransparent">#BB81C3D7</color>
+    <color name="colorAccentGreyTransparent">#BB888888</color>
 
     <color name="status_open">#32a852</color>
     <color name="status_closed">#c23434</color>

@@ -151,11 +151,13 @@
         android:orientation="vertical">
 
         <FrameLayout
+            android:id="@+id/lanes_ll_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="visible"
-            android:background="@color/colorAccentTransparent">
+            android:layout_marginHorizontal="3dp"
+            android:background="@color/colorAccentGreyTransparent">
             <LinearLayout
                 android:id="@+id/lanes_ll"
                 android:layout_width="350dp"
@@ -200,6 +202,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -227,6 +230,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -254,6 +258,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -281,6 +286,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -308,6 +314,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -335,6 +342,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -362,6 +370,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>
@@ -389,6 +398,7 @@
                         android:layout_height="match_parent"
                         android:background="#00FFFFFF"
                         android:scaleType="fitCenter"
+                        android:enabled="false"
                         android:src="@drawable/ic_straight_arrow"
                         tools:src="@drawable/ic_straight_arrow" />
                 </LinearLayout>

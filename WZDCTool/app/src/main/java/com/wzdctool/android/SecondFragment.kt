@@ -181,6 +181,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<ImageButton>(buttons[i]).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
+
+//        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(R.color.colorAccentGreyTransparent))
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
 
         if (viewModel.isViewDisabled) {
@@ -210,7 +212,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 requireView().findViewById<ImageButton>(buttons[i]).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
-        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
+
+        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(R.color.colorAccentTransparent))
+//        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -246,6 +250,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 
+            requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
+
 //            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
@@ -254,6 +260,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 ////            requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
 ////            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
+
+            requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
 
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }
