@@ -15,6 +15,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -76,6 +77,17 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         R.id.lane7_ll,
         R.id.lane8_ll
     )
+    val laneLines = listOf(
+        0,
+        R.id.lane_line_1_2,
+        R.id.lane_line_2_3,
+        R.id.lane_line_3_4,
+        R.id.lane_line_4_5,
+        R.id.lane_line_5_6,
+        R.id.lane_line_6_7,
+        R.id.lane_line_7_8,
+        0
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -126,8 +138,25 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         }
 
         view.findViewById<Button>(R.id.centerButton).setOnClickListener {
-            viewModel.updatingMap.value = true
-            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            if (mMap != null) {
+                viewModel.setCurrentZoom(mMap)
+                viewModel.updatingMap.value = true
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
+        }
+
+        view.findViewById<ImageButton>(R.id.zoomInButton).setOnClickListener{
+            if (mMap != null) {
+                viewModel.zoomIn()
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
+        }
+
+        view.findViewById<ImageButton>(R.id.zoomOutButton).setOnClickListener{
+            if (mMap != null) {
+                viewModel.zoomOut()
+                viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+            }
         }
     }
 
@@ -160,17 +189,22 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<ImageButton>(buttons[i]).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = false
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.GONE
+
+//        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(R.color.colorAccentGreyTransparent))
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.GONE
 
         if (viewModel.isViewDisabled) {
             requireView().findViewById<ImageButton>(R.id.startBtn).isEnabled = false
             requireView().findViewById<ImageButton>(R.id.startBtn).visibility = View.GONE
+            requireView().findViewById<ImageButton>(R.id.zoomInButton).isEnabled = false
+            requireView().findViewById<ImageButton>(R.id.zoomOutButton).isEnabled = false
             requireView().findViewById<LinearLayout>(R.id.overlay).visibility = View.VISIBLE
             requireView().findViewById<SwitchCompat>(R.id.gpsSwitch).isEnabled = false
             requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
             requireView().findViewById<Button>(R.id.centerButton).isEnabled = false
             mMap?.uiSettings?.setAllGesturesEnabled(false)
         }
+        requireView().findViewById<MapView>(R.id.mapView).isEnabled = false
     }
 
     fun markRefPtUI() {
@@ -189,7 +223,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 requireView().findViewById<ImageButton>(buttons[i]).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
-        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
+
+        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(R.color.colorAccentTransparent))
+//        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -200,7 +236,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 if (!laneStatLocal[lane]) {
                     //change open image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_nolines))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.colorAccent
                     )
@@ -208,7 +244,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 else {
                     //change close image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_closed))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_lane_arrow_closed))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.primary_active
                     )
@@ -225,6 +261,8 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             requireView().findViewById<ImageButton>(R.id.endBtn).visibility = View.GONE
             requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 
+            requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
+
 //            requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.GONE
         }
         else {
@@ -234,12 +272,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 ////            requireView().findViewById<ImageButton>(R.id.ref).visibility = View.GONE
 //            requireView().findViewById<ImageButton>(R.id.ref).isEnabled = false
 
+            requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
+
             requireView().findViewById<LinearLayout>(R.id.manual_buttons_ll).visibility = View.VISIBLE
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+//        mMap!!.uiSettings.isScrollGesturesEnabled = false
+//        mMap!!.uiSettings.setAllGesturesEnabled(false)
 
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -317,7 +359,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             }
 
             val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
-            gps_switch.isEnabled = it.internal == gps_status.valid && it.usb == gps_status.valid
+            gps_switch.isEnabled = (it.internal == gps_status.valid && it.usb == gps_status.valid && !viewModel.isViewDisabled)
         })
 
         subscriptions.add(activeLocationSourceSubject.subscribe {
@@ -479,12 +521,12 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         //requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
 
         val layout_params = requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams
-        layout_params.width = ((requireView().parent as View).width * 0.9 * numLanes/8).toInt()
+        layout_params.width = ((requireView().parent as View).width * 0.95 * numLanes/8).toInt()
         println(layout_params.width)
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
 
 
-        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_road_driven_2))
+        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_car))
 
 
 
@@ -498,6 +540,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             for (i in (min(numLanes, 8)+1)..8) {
                 val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
                 laneLayout.visibility = View.GONE
+
+
+                requireView().findViewById<ImageView>(laneLines[i-1]).visibility = View.GONE
 
                 //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
                 //laneLine.visibility = View.INVISIBLE

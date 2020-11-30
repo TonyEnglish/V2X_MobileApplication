@@ -108,6 +108,9 @@ class MainFragment : Fragment() {
                 animation.repeatMode = Animation.REVERSE // Reverse animation at the end so the button will fade back in
                 uploadButton.startAnimation(animation)
             }
+            else {
+                uploadButton.clearAnimation()
+            }
 
             requireView().findViewById<Button>(R.id.viewMapButton).isEnabled =
                 DataFileRepository.getDataFilesList().isNotEmpty()

@@ -22,6 +22,26 @@
         android:visibility="invisible"
         android:layout_below="@+id/toolbar_stuffs"/>
 
+    <ImageButton
+        android:id="@+id/zoomInButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_map_plus"
+        android:scaleType="fitCenter"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/centerButton"/>
+
+    <ImageButton
+        android:id="@+id/zoomOutButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_map_minus"
+        android:backgroundTint="@color/colorAccent"
+        android:scaleType="fitCenter"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/zoomInButton"/>
+
     <LinearLayout
         android:id="@+id/toolbar_stuffs"
         android:layout_width="match_parent"
@@ -113,7 +133,7 @@
                 android:gravity="center_horizontal"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:text="Waiting for Start Point"
+                android:text="Waiting To Reach Start Point"
                 android:textAlignment="center"
                 android:textColor="@color/text" />
 
@@ -130,177 +150,283 @@
         android:backgroundTint="@color/background"
         android:orientation="vertical">
 
-        <!-- Layout for lane UI components -->
-        <LinearLayout
-            android:id="@+id/lanes_ll"
-            android:layout_width="350dp"
+        <FrameLayout
+            android:id="@+id/lanes_ll_background"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone"
-            android:orientation="horizontal">
-
-            <!-- Lane 1 -->
+            android:visibility="visible"
+            android:layout_marginHorizontal="3dp"
+            android:background="@color/colorAccentGreyTransparent">
             <LinearLayout
-                android:id="@+id/lane1_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical">
+                android:id="@+id/lanes_ll"
+                android:layout_width="350dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/lane1btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.0085"-->
+                <!--                android:layout_marginStart="5dp"-->
+                <!--                android:background="#FFFF00">-->
+                <!--            </FrameLayout>-->
+
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.02"-->
+                <!--                android:background="#444444">-->
+                <!--            </FrameLayout>-->
+
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.0085"-->
+                <!--                android:background="#FFFF00">-->
+                <!--            </FrameLayout>-->
+
+                <ImageView
+                    android:id="@+id/lane_line_0_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.01"
+                    android:src="@drawable/ic_yellow_lane_line">
+                </ImageView>
 
-            <!-- Lane 2 -->
-            <LinearLayout
-                android:id="@+id/lane2_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical">
+                <!-- Lane 1 -->
+                <LinearLayout
+                    android:id="@+id/lane1_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/lane2btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                    <ImageButton
+                        android:id="@+id/lane1btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_1_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
+                </ImageView>
 
-            <!-- Lane 3 -->
-            <LinearLayout
-                android:id="@+id/lane3_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical">
+<!--                <FrameLayout>-->
+<!--                </FrameLayout>-->
 
-                <ImageButton
-                    android:id="@+id/lane3btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 2 -->
+                <LinearLayout
+                    android:id="@+id/lane2_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane2btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_2_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-            <!-- Lane 4 -->
-            <LinearLayout
-                android:id="@+id/lane4_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical">
+                </ImageView>
 
-                <ImageButton
-                    android:id="@+id/lane4btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 3 -->
+                <LinearLayout
+                    android:id="@+id/lane3_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane3btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_3_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-            <!-- Lane 5 -->
-            <LinearLayout
-                android:id="@+id/lane5_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical" >
+                </ImageView>
 
-                <ImageButton
-                    android:id="@+id/lane5btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 4 -->
+                <LinearLayout
+                    android:id="@+id/lane4_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane4btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_4_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-            <!-- Lane 6 -->
-            <LinearLayout
-                android:id="@+id/lane6_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical" >
+                </ImageView>
 
-                <ImageButton
-                    android:id="@+id/lane6btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 5 -->
+                <LinearLayout
+                    android:id="@+id/lane5_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane5btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_5_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-            <!-- Lane 7 -->
-            <LinearLayout
-                android:id="@+id/lane7_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical" >
+                </ImageView>
 
-                <ImageButton
-                    android:id="@+id/lane7btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 6 -->
+                <LinearLayout
+                    android:id="@+id/lane6_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane6btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_6_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-            <!-- Lane 8 -->
-            <LinearLayout
-                android:id="@+id/lane8_ll"
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.125"
-                android:orientation="vertical" >
+                </ImageView>
 
-                <ImageButton
-                    android:id="@+id/lane8btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="#00FFFFFF"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                <!-- Lane 7 -->
+                <LinearLayout
+                    android:id="@+id/lane7_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane7btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_7_8"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_road_nolines"
-                    tools:src="@drawable/ic_road_nolines" />
-            </LinearLayout>
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
 
-        </LinearLayout>
+                </ImageView>
+
+                <!-- Lane 8 -->
+                <LinearLayout
+                    android:id="@+id/lane8_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane8btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Layout for lane UI components -->
+
 
         <LinearLayout
             android:id="@+id/manual_buttons_ll"
