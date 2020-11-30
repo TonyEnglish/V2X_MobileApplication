@@ -76,6 +76,17 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         R.id.lane7_ll,
         R.id.lane8_ll
     )
+    val laneLines = listOf(
+        0,
+        R.id.lane_line_1_2,
+        R.id.lane_line_2_3,
+        R.id.lane_line_3_4,
+        R.id.lane_line_4_5,
+        R.id.lane_line_5_6,
+        R.id.lane_line_6_7,
+        R.id.lane_line_7_8,
+        0
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -127,6 +138,16 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<Button>(R.id.centerButton).setOnClickListener {
             viewModel.updatingMap.value = true
+            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+        }
+
+        view.findViewById<ImageButton>(R.id.zoomInButton).setOnClickListener{
+            viewModel.zoomIn()
+            viewModel.updateMapLocation(viewModel.prevLocation, mMap)
+        }
+
+        view.findViewById<ImageButton>(R.id.zoomOutButton).setOnClickListener{
+            viewModel.zoomOut()
             viewModel.updateMapLocation(viewModel.prevLocation, mMap)
         }
     }
@@ -200,7 +221,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 if (!laneStatLocal[lane]) {
                     //change open image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_nolines))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_straight_arrow))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.colorAccent
                     )
@@ -208,7 +229,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
                 else {
                     //change close image
                     val button = requireView().findViewById<ImageButton>(buttons[lane])
-                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_road_closed))
+                    button.setImageDrawable(resources.getDrawable(R.drawable.ic_straight_arrow_closed))
                     button.backgroundTintList = resources.getColorStateList(
                         R.color.primary_active
                     )
@@ -484,7 +505,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
 
 
-        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_road_driven_2))
+        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_car))
 
 
 
@@ -498,6 +519,9 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
             for (i in (min(numLanes, 8)+1)..8) {
                 val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
                 laneLayout.visibility = View.GONE
+
+
+                requireView().findViewById<FrameLayout>(laneLines[i-1]).visibility = View.GONE
 
                 //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
                 //laneLine.visibility = View.INVISIBLE

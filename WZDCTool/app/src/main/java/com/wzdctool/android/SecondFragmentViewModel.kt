@@ -176,6 +176,14 @@ class SecondFragmentViewModel : ViewModel() {
         }
     }
 
+    fun zoomIn() {
+        zoom++
+    }
+
+    fun zoomOut() {
+        zoom--
+    }
+
     fun updateMapLocation(location: Location?, mMap: GoogleMap?) {
         if (mMap == null || location == null)
             return
