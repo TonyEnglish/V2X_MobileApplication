@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.wzdctool.android.FirstFragment"
+        android:name="com.wzdctool.android.ConfigurationFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/configuration_fragment">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
@@ -19,9 +19,9 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.wzdctool.android.SecondFragment"
+        android:name="com.wzdctool.android.DataCollectionFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/data_collection_fragment">
         <action
             android:id="@+id/action_SecondFragment_to_MainFragment"
             app:destination="@id/MainFragment" />

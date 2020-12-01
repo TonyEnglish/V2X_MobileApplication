@@ -15,7 +15,7 @@ import com.wzdctool.android.repos.DataClassesRepository.dataCollectionSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FirstFragmentViewModel : ViewModel() {
+class ConfigurationFragmentViewModel : ViewModel() {
 
     var automaticDetection = true
 

@@ -4,20 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FirstFragment"
+    android:orientation="vertical"
+    tools:context=".ConfigurationFragment"
     android:background="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/toolbar_stuffs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
             android:background="?attr/colorPrimary"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -29,8 +30,8 @@
                     android:id="@+id/activeConfigTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Active Config: NONE"
                     android:singleLine="true"
+                    android:text="Active Config: NONE"
                     android:textSize="20sp" />
             </HorizontalScrollView>
 
@@ -38,9 +39,9 @@
                 android:id="@+id/gps_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:layout_marginTop="5dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/locationSourceOff"
@@ -55,11 +56,11 @@
                     android:id="@+id/gpsSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:layout_marginBottom="0dp"
                     android:checked="false"
                     app:layout_anchorGravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
 
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
 
@@ -81,27 +82,27 @@
                 android:id="@+id/checkbox_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/checkBox2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WZDx"
+                    android:layout_marginRight="30dp"
                     android:checked="true"
-                    android:textSize="20sp"
                     android:enabled="false"
-                    android:layout_marginRight="30dp"/>
+                    android:text="WZDx"
+                    android:textSize="20sp" />
 
                 <CheckBox
                     android:id="@+id/checkBox3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RSM"
                     android:checked="true"
-                    android:textSize="20sp"
-                    android:enabled="false" />
+                    android:enabled="false"
+                    android:text="RSM"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
@@ -111,12 +112,12 @@
             android:id="@+id/help_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_baseline_help_24"
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/guideline6" />
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_baseline_help_24"
+            app:layout_constraintBottom_toTopOf="@+id/titleGuideline"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/textview_first"
@@ -130,10 +131,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline6" />
+            app:layout_constraintTop_toTopOf="@+id/titleGuideline" />
 
         <Button
-            android:id="@+id/button_first"
+            android:id="@+id/startDataCollectionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
@@ -145,10 +146,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+            app:layout_constraintTop_toBottomOf="@+id/configSpinner" />
 
         <Spinner
-            android:id="@+id/spinner2"
+            android:id="@+id/configSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -156,110 +157,119 @@
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="30dp"
-            android:entries="@array/config_files"
-            tools:listitem="@layout/support_simple_spinner_dropdown_item"
             android:backgroundTint="@color/colorAccent"
+            android:entries="@array/config_files"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline4"/>
+            app:layout_constraintTop_toTopOf="@+id/configSpinnerGuideline"
+            tools:listitem="@layout/support_simple_spinner_dropdown_item" />
 
         <!--        <LinearLayout-->
-<!--            android:id="@+id/spinner_ll"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/guideline4">-->
+        <!--            android:id="@+id/spinner_ll"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="@+id/guideline4">-->
 
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/refreshButton"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/ic_refresh_small"-->
-<!--                android:backgroundTint="@color/colorAccent"/>-->
+        <!--            <ImageButton-->
+        <!--                android:id="@+id/refreshButton"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:src="@drawable/ic_refresh_small"-->
+        <!--                android:backgroundTint="@color/colorAccent"/>-->
 
-<!--            <Spinner-->
-<!--                android:id="@+id/spinner2"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="5dp"-->
-<!--                android:layout_marginLeft="5dp"-->
-<!--                android:layout_marginEnd="5dp"-->
-<!--                android:layout_marginRight="5dp"-->
-<!--                android:layout_marginBottom="30dp"-->
-<!--                android:entries="@array/config_files"-->
-<!--                tools:listitem="@layout/support_simple_spinner_dropdown_item"-->
-<!--                android:backgroundTint="@color/colorAccent"/>-->
-<!--        </LinearLayout>-->
+        <!--            <Spinner-->
+        <!--                android:id="@+id/spinner2"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="5dp"-->
+        <!--                android:layout_marginLeft="5dp"-->
+        <!--                android:layout_marginEnd="5dp"-->
+        <!--                android:layout_marginRight="5dp"-->
+        <!--                android:layout_marginBottom="30dp"-->
+        <!--                android:entries="@array/config_files"-->
+        <!--                tools:listitem="@layout/support_simple_spinner_dropdown_item"-->
+        <!--                android:backgroundTint="@color/colorAccent"/>-->
+        <!--        </LinearLayout>-->
 
 
-
-<!--        <Button-->
-<!--            android:id="@+id/import_config"-->
-<!--            android:layout_width="200dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:backgroundTint="@color/colorAccent"-->
-<!--            android:drawableLeft="@drawable/ic_baseline_arrow_downward_24"-->
-<!--            android:text="Import Config"-->
-<!--            android:textColor="@color/text"-->
-<!--            android:textSize="18sp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/guideline4" />-->
+        <!--        <Button-->
+        <!--            android:id="@+id/import_config"-->
+        <!--            android:layout_width="200dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:backgroundTint="@color/colorAccent"-->
+        <!--            android:drawableLeft="@drawable/ic_baseline_arrow_downward_24"-->
+        <!--            android:text="Import Config"-->
+        <!--            android:textColor="@color/text"-->
+        <!--            android:textSize="18sp"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="@+id/guideline4" />-->
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline4"
+            android:id="@+id/configSpinnerGuideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_begin="325dp" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline6"
+            android:id="@+id/titleGuideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_begin="120dp" />
 
+        <TextView
+            android:id="@+id/detectionModeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Start and End of Data Collection"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch1"
+            android:id="@+id/collectionModeSwitchGuideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:checked="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
         <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
+            android:id="@+id/manualDetectionModeTextView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="48dp"
+            android:layout_marginEnd="30dp"
             android:layout_marginRight="48dp"
             android:gravity="center"
-            android:text="Manual\nDetection"
+            android:text="Manual"
             android:textColor="@color/text"
             android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/switch1"
+            app:layout_constraintEnd_toStartOf="@+id/collectionModeSwitchGuideline"
             app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
         <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
+            android:id="@+id/automaticDetectionModeTextView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="42dp"
-            android:layout_marginLeft="42dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="Automatic\nDetection"
+            android:text="Automatic"
             android:textColor="@color/text"
             android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/switch1"
+            app:layout_constraintStart_toEndOf="@+id/collectionModeSwitchGuideline"
             app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
         <androidx.constraintlayout.widget.Guideline
@@ -267,6 +277,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="197dp" />
+            app:layout_constraintGuide_begin="240dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

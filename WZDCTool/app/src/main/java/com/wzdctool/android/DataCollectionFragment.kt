@@ -15,7 +15,6 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -23,14 +22,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.wzdctool.android.dataclasses.MarkerObj
-import com.wzdctool.android.dataclasses.SecondFragmentUIObj
+import com.wzdctool.android.dataclasses.DataCollectionUIObj
 import com.wzdctool.android.dataclasses.gps_status
 import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
-import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository.dataFileSubject
 import com.wzdctool.android.repos.DataFileRepository.markerSubject
@@ -41,15 +39,15 @@ import kotlin.math.min
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment(), OnMapReadyCallback {
+class DataCollectionFragment : Fragment(), OnMapReadyCallback {
 
 //    companion object {
 //        fun newInstance() = test_fragment()
 //    }
 
-    private lateinit var viewModel: SecondFragmentViewModel
-    private lateinit var uiObjObserver: Observer<SecondFragmentUIObj>
-    private lateinit var localUIObj: SecondFragmentUIObj
+    private lateinit var viewModel: DataCollectionFragmentViewModel
+    private lateinit var uiObjObserver: Observer<DataCollectionUIObj>
+    private lateinit var localUIObj: DataCollectionUIObj
     private var mMap: GoogleMap? = null
     private lateinit var mMapView: MapView
 
@@ -94,7 +92,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_second, container, false)
+        return inflater.inflate(R.layout.data_collection_fragment, container, false)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -434,7 +432,7 @@ class SecondFragment : Fragment(), OnMapReadyCallback {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(DataCollectionFragmentViewModel::class.java)
 
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
         ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)

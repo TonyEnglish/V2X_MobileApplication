@@ -18,10 +18,9 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import com.wzdctool.android.dataclasses.azureInfoObj
+import com.wzdctool.android.dataclasses.AzureInfoObj
 import com.wzdctool.android.dataclasses.gps_status
 import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.handlers.UsbHandler
@@ -37,14 +36,12 @@ import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
 import com.wzdctool.android.repos.DataFileRepository
-import com.wzdctool.android.repos.DataFileRepository.uploadAllDataFiles
-import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
-import com.wzdctool.android.repos.azureInfoRepository.updateConnectionStringFromObj
+import com.wzdctool.android.repos.AzureInfoRepository.currentAzureInfoSubject
+import com.wzdctool.android.repos.AzureInfoRepository.updateConnectionStringFromObj
 import com.wzdctool.android.services.LocationService
 import com.wzdctool.android.services.UsbService
 import com.wzdctool.android.services.UsbService.UsbBinder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import rx.Subscription
 
@@ -284,7 +281,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             if (accountName != null && accountKey != null) {
-                currentAzureInfoSubject.onNext(azureInfoObj(accountName, accountKey))
+                currentAzureInfoSubject.onNext(AzureInfoObj(accountName, accountKey))
             }
 
             val automaticUpload = sharedPref.getBoolean(

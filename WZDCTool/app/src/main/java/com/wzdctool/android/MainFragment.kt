@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.internetStatusSubject
 import com.wzdctool.android.repos.DataFileRepository
-import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
+import com.wzdctool.android.repos.AzureInfoRepository.currentConnectionStringSubject
 import rx.Subscription
 
 

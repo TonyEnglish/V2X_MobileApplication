@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.navigation.fragment.findNavController
 import com.wzdctool.android.R
 
 class InitializationFragment : Fragment() {
@@ -20,7 +18,7 @@ class InitializationFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_first, container, false)
+        return inflater.inflate(R.layout.configuration_fragment, container, false)
         // return inflater.inflate(R.layout.initialization_fragment, container, false)
     }
 

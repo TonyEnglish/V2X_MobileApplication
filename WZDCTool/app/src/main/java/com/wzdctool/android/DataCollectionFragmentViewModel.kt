@@ -5,11 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.wzdctool.android.dataclasses.*
 import com.wzdctool.android.repos.DataClassesRepository
@@ -21,10 +19,10 @@ import com.wzdctool.android.repos.DataFileRepository.markerSubject
 import kotlin.math.*
 
 
-class SecondFragmentViewModel : ViewModel() {
+class DataCollectionFragmentViewModel : ViewModel() {
     // Required parameters
     lateinit var localDataObj: DataCollectionObj
-    lateinit var localUIObj: SecondFragmentUIObj
+    lateinit var localUIObj: DataCollectionUIObj
 
     private var prevDistance = 0.0
     var automaticDetection = MutableLiveData<Boolean>()
@@ -52,8 +50,8 @@ class SecondFragmentViewModel : ViewModel() {
         automaticDetectionSubject.onNext(localUIObj.automatic_detection)
     }
 
-    private fun mapDataToUIObj(data_obj: DataCollectionObj): SecondFragmentUIObj {
-        val ui_obj = SecondFragmentUIObj(
+    private fun mapDataToUIObj(data_obj: DataCollectionObj): DataCollectionUIObj {
+        val ui_obj = DataCollectionUIObj(
             num_lanes = data_obj.num_lanes,
             laneStat = laneStat.value!!,
             wpStat = wpStat,

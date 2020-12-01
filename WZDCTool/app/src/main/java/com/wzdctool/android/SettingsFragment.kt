@@ -11,11 +11,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
-import com.wzdctool.android.dataclasses.azureInfoObj
+import com.wzdctool.android.dataclasses.AzureInfoObj
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
-import com.wzdctool.android.repos.azureInfoRepository
-import com.wzdctool.android.repos.azureInfoRepository.currentAzureInfoSubject
+import com.wzdctool.android.repos.AzureInfoRepository.currentAzureInfoSubject
 import rx.Subscription
 
 class SettingsFragment : Fragment() {
@@ -63,7 +62,7 @@ class SettingsFragment : Fragment() {
     private fun processAzureSettings(): Boolean {
         val account_name: String = requireView().findViewById<EditText>(R.id.editTextAccountName).text.toString()
         val account_key: String = requireView().findViewById<EditText>(R.id.editTextAccountKey).text.toString()
-        val azureInfo = azureInfoObj(account_name, account_key)
+        val azureInfo = AzureInfoObj(account_name, account_key)
 
         val valid = viewModel.verifyAzureInfo(azureInfo)
         return if (valid) {

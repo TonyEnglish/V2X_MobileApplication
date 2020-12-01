@@ -1,6 +1,5 @@
 package com.wzdctool.android
 
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,24 +18,24 @@ import com.wzdctool.android.dataclasses.gps_type
 import com.wzdctool.android.repos.ConfigurationRepository
 import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
-import com.wzdctool.android.repos.ConfigurationRepository.configListSubject
 import com.wzdctool.android.repos.DataClassesRepository.activeLocationSourceSubject
-import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSourcesSubject
 import com.wzdctool.android.repos.DataClassesRepository.rsmStatus
 import rx.Subscription
 
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ *  Configure settings before data collection.
+ *
+ *  Establish GPS device connection, verify messages to be generated,
+ *      change the start and end data collection mode, select local configuration files to import,
+ *      start data collection
+ *
+ *
  */
-class FirstFragment : Fragment() {
+class ConfigurationFragment : Fragment() {
 
-//    companion object {
-//        fun newInstance() = test_fragment()
-//    }
-
-    private lateinit var viewModel: FirstFragmentViewModel
+    private lateinit var viewModel: ConfigurationFragmentViewModel
     private var isGpsValid = false
     private var isConfigValid = false
 
@@ -48,22 +46,23 @@ class FirstFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false)
+        return inflater.inflate(R.layout.configuration_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.button_first).setOnClickListener {
+        view.findViewById<Button>(R.id.startDataCollectionButton).setOnClickListener {
             viewModel.updateDataCollectionObj()
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
+        // Help button (small question mark in top right)
         view.findViewById<ImageButton>(R.id.help_button).setOnClickListener() {
             findNavController().navigate(R.id.helpFragment)
         }
 
-        view.findViewById<Spinner>(R.id.spinner2).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        view.findViewById<Spinner>(R.id.configSpinner).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 println("Nothing Selected")
             }
@@ -71,7 +70,7 @@ class FirstFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 println("Item Selected: $position")
                 isConfigValid = false
-                requireView().findViewById<Button>(R.id.button_first).isEnabled = isGpsValid && isConfigValid
+                requireView().findViewById<Button>(R.id.startDataCollectionButton).isEnabled = isGpsValid && isConfigValid
 
                 val configName: String = parent?.getItemAtPosition(position).toString()
                 val success: Boolean = ConfigurationRepository.activateConfig(configName)
@@ -80,7 +79,7 @@ class FirstFragment : Fragment() {
         }
 
         println("Printing Before")
-        view.findViewById<SwitchCompat>(R.id.switch1).setOnCheckedChangeListener { _, isChecked ->
+        view.findViewById<SwitchCompat>(R.id.collectionModeSwitchGuideline).setOnCheckedChangeListener { _, isChecked ->
             println("isChecked: $isChecked")
             viewModel.automaticDetection = isChecked
             // do something, the isChecked will be
@@ -159,7 +158,7 @@ class FirstFragment : Fragment() {
             } else {
                 isGpsValid = false
             }
-            requireView().findViewById<Button>(R.id.button_first).isEnabled =
+            requireView().findViewById<Button>(R.id.startDataCollectionButton).isEnabled =
                 isGpsValid && isConfigValid
         })
 
@@ -190,7 +189,7 @@ class FirstFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FirstFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ConfigurationFragmentViewModel::class.java)
 
         refreshSpinner()
 //        val spinnerObserver = Observer<List<String>> {
@@ -225,7 +224,7 @@ class FirstFragment : Fragment() {
             println("Configuration object Updated")
             if (view != null) {
                 isConfigValid = true
-                requireView().findViewById<Button>(R.id.button_first).isEnabled = isGpsValid && isConfigValid
+                requireView().findViewById<Button>(R.id.startDataCollectionButton).isEnabled = isGpsValid && isConfigValid
             }
             viewModel.updateDataCollectionObj()
         }
@@ -238,7 +237,7 @@ class FirstFragment : Fragment() {
     }
 
     private fun refreshSpinner() {
-        val spinner = requireView().findViewById(R.id.spinner2) as Spinner
+        val spinner = requireView().findViewById(R.id.configSpinner) as Spinner
         val list: Array<String> = resources.getStringArray(R.array.config_files)
         //
         val configList = ConfigurationRepository.getLocalConfigList()

@@ -1,7 +1,5 @@
 package com.wzdctool.android.repos
 
-import android.R.attr.path
-import android.system.ErrnoException
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -14,7 +12,7 @@ import com.wzdctool.android.Constants
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
-import com.wzdctool.android.repos.azureInfoRepository.currentConnectionStringSubject
+import com.wzdctool.android.repos.AzureInfoRepository.currentConnectionStringSubject
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
