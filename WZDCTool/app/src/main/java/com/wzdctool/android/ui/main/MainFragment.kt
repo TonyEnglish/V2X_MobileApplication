@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,11 +12,19 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.R
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.internetStatusSubject
 import com.wzdctool.android.repos.DataFileRepository
 import com.wzdctool.android.repos.AzureInfoRepository.currentConnectionStringSubject
 import rx.Subscription
+
+
+/**
+ *  Main Page
+ *
+ *
+ */
 
 
 class MainFragment : Fragment() {
@@ -86,9 +94,10 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel::class.java)
         // TODO: Use the ViewModel
 
-        if (DataClassesRepository.automaticUploadSubject.value) {
-            viewModel.uploadDataFiles()
-        }
+        // No longer automatically uploading data files
+//        if (DataClassesRepository.automaticUploadSubject.value) {
+//            viewModel.uploadDataFiles()
+//        }
     }
 
     private fun addSubscriptions() {

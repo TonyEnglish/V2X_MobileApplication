@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.configuration
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.ConfigurationObj
 import com.wzdctool.android.dataclasses.gps_status
 import com.wzdctool.android.dataclasses.gps_type
@@ -64,11 +65,9 @@ class ConfigurationFragment : Fragment() {
 
         view.findViewById<Spinner>(R.id.configSpinner).onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                println("Nothing Selected")
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                println("Item Selected: $position")
                 isConfigValid = false
                 requireView().findViewById<Button>(R.id.startDataCollectionButton).isEnabled = isGpsValid && isConfigValid
 
@@ -78,9 +77,8 @@ class ConfigurationFragment : Fragment() {
             }
         }
 
-        println("Printing Before")
+
         view.findViewById<SwitchCompat>(R.id.collectionModeSwitchGuideline).setOnCheckedChangeListener { _, isChecked ->
-            println("isChecked: $isChecked")
             viewModel.automaticDetection = isChecked
             // do something, the isChecked will be
             // true if the switch is in the On position
@@ -108,6 +106,7 @@ class ConfigurationFragment : Fragment() {
     }
 
     private fun addSubscriptions() {
+        // triggered by gps location sources on status change
         subscriptions.add(locationSourcesSubject.subscribe {
             // Internal GPS
             if (it.internal == gps_status.valid) {
@@ -147,6 +146,7 @@ class ConfigurationFragment : Fragment() {
             gps_switch.isEnabled = it.internal == gps_status.valid && it.usb == gps_status.valid
         })
 
+        // triggered by change in active location source
         subscriptions.add(activeLocationSourceSubject.subscribe {
             val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
             if (it == gps_type.internal) {
@@ -162,10 +162,12 @@ class ConfigurationFragment : Fragment() {
                 isGpsValid && isConfigValid
         })
 
+        // triggered by main activity RSM status change
         subscriptions.add(rsmStatus.subscribe {
             requireView().findViewById<CheckBox>(R.id.checkBox3).isChecked = it
         })
 
+        // triggered by configuration file import
         val configObserver = Observer<String> {
             requireView().findViewById<TextView>(R.id.activeConfigTextView).text = "Active Config: $it"
         }
@@ -192,36 +194,9 @@ class ConfigurationFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ConfigurationFragmentViewModel::class.java)
 
         refreshSpinner()
-//        val spinnerObserver = Observer<List<String>> {
-//            println("Printing config file names")
-//            for (name in it) {
-//                println(name)
-//            }
-//            val spinner = requireView().findViewById(R.id.spinner2) as Spinner
-//            val list: Array<String> = resources.getStringArray(R.array.config_files)
-//            //
-//            val spinnerAdapter: ArrayAdapter<String> =
-//                ArrayAdapter<String>(
-//                    this.requireContext(), android.R.layout.simple_spinner_item, it
-//                )
-//            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            spinner.adapter = spinnerAdapter
-//            spinnerAdapter.notifyDataSetChanged()
-//
-//            // println("Setting to index of: config--${activeWZIDSubject.value}.json")
-//
-//            try {
-//                spinner.setSelection(configListSubject.value!!.indexOf("config--${activeWZIDSubject.value}.json"))
-//            }
-//            catch (e: Exception) {
-//                println(e)
-//            }
-//        }
-//        configListSubject.observe(viewLifecycleOwner, spinnerObserver)
 
-        // AzureDownloadConfigFile().execute()
+        // Observe active configuration object
         val configObserver = Observer<ConfigurationObj> {
-            println("Configuration object Updated")
             if (view != null) {
                 isConfigValid = true
                 requireView().findViewById<Button>(R.id.startDataCollectionButton).isEnabled = isGpsValid && isConfigValid
@@ -239,7 +214,7 @@ class ConfigurationFragment : Fragment() {
     private fun refreshSpinner() {
         val spinner = requireView().findViewById(R.id.configSpinner) as Spinner
         val list: Array<String> = resources.getStringArray(R.array.config_files)
-        //
+
         val configList = ConfigurationRepository.getLocalConfigList()
         if (configList.isNotEmpty()) {
             spinner.isEnabled = true

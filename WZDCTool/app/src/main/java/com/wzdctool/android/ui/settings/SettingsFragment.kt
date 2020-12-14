@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.settings
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -11,11 +11,19 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.AzureInfoObj
 import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
 import com.wzdctool.android.repos.AzureInfoRepository.currentAzureInfoSubject
 import rx.Subscription
+
+
+/**
+ *  Settings page
+ *
+ *
+ */
 
 class SettingsFragment : Fragment() {
 

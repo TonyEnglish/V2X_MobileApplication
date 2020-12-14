@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.visualization
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -11,15 +11,23 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.Constants
+import com.wzdctool.android.R
 import com.wzdctool.android.repos.ConfigurationRepository
+import com.wzdctool.android.repos.DataClassesRepository
 import com.wzdctool.android.repos.DataFileRepository
 import rx.Subscription
 
-class UploadFragment : Fragment() {
 
-    private lateinit var viewModel: UploadFragmentViewModel
+/**
+ *  Select data file to visualize/edit
+ *
+ *
+ */
 
-    private var adapter: ArrayAdapter<String?>? = null
+class EditingSelectionFragment : Fragment() {
+
+    private lateinit var viewModel: EditingSelectionFragmentViewModel
 
     private val subscriptions: MutableList<Subscription> = mutableListOf()
 
@@ -27,12 +35,13 @@ class UploadFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.upload_fragment, container, false)
+        return inflater.inflate(R.layout.editing_selection_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val list = requireView().findViewById<ListView>(R.id.list)
+        val configList = ConfigurationRepository.getLocalConfigList()
 
         view.findViewById<Button>(R.id.button).setOnClickListener {
             val selectedItems = mutableListOf<String>()
@@ -42,56 +51,49 @@ class UploadFragment : Fragment() {
                 println(list.getItemAtPosition(i).toString())
                 selectedItems.add(list.getItemAtPosition(i).toString())
             }
+            if (selectedItems.isNotEmpty()) {
+                println(selectedItems[0])
+//                if (hasConfig(selectedItems[0], configList)) {
+                    val fileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/${selectedItems[0]}"
+                    val visualizationObj = DataFileRepository.getVisualizationObj(fileName)
+                    DataClassesRepository.visualizationObj = visualizationObj
 
-            disableUI()
-            viewModel.uploadDataFiles(selectedItems)
-//            findNavController().navigate(R.id.action_uploadFragment_to_MainFragment)
-        }
-
-        view.findViewById<Button>(R.id.clearButton).setOnClickListener {
-            val list = view.findViewById<ListView>(R.id.list)
-            list.adapter = adapter
-        }
-
-        view.findViewById<Button>(R.id.fillButton).setOnClickListener {
-            val list = view.findViewById<ListView>(R.id.list)
-            list.adapter = adapter
-            for (i in 0 until list.count) {
-                list.setItemChecked(i, true)
+                    findNavController().navigate(R.id.action_editingSelectionFragment_to_editingFragment)
+//                }
+//                else {
+//                    toastNotificationSubject.onNext("No config found for selected file")
+//                }
             }
         }
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(UploadFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(EditingSelectionFragmentViewModel::class.java)
         // TODO: Use the ViewModel
 
         val fileList = DataFileRepository.getDataFilesList()
 
         val list = requireView().findViewById<ListView>(R.id.list)
-        val config_files = resources.getStringArray(R.array.config_files_download)
-        adapter = ArrayAdapter(
+        val adapter = ArrayAdapter(
             this.requireContext(),
-            android.R.layout.simple_list_item_multiple_choice, fileList
+            android.R.layout.simple_list_item_single_choice, fileList
         )
-        list.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+
+        list.choiceMode = ListView.CHOICE_MODE_SINGLE
         list.adapter = adapter
         adapter!!.notifyDataSetChanged()
+    }
 
-        for (i in 0 until list.count) {
-            list.setItemChecked(i, true)
+    fun hasConfig(dataFile: String, configFiles: List<String>): Boolean {
+        val wzID = dataFile.removePrefix("path-data--").removeSuffix(".csv").removeSuffix("--update-image")
+        for (configName in configFiles) {
+            if (configName.contains(wzID)) {
+                return true
+            }
         }
-
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
-            findNavController().navigate(it)
-        })
+        return false
     }
 
-    private fun disableUI() {
-        requireView().findViewById<Button>(R.id.clearButton).isEnabled = false
-        requireView().findViewById<Button>(R.id.fillButton).isEnabled = false
-        requireView().findViewById<ListView>(R.id.list).isEnabled = false
-        requireView().findViewById<Button>(R.id.button).isEnabled = false
-    }
 }

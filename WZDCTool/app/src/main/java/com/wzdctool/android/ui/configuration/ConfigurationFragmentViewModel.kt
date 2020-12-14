@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.configuration
 
 import android.os.Looper
 import android.widget.ArrayAdapter
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class ConfigurationFragmentViewModel : ViewModel() {
 
-    var automaticDetection = true
+    var automaticDetection = false
 
     fun updateConfigList() {
         viewModelScope.launch(Dispatchers.IO) {

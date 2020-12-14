@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.download
 
 import android.os.Bundle
 import android.util.SparseBooleanArray
@@ -10,9 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.wzdctool.android.R
 import com.wzdctool.android.repos.ConfigurationRepository
 import rx.Subscription
 import kotlin.math.roundToInt
+
+
+/**
+ *  Download configuration files
+ *
+ *
+ */
 
 
 class DownloadFragment : Fragment() {

@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.visualization
 
 import androidx.lifecycle.ViewModel
 

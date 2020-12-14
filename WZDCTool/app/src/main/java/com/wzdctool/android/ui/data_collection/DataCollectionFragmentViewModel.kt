@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.data_collection
 
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
@@ -37,7 +37,6 @@ class DataCollectionFragmentViewModel : ViewModel() {
     var zoom = -1
     var dataLog = MutableLiveData<Boolean>(false)
     var gotRP = MutableLiveData<Boolean>(false)
-    var navigationLiveData = MutableLiveData<Int>()
     var notificationText = MutableLiveData<String>()
     var laneStat = MutableLiveData<MutableList<Boolean>>(MutableList<Boolean>(8 + 1) { false })
 
@@ -97,6 +96,8 @@ class DataCollectionFragmentViewModel : ViewModel() {
         return Coordinate(location.latitude, location.longitude, location.altitude)
     }
 
+    // Automatic start/end mode: Automatically start and end data collection based on markers set
+    //     in config file
     fun checkLocation(location: Location) {
         println("Checking Location")
         if (!automaticDetection.value!!)
@@ -106,9 +107,9 @@ class DataCollectionFragmentViewModel : ViewModel() {
             if (!gotRP.value!!) {
                 val distance = distDeg(localUIObj.start_coord, currCoord)
                 if (prevDistance != 0.0 && prevDistance < distance) {
+                    // If just moved past start point:
                     toastNotificationSubject.onNext("Starting Data Collection")
                     markRefPt()
-//                    prevDistance = 0.0
                 }
                 else {
                     prevDistance = distance
@@ -117,6 +118,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
             else {
                 val distance = distDeg(localUIObj.end_coord, currCoord)
                 if (distance < 50) { //prevDistance != 0.0 && prevDistance < distance &&
+                    // If close enough to end marker:
                     stopDataCollection()
                 }
                 // prevDistance = distance
@@ -125,45 +127,55 @@ class DataCollectionFragmentViewModel : ViewModel() {
         else if (!dataLog.value!!) {
             val distance = distDeg(localUIObj.start_coord, currCoord)
             if (distance <= 50) {
+                // If close enough to start point:
                 prevDistance = distance
                 startDataCollection()
             }
         }
     }
 
+    // Initialize google map
+    // Add start + end markers
     fun initMap(mMap: GoogleMap, mMapView: MapView) {
-        val startMarkerPosition = LatLng(
-            localUIObj.start_coord.Lat,
-            localUIObj.start_coord.Lon
-        )
-        val endMarkerPosition = LatLng(
-            localUIObj.end_coord.Lat,
-            localUIObj.end_coord.Lon
-        )
-        val startMarker = MarkerOptions()
-            .position(startMarkerPosition)
-            .title("Start of Work Zone")
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        val endMarker = MarkerOptions()
-            .position(endMarkerPosition)
-            .title("End of Work Zone")
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        mMap.addMarker(startMarker)
-        mMap.addMarker(endMarker)
 
-        val centerLat = (startMarkerPosition.latitude + endMarkerPosition.latitude)/2
-        val centerLon = (startMarkerPosition.longitude + endMarkerPosition.longitude)/2
-        // val center = str(centerLat) + ',' + str(centerLon)
+        if (localUIObj.automatic_detection) {
+            // Automatic start + end point detection
+            val startMarkerPosition = LatLng(
+                localUIObj.start_coord.Lat,
+                localUIObj.start_coord.Lon
+            )
+            val endMarkerPosition = LatLng(
+                localUIObj.end_coord.Lat,
+                localUIObj.end_coord.Lon
+            )
+            val startMarker = MarkerOptions()
+                .position(startMarkerPosition)
+                .title("Start of Work Zone")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            val endMarker = MarkerOptions()
+                .position(endMarkerPosition)
+                .title("End of Work Zone")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            mMap.addMarker(startMarker)
+            mMap.addMarker(endMarker)
 
-        val north = max(startMarkerPosition.latitude, endMarkerPosition.latitude)
-        val south = min(startMarkerPosition.latitude, endMarkerPosition.latitude)
-        val east = max(startMarkerPosition.longitude, endMarkerPosition.longitude)
-        val west = min(startMarkerPosition.longitude, endMarkerPosition.longitude)
+            val centerLat = (startMarkerPosition.latitude + endMarkerPosition.latitude)/2
+            val centerLon = (startMarkerPosition.longitude + endMarkerPosition.longitude)/2
+            // val center = str(centerLat) + ',' + str(centerLon)
 
-        val pixelWidth = mMapView.width
-        val pixelHeight = mMapView.height
+            val north = max(startMarkerPosition.latitude, endMarkerPosition.latitude)
+            val south = min(startMarkerPosition.latitude, endMarkerPosition.latitude)
+            val east = max(startMarkerPosition.longitude, endMarkerPosition.longitude)
+            val west = min(startMarkerPosition.longitude, endMarkerPosition.longitude)
 
-        zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
+            val pixelWidth = mMapView.width
+            val pixelHeight = mMapView.height
+
+            zoom = calcZoomLevel(north, south, east, west, pixelWidth, pixelHeight)
+        }
+        else {
+            zoom = 10
+        }
 
         mMap.setOnCameraMoveStartedListener {
             if (it == 1) {
@@ -174,6 +186,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
         }
     }
 
+    // update local variable with zoom level of map
     fun setCurrentZoom(mMap: GoogleMap?) {
         zoom = mMap!!.cameraPosition.zoom.toInt()
     }
@@ -186,6 +199,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
         zoom--
     }
 
+    // Update map camera location and zoom
     fun updateMapLocation(location: Location?, mMap: GoogleMap?) {
         if (mMap == null || location == null)
             return
@@ -198,6 +212,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
         prevLocation = location
     }
 
+    // Dynamically calculate zoom level to fit bounds
     fun calcZoomLevel(
         north: Double,
         south: Double,
@@ -234,15 +249,17 @@ class DataCollectionFragmentViewModel : ViewModel() {
                         / ln(2.0)
                 ).roundToInt() - 3
 
-        return Math.max(Math.min(Math.min(zoomHoriz, zoomVert), ZOOM_MAX), 0)
+        return zoomHoriz.coerceAtMost(zoomVert).coerceAtMost(ZOOM_MAX).coerceAtLeast(0)
     }
 
+    // Get distance between points (Locations in radians)
     private fun dist(p1: Coordinate, p2: Coordinate): Double {
         val R = 6371000
         val avgLat = (p1.Lat + p2.Lat) / 2
         return R * sqrt((p1.Lat - p2.Lat).pow(2) + cos(avgLat).pow(2) * (p1.Lon - p2.Lon).pow(2))
     }
 
+    // Get distance between points (Locations in degrees)
     private fun distDeg(p1: Coordinate, p2: Coordinate): Double {
         val R = 6371000
         val p = PI/180
@@ -254,6 +271,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
         )
     }
 
+    // Find closest point from point on line
     // TODO: Determine if need lon=lon*cos(lat)
     private fun dist_to_line(v: Coordinate, w: Coordinate, p: Coordinate): Double {
         val l = dist(v, w).pow(2.0)
@@ -262,10 +280,12 @@ class DataCollectionFragmentViewModel : ViewModel() {
         return dist(p, pp)
     }
 
+    // Dot product
     private fun dot(v: Coordinate, w: Coordinate): Double {
         return v.Lat * w.Lat + v.Lon * w.Lon
     }
 
+    // Get difference between two coordinates
     private fun dif(v: Coordinate, w: Coordinate): Coordinate {
         return if (v.Elev != null && w.Elev != null )
             Coordinate(v.Lon - w.Lon, v.Lon - w.Lon, v.Elev - w.Elev)
@@ -273,6 +293,7 @@ class DataCollectionFragmentViewModel : ViewModel() {
             Coordinate(v.Lon - w.Lon, v.Lon - w.Lon, null)
     }
 
+    // Lane closure toggled
     fun laneClicked(lane: Int) {
         val currLaneStat: MutableList<Boolean> = laneStat.value!!
         if (currLaneStat[lane]) {
@@ -291,30 +312,8 @@ class DataCollectionFragmentViewModel : ViewModel() {
         }
     }
 
-    fun uploadDataFile(fileName: String) {
-//        println("UploadDataFile")
-//        dataFileName =
-//            "path-data--${ConfigurationRepository.activeWZIDSubject.value}.csv"
-//        val uploadFileName =
-//            if (automaticDetection.value!!) {
-//                dataFileName
-//            }
-//            else {
-//                dataFileName.replace(".csv", "--update-image.csv")
-//            }
-//
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val output = DataFileRepository.uploadPathDataFile(
-//                fileName,
-//                uploadFileName
-//            )
-//            println(output)
-//            notificationSubject.onNext("Path data file uploaded")
-//        }
-//        navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
-//        val testFileName = "${Constants.PENDING_UPLOAD_DIRECTORY}/path-data--sample-work-zone--white-rock-cir--update-image.csv"
+    fun initVisualizer(fileName: String) {
         val visualizationObj = DataFileRepository.getVisualizationObj(fileName)
         DataClassesRepository.visualizationObj = visualizationObj
-        navigationLiveData.value = R.id.action_SecondFragment_to_editingFragment2
     }
 }

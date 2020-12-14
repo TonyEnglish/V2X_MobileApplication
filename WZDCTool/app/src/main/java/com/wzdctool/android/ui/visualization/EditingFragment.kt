@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.visualization
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,18 +8,24 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.Marker
+import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.Title
 import com.wzdctool.android.dataclasses.parseTitleString
 import com.wzdctool.android.repos.DataClassesRepository
+
+
+/**
+ *  Visualize and edit mapped work zone
+ *
+ *
+ */
 
 
 class EditingFragment : Fragment(), OnMapReadyCallback {

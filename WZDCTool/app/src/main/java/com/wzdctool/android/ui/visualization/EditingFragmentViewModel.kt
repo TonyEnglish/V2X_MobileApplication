@@ -1,20 +1,17 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.visualization
 
 import android.location.Location
-import android.view.View
-import android.widget.FrameLayout
-import android.widget.RelativeLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.CSVMarkerObj
 import com.wzdctool.android.dataclasses.VisualizationObj
 import com.wzdctool.android.dataclasses.getTitleString
@@ -22,7 +19,6 @@ import com.wzdctool.android.dataclasses.parseTitleString
 import com.wzdctool.android.repos.DataFileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Math.max
 
 
 class EditingFragmentViewModel : ViewModel() {

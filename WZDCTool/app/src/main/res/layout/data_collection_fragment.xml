@@ -5,7 +5,7 @@
     android:id="@+id/fragment2_rl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DataCollectionFragment">
+    tools:context=".ui.data_collection.DataCollectionFragment">
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"

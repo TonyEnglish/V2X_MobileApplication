@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 
-
 class SplashScreenActivity : AppCompatActivity() {
     private val SPLASH_TIME_OUT = 2000L
 

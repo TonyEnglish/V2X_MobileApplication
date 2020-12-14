@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 class MainFragmentViewModel : ViewModel() {
     // TODO: Implement the ViewModel
 
+    // UNUSED
+    // Asynchronously upload data files.
     fun uploadDataFiles() {
         viewModelScope.launch(Dispatchers.IO) {
             if (DataClassesRepository.isInternetAvailable()) {

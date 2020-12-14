@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.wzdctool.android.ConfigurationFragment"
+        android:name="com.wzdctool.android.ui.configuration.ConfigurationFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/configuration_fragment">
 
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.wzdctool.android.DataCollectionFragment"
+        android:name="com.wzdctool.android.ui.data_collection.DataCollectionFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/data_collection_fragment">
         <action
@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="com.wzdctool.android.SettingsFragment"
+        android:name="com.wzdctool.android.ui.settings.SettingsFragment"
         android:label="Settings_fragment"
         tools:layout="@layout/settings_fragment">
         <action
@@ -47,7 +47,7 @@
     </fragment>
     <fragment
         android:id="@+id/MainFragment"
-        android:name="com.wzdctool.android.MainFragment"
+        android:name="com.wzdctool.android.ui.main.MainFragment"
         android:label="Main_fragment"
         tools:layout="@layout/main_fragment">
         <action
@@ -72,7 +72,7 @@
     </fragment>
     <fragment
         android:id="@+id/downloadFragment"
-        android:name="com.wzdctool.android.DownloadFragment"
+        android:name="com.wzdctool.android.ui.download.DownloadFragment"
         android:label="download_fragment"
         tools:layout="@layout/download_fragment" >
         <action
@@ -81,7 +81,7 @@
     </fragment>
     <fragment
         android:id="@+id/uploadFragment"
-        android:name="com.wzdctool.android.UploadFragment"
+        android:name="com.wzdctool.android.ui.upload.UploadFragment"
         android:label="upload_fragment"
         tools:layout="@layout/upload_fragment" >
         <action
@@ -90,7 +90,7 @@
     </fragment>
     <fragment
         android:id="@+id/helpFragment"
-        android:name="com.wzdctool.android.HelpFragment"
+        android:name="com.wzdctool.android.ui.help.HelpFragment"
         android:label="help_fragment"
         tools:layout="@layout/help_fragment" >
         <action
@@ -101,7 +101,7 @@
     </fragment>
     <fragment
         android:id="@+id/editingFragment"
-        android:name="com.wzdctool.android.EditingFragment"
+        android:name="com.wzdctool.android.ui.visualization.EditingFragment"
         android:label="editing_fragment"
         tools:layout="@layout/editing_fragment" >
         <action
@@ -110,7 +110,7 @@
     </fragment>
     <fragment
         android:id="@+id/editingSelectionFragment"
-        android:name="com.wzdctool.android.EditingSelectionFragment"
+        android:name="com.wzdctool.android.ui.visualization.EditingSelectionFragment"
         android:label="editing_selection_fragment"
         tools:layout="@layout/editing_selection_fragment" >
         <action

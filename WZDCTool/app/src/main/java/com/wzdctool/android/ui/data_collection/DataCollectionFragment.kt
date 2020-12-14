@@ -1,4 +1,4 @@
-package com.wzdctool.android
+package com.wzdctool.android.ui.data_collection
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.MarkerObj
 import com.wzdctool.android.dataclasses.DataCollectionUIObj
 import com.wzdctool.android.dataclasses.gps_status
@@ -37,7 +38,9 @@ import kotlin.math.min
 
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ *  Data Collection
+ *
+ *
  */
 class DataCollectionFragment : Fragment(), OnMapReadyCallback {
 
@@ -222,7 +225,9 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
         requireView().findViewById<ImageButton>(R.id.wp).isEnabled = true
         requireView().findViewById<ImageButton>(R.id.wp).visibility = View.VISIBLE
 
-        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(R.color.colorAccentTransparent))
+        requireView().findViewById<FrameLayout>(R.id.lanes_ll_background).setBackgroundColor(resources.getColor(
+            R.color.colorAccentTransparent
+        ))
 //        requireView().findViewById<LinearLayout>(R.id.lanes_ll).visibility = View.VISIBLE
     }
 
@@ -313,14 +318,19 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun addSubscriptions() {
+        // Triggered by DataFileRepo when data file is complete
         subscriptions.add(dataFileSubject.subscribe {
-            viewModel.uploadDataFile(it)
+            viewModel.initVisualizer(it)
+            findNavController().navigate(R.id.action_SecondFragment_to_editingFragment2)
         })
 
+        // Triggered by active gps location source (intenal or external)
         subscriptions.add(locationSubject.subscribe {
             viewModel.checkLocation(it)
+            viewModel.updateMapLocation(it, mMap)
         })
 
+        // triggered by gps location sources on status change
         subscriptions.add(locationSourcesSubject.subscribe {
             // Internal GPS
             if (it.internal == gps_status.valid) {
@@ -360,6 +370,7 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
             gps_switch.isEnabled = (it.internal == gps_status.valid && it.usb == gps_status.valid && !viewModel.isViewDisabled)
         })
 
+        // triggered by change in active location source
         subscriptions.add(activeLocationSourceSubject.subscribe {
             val gps_switch = requireView().findViewById<SwitchCompat>(R.id.gpsSwitch)
             if (it == gps_type.internal) {
@@ -370,40 +381,26 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
                 toastNotificationSubject.onNext("No valid GPS sources found. Exiting data collection")
                 val marker = MarkerObj("Cancel", "")
                 markerSubject.onNext(marker)
-                viewModel.navigationLiveData.value = R.id.action_SecondFragment_to_MainFragment
+                findNavController().navigate(R.id.action_SecondFragment_to_MainFragment)
             }
         })
 
+        // triggered by main activity RSM status change
         subscriptions.add(DataClassesRepository.rsmStatus.subscribe {
             requireView().findViewById<CheckBox>(R.id.checkBox3).isChecked = it
-        })
-
-        subscriptions.add(locationSubject.subscribe {
-            println("updating map")
-            viewModel.updateMapLocation(it, mMap)
         })
     }
 
     override fun onResume() {
         super.onResume()
         addSubscriptions()
-        try {
-            mMapView.onResume()
-        }
-        catch (e: UninitializedPropertyAccessException) {
-            return
-        }
+        try { mMapView.onResume() } catch (e: UninitializedPropertyAccessException) { return }
     }
 
     override fun onPause() {
         super.onPause()
         removeSubscriptions()
-        try {
-            mMapView.onPause()
-        }
-        catch (e: UninitializedPropertyAccessException) {
-            return
-        }
+        try { mMapView.onPause() } catch (e: UninitializedPropertyAccessException) { return }
     }
 
     override fun onDestroy() {
@@ -411,22 +408,12 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
         removeSubscriptions()
         val marker = MarkerObj("Cancel", "")
         markerSubject.onNext(marker)
-        try {
-            mMapView.onDestroy()
-        }
-        catch (e: UninitializedPropertyAccessException) {
-            return
-        }
+        try { mMapView.onDestroy() } catch (e: UninitializedPropertyAccessException) { return }
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        try {
-            mMapView.onLowMemory()
-        }
-        catch (e: UninitializedPropertyAccessException) {
-            return
-        }
+        try { mMapView.onLowMemory() } catch (e: UninitializedPropertyAccessException) { return }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -437,10 +424,7 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
         viewModel.initializeUI(DataClassesRepository.dataCollectionObj)
         ititializeLaneBtns(viewModel.localUIObj.num_lanes, viewModel.localUIObj.data_lane)
 
-        viewModel.navigationLiveData.observe(viewLifecycleOwner, {
-            findNavController().navigate(it)
-        })
-
+        // triggered by change in data logging status (true or false)
         viewModel.dataLog.observe(viewLifecycleOwner, {
             if (it)
                 startDataCollectionUI()
@@ -448,34 +432,38 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
                 stopDataCollectionUI()
         })
 
+        // triggered by change in got reference point status
         viewModel.gotRP.observe(viewLifecycleOwner, {
             if (it)
                 markRefPtUI()
-            // else
-            // TODO: Something??
         })
 
+        // triggered by change in lane closure status
         viewModel.laneStat.observe(viewLifecycleOwner, {
             laneClickedUI(it)
         })
 
+        // TODO: Refactor to not use observable
         viewModel.automaticDetection.observe(viewLifecycleOwner, {
             collectionModeUI()
         })
 
-        // if (!viewModel.automaticDetection) {
+        // Play button
         requireView().findViewById<ImageButton>(R.id.startBtn).setOnClickListener {
             viewModel.startDataCollection()
         }
 
+        // Stop button
         requireView().findViewById<ImageButton>(R.id.endBtn).setOnClickListener {
             viewModel.stopDataCollection()
         }
 
+        // Marker button
         requireView().findViewById<ImageButton>(R.id.ref).setOnClickListener {
             viewModel.markRefPt()
         }
 
+        // Triggered by change in updating map status (true or false)
         viewModel.updatingMap.observe(viewLifecycleOwner, {
             if (it) {
                 requireView().findViewById<Button>(R.id.centerButton).visibility = View.GONE
@@ -493,114 +481,46 @@ class DataCollectionFragment : Fragment(), OnMapReadyCallback {
 
     }
 
+    // Initialize lane buttons display. Hide unused lanes
     private fun ititializeLaneBtns(numLanes: Int, dataLane: Int) {
         println("Data Lane: $dataLane")
-
-        //lane3_ll
-        //laneLine3_4
 
         requireView().findViewById<ImageButton>(R.id.lane1btn).setOnClickListener {
             viewModel.laneClicked(1)
         }
-
-//        val carImageViewparams = requireView().findViewById<ImageView>(R.id.carImageView).layoutParams as ConstraintLayout.LayoutParams
-//        carImageViewparams.endToEnd = buttons[dataLane]
-//        carImageViewparams.startToStart = buttons[dataLane]
-
-        //val drivenStatusText = requireView().findViewById<TextView>(statusList[dataLane])
-        //drivenStatusText.setText(drivenStatusText.text)
-        // println(drivenStatusText.text)
-
-        // val adapter = AdapterView<TextView>(this)
-
-        //drivenStatusText.text = resources.getString(R.string.status_driven)
-        //println(drivenStatusText.text)
-        //drivenStatusText.setTextColor(resources.getColor(R.color.status_driven))
-        //requireView().findViewById<Button>(buttons[dataLane]).isClickable = false
 
         val layout_params = requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams
         layout_params.width = ((requireView().parent as View).width * 0.95 * numLanes/8).toInt()
         println(layout_params.width)
         requireView().findViewById<LinearLayout>(R.id.lanes_ll).layoutParams = layout_params
 
+        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(
+            R.drawable.ic_car
+        ))
 
-        requireView().findViewById<ImageButton>(buttons[dataLane]).setImageDrawable(resources.getDrawable(R.drawable.ic_car))
-
-
-
-
-//        val btn1params = requireView().findViewById<ToggleButton>(R.id.lane1btn).layoutParams as ConstraintLayout.LayoutParams
         if (numLanes <= 1 ) {
+            // This is not possible (based on config file creation method)
             // TODO: Throw exception
             return
         }
         else if (numLanes > 1) {
             for (i in (min(numLanes, 8)+1)..8) {
-                val laneLayout = requireView().findViewById<LinearLayout>(laneLayouts[i])
-                laneLayout.visibility = View.GONE
+                // For (numLanes + 1) -> 8, all unused lanes
 
+                // Hide unused lane button
+                requireView().findViewById<LinearLayout>(laneLayouts[i]).visibility = View.GONE
 
+                // Hide unused lane line
                 requireView().findViewById<ImageView>(laneLines[i-1]).visibility = View.GONE
-
-                //val laneLine = requireView().findViewById<ImageView>(laneLines[i - 1])
-                //laneLine.visibility = View.INVISIBLE
-
-//                val button = requireView().findViewById<ToggleButton>(buttons[i])
-//                button.visibility = View.INVISIBLE
-//                val status = requireView().findViewById<TextView>(statusList[i])
-//                status.visibility = View.INVISIBLE
-//                val textView = requireView().findViewById<TextView>(textViewList[i])
-//                textView.visibility = View.INVISIBLE
             }
             for (i in 2..min(numLanes, 8)) {
-                val button = requireView().findViewById<ImageButton>(buttons[i])
-                button.setOnClickListener {
+                // For 0 -> numLanes, all used lanes
+
+                // Add onclick listeners to lane buttons
+                requireView().findViewById<ImageButton>(buttons[i]).setOnClickListener {
                     viewModel.laneClicked(i)
                 }
             }
         }
-//            btn1params.endToStart = R.id.lane2btn
-//            btn1params.startToStart = 0
-//
-//            for (i in 2..min(numLanes, 4)) {
-//                val button = requireView().findViewById<ToggleButton>(buttons[i])
-//                val params = button.layoutParams as ConstraintLayout.LayoutParams
-//                params.startToEnd = buttons[i - 1]
-//                if (i == numLanes || i == 4) params.endToEnd = 0
-//                else params.endToEnd = buttons[i + 1]
-//                button.visibility = View.VISIBLE
-//                button.setOnClickListener {
-//                    viewModel.laneClicked(i)
-//                }
-//            }
-//
-//            // Second row of lane buttons
-//            if (numLanes == 5) {
-//                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
-//                btn1params.endToEnd = 0
-//                btn1params.startToStart = 0
-//                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
-//            }
-//            else if (numLanes > 5) {
-//                val btn5params = requireView().findViewById<ToggleButton>(R.id.lane5btn).layoutParams as ConstraintLayout.LayoutParams
-//                btn5params.endToStart = R.id.lane6btn
-//                btn5params.startToStart = 0
-//                requireView().findViewById<ToggleButton>(R.id.lane5btn).visibility = View.VISIBLE
-//                for (i in 6..numLanes) {
-//                    val button = requireView().findViewById<ToggleButton>(buttons[i])
-//                    val params = button.layoutParams as ConstraintLayout.LayoutParams
-//                    params.startToEnd = buttons[i - 1]
-//                    if (i == numLanes) params.endToEnd = 0
-//                    else params.endToEnd = buttons[i + 1]
-//                    button.visibility = View.VISIBLE
-//                    button.setOnClickListener {
-//                        viewModel.laneClicked(i)
-//                    }
-//                }
-//            }
-
-//            app:layout_constraintEnd_toEndOf="@+id/lane1btn"
-//            app:layout_constraintStart_toStartOf="@+id/lane1btn"
-//        }
     }
 }
