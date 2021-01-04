@@ -2,25 +2,16 @@ package com.wzdctool.android.repos
 
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.microsoft.azure.storage.CloudStorageAccount
-import com.microsoft.azure.storage.blob.CloudBlob
 import com.microsoft.azure.storage.blob.CloudBlobClient
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import com.microsoft.azure.storage.blob.CloudBlockBlob
 import com.wzdctool.android.Constants
-import com.wzdctool.android.R
 import com.wzdctool.android.dataclasses.*
-import com.wzdctool.android.repos.ConfigurationRepository.activeConfigSubject
 import com.wzdctool.android.repos.ConfigurationRepository.activeWZIDSubject
-import com.wzdctool.android.repos.DataClassesRepository.isInternetAvailable
 import com.wzdctool.android.repos.DataClassesRepository.locationSubject
-import com.wzdctool.android.repos.DataClassesRepository.longToastNotificationSubject
 import com.wzdctool.android.repos.DataClassesRepository.notificationSubject
-import com.wzdctool.android.repos.DataClassesRepository.toastNotificationSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import rx.Subscription
 import rx.subjects.PublishSubject
 import java.io.*
@@ -562,11 +553,11 @@ object DataFileRepository {
         try {
             println("started")
             // Retrieve storage account from connection-string.
-            if (azureInfoRepository.currentConnectionStringSubject.value == null) {
+            if (AzureInfoRepository.currentConnectionStringSubject.value == null) {
                 return false
             }
             val storageAccount: CloudStorageAccount =
-                CloudStorageAccount.parse(azureInfoRepository.currentConnectionStringSubject.value)
+                CloudStorageAccount.parse(AzureInfoRepository.currentConnectionStringSubject.value)
 
             // Create the blob client.
             val blobClient: CloudBlobClient = storageAccount.createCloudBlobClient()

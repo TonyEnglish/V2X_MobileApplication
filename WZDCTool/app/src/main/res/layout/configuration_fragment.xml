@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.configuration.ConfigurationFragment"
+    android:background="@color/background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/toolbar_stuffs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp">
+
+                <TextView
+                    android:id="@+id/activeConfigTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Active Config: NONE"
+                    android:textSize="20sp" />
+            </HorizontalScrollView>
+
+            <LinearLayout
+                android:id="@+id/gps_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/locationSourceOff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Internal GPS"
+                    android:textColor="@color/usb_status_valid"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/gpsSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="0dp"
+                    android:checked="false"
+                    app:layout_anchorGravity="center_horizontal"
+
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <TextView
+                    android:id="@+id/locationSourceOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USB GPS"
+                    android:textColor="@color/usb_status_disconnected"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/guideline2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/gpsSwitch" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/checkbox_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/checkBox2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:checked="true"
+                    android:enabled="false"
+                    android:text="WZDx"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/checkBox3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:enabled="false"
+                    android:text="RSM"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/help_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_baseline_help_24"
+            app:layout_constraintBottom_toTopOf="@+id/titleGuideline"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/textview_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="Configuration Page"
+            android:textColor="@color/text"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/titleGuideline" />
+
+        <Button
+            android:id="@+id/startDataCollectionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:backgroundTint="@color/colorAccent"
+            android:enabled="false"
+            android:text="@string/next"
+            android:textColor="@color/button_text"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/configSpinner" />
+
+        <Spinner
+            android:id="@+id/configSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="@color/colorAccent"
+            android:entries="@array/config_files"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/configSpinnerGuideline"
+            tools:listitem="@layout/support_simple_spinner_dropdown_item" />
+
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/spinner_ll"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="@+id/guideline4">-->
+
+
+        <!--            <ImageButton-->
+        <!--                android:id="@+id/refreshButton"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:src="@drawable/ic_refresh_small"-->
+        <!--                android:backgroundTint="@color/colorAccent"/>-->
+
+        <!--            <Spinner-->
+        <!--                android:id="@+id/spinner2"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_marginStart="5dp"-->
+        <!--                android:layout_marginLeft="5dp"-->
+        <!--                android:layout_marginEnd="5dp"-->
+        <!--                android:layout_marginRight="5dp"-->
+        <!--                android:layout_marginBottom="30dp"-->
+        <!--                android:entries="@array/config_files"-->
+        <!--                tools:listitem="@layout/support_simple_spinner_dropdown_item"-->
+        <!--                android:backgroundTint="@color/colorAccent"/>-->
+        <!--        </LinearLayout>-->
+
+
+        <!--        <Button-->
+        <!--            android:id="@+id/import_config"-->
+        <!--            android:layout_width="200dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:backgroundTint="@color/colorAccent"-->
+        <!--            android:drawableLeft="@drawable/ic_baseline_arrow_downward_24"-->
+        <!--            android:text="Import Config"-->
+        <!--            android:textColor="@color/text"-->
+        <!--            android:textSize="18sp"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="@+id/guideline4" />-->
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/configSpinnerGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="325dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/titleGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="120dp" />
+
+        <TextView
+            android:id="@+id/detectionModeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Start and End of Data Collection"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/collectionModeSwitchGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline8" />
+
+        <TextView
+            android:id="@+id/manualDetectionModeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:layout_marginRight="48dp"
+            android:gravity="center"
+            android:text="Manual"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toStartOf="@+id/collectionModeSwitchGuideline"
+            app:layout_constraintTop_toTopOf="@+id/guideline8" />
+
+        <TextView
+            android:id="@+id/automaticDetectionModeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:gravity="center"
+            android:text="Automatic"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/collectionModeSwitchGuideline"
+            app:layout_constraintTop_toTopOf="@+id/guideline8" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="240dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

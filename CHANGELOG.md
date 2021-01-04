@@ -1,3 +1,8 @@
+12/14/2020
+- Refactored application files
+- Updated lane open/closed icons
+- Updated data collection UI logic
+
 11/24/2020
 - Updated application icon
 - Improved GPS detection

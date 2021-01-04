@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment2_rl"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.data_collection.DataCollectionFragment">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/centerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Re-Center"
+        android:textSize="16sp"
+        android:layout_alignParentEnd="true"
+        android:visibility="invisible"
+        android:layout_below="@+id/toolbar_stuffs"/>
+
+    <ImageButton
+        android:id="@+id/zoomInButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_map_plus"
+        android:scaleType="fitCenter"
+        android:backgroundTint="@color/colorAccent"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/centerButton"/>
+
+    <ImageButton
+        android:id="@+id/zoomOutButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_map_minus"
+        android:backgroundTint="@color/colorAccent"
+        android:scaleType="fitCenter"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/zoomInButton"/>
+
+    <LinearLayout
+        android:id="@+id/toolbar_stuffs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="?attr/colorPrimary"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/gps_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/locationSourceOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Internal GPS"
+                android:textColor="@color/usb_status_valid"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/gpsSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:checked="false"
+                app:layout_anchorGravity="center_horizontal"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            <TextView
+                android:id="@+id/locationSourceOn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USB GPS"
+                android:textColor="@color/usb_status_disconnected"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/guideline2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/gpsSwitch" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/checkbox_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WZDx"
+                android:checked="true"
+                android:textSize="20sp"
+                android:enabled="false"
+                android:layout_marginRight="30dp"/>
+
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RSM"
+                android:checked="true"
+                android:textSize="20sp"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/automaticStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:text="Waiting To Reach Start Point"
+                android:textAlignment="center"
+                android:textColor="@color/text" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/button_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#20FFFFFF"
+        android:backgroundTint="@color/background"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/lanes_ll_background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:layout_marginHorizontal="3dp"
+            android:background="@color/colorAccentGreyTransparent">
+            <LinearLayout
+                android:id="@+id/lanes_ll"
+                android:layout_width="350dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:orientation="horizontal">
+
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.0085"-->
+                <!--                android:layout_marginStart="5dp"-->
+                <!--                android:background="#FFFF00">-->
+                <!--            </FrameLayout>-->
+
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.02"-->
+                <!--                android:background="#444444">-->
+                <!--            </FrameLayout>-->
+
+                <!--            <FrameLayout-->
+                <!--                android:layout_width="0sp"-->
+                <!--                android:layout_height="match_parent"-->
+                <!--                android:layout_weight="0.0085"-->
+                <!--                android:background="#FFFF00">-->
+                <!--            </FrameLayout>-->
+
+                <ImageView
+                    android:id="@+id/lane_line_0_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.01"
+                    android:src="@drawable/ic_yellow_lane_line">
+                </ImageView>
+
+                <!-- Lane 1 -->
+                <LinearLayout
+                    android:id="@+id/lane1_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane1btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_1_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+<!--                <FrameLayout>-->
+<!--                </FrameLayout>-->
+
+                <!-- Lane 2 -->
+                <LinearLayout
+                    android:id="@+id/lane2_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane2btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_2_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 3 -->
+                <LinearLayout
+                    android:id="@+id/lane3_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane3btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_3_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 4 -->
+                <LinearLayout
+                    android:id="@+id/lane4_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/lane4btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_4_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 5 -->
+                <LinearLayout
+                    android:id="@+id/lane5_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane5btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_5_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 6 -->
+                <LinearLayout
+                    android:id="@+id/lane6_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane6btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_6_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 7 -->
+                <LinearLayout
+                    android:id="@+id/lane7_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane7btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/lane_line_7_8"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:layout_weight="0.008"
+                    android:src="@drawable/ic_lane_line">
+
+                </ImageView>
+
+                <!-- Lane 8 -->
+                <LinearLayout
+                    android:id="@+id/lane8_ll"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.115"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/lane8btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#00FFFFFF"
+                        android:scaleType="fitCenter"
+                        android:enabled="false"
+                        android:src="@drawable/ic_lane_arrow"
+                        tools:src="@drawable/ic_lane_arrow" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Layout for lane UI components -->
+
+
+        <LinearLayout
+            android:id="@+id/manual_buttons_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+
+            <ImageButton
+                android:id="@+id/wp"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/colorAccent"
+                android:src="@drawable/ic_construction_worker_bw"
+                android:enabled="false"
+                android:visibility="gone"
+                android:textColor="@color/button_text" />
+
+            <ImageButton
+                android:id="@+id/startBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:backgroundTint="@color/colorAccent"
+                android:src="@drawable/ic_baseline_play_arrow_24"
+                android:textColor="@color/button_text"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/ref"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:backgroundTint="@color/colorAccent"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_pin_drop_24"
+                android:textColor="@color/button_text" />
+
+            <ImageButton
+                android:id="@+id/endBtn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.33"
+                android:backgroundTint="@color/primary_active"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_stop_24"
+                android:textColor="@color/button_text" />
+
+            <LinearLayout
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:background="#f0f0f0"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/overlayText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.33"
+                    android:gravity="center"
+                    android:text="Finalizing Data Collection"
+                    android:textSize="20sp"
+                    android:visibility="visible"
+                    android:paddingVertical="20dp"
+                    android:textColor="@color/button_text" />
+
+                <ProgressBar
+                    android:id="@+id/overlayProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="20dp">
+
+                </ProgressBar>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
