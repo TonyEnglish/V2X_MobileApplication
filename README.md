@@ -16,6 +16,7 @@ This repository contains the following components:
 ### Related Projects
 
 - [Work Zone Data Collection Tool](https://github.com/TonyEnglish/V2X-manual-data-collection)
+- [V2X Website](https://github.com/TonyEnglish/V2X_Website)
 - [V2X Azure Functions](https://github.com/TonyEnglish/V2X_AzureFunctions)
 
 ## Prerequisites
@@ -25,6 +26,8 @@ Internet access (Loading configuration files and uploading path data)
 
 ## Usage
 This application is located on the Google play store: [WZDC Tool](https://play.google.com/store/apps/details?id=com.wzdctool.android)
+
+This application was designed to run alongside a custom TMC website. This site is not hosted publicly, but can be self-hosted using this repository: [V2X Website](https://github.com/TonyEnglish/V2X_Website)
 
 ### Building
 
@@ -46,7 +49,7 @@ Contact [tony@neaeraconsulting.com](mailto://tony@neaeraconsulting.com) to reque
 
 #### Step 1: Download Configuration Files
 Mapping a work zone requires that the corresponding configuration file is downloaded. This file contains basic information such as the number of lanes and the driven lane during data collection. 
-Configuration files must be downloaded before the start of data collection. This is done through the Download Config Files page. Simply select the config files that you would like to download and press sync. All local config files will be deleted when new config files will be downloaded. A configuration file can be created at https://neaeraconsulting.com/V2X_ConfigCreator.
+Configuration files must be downloaded before the start of data collection. This is done through the Download Config Files page. Simply select the config files that you would like to download and press sync. All local config files will be deleted when new config files will be downloaded.
 
 #### Step 2: Map Work Zone: Configuration
 At the top of the screen, there are 3 elements. The highest is a textbox labeled Active Config. This displays the work zone id of the active configuration file. The next element is a slider showing Internal GPS and USb GPS. Each GPS type ahs the following stats
@@ -95,7 +98,7 @@ This visualization shows the recorded path data (small purple dots), Lane closur
 #### Step 5: Upload Path Data
 After mapping a work zone, a data file will be saved to the device. A new data file is created for each distinct mapped work zone. These must be manually uploaded. This is done from the main page, by pressing the Upload Data Files button. This button will only be enabled if work zone maps are present on the device. 
 All of the data files will be pre-selected. Simply press a list item to toggle its selection. There are Select All and Deselect All buttons at the top. To upload all selected data files, simply press the Upload button at the bottom of the screen. Uploaded data files will be removed from the device and can no longer be visualized locally. 
-The next step is to move to the verification page of the associated website, https://neaeraconsulting.com/V2X_Verification. This page allows advanced visualization of work zones, as well as editing and publishing.
+
 
 ## Additional Notes
 
